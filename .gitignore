@@ -16,6 +16,9 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 
+# Documentos markdown
+docs/technical-design.md
+
 # Variables de entorno y secretos
 .env
 .env.*
