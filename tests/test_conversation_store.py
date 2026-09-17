@@ -6,7 +6,7 @@ Covers: save/load, TTL expiry, delete, and cleanup.
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from unittest.mock import patch
 from uuid import uuid4
@@ -30,7 +30,7 @@ def _make_run(conversation_id=None) -> ConversationRun:
         criterios=CriteriosBusqueda(tarea="codigo", vram_gb=11.0),
         candidatos_elegibles=[],
         historial=[],
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
     )
 
 
@@ -97,21 +97,21 @@ class TestTTL:
     def test_expired_run_returns_none(self) -> None:
         run = _make_run()
         # Set created_at to 25 hours ago
-        run.created_at = datetime.utcnow() - timedelta(hours=25)
+        run.created_at = datetime.now(UTC) - timedelta(hours=25)
         conversation_store.guardar(run)
         loaded = conversation_store.cargar(run.conversation_id)
         assert loaded is None
 
     def test_fresh_run_returns_ok(self) -> None:
         run = _make_run()
-        run.created_at = datetime.utcnow() - timedelta(hours=23)
+        run.created_at = datetime.now(UTC) - timedelta(hours=23)
         conversation_store.guardar(run)
         loaded = conversation_store.cargar(run.conversation_id)
         assert loaded is not None
 
     def test_exactly_at_ttl_returns_none(self) -> None:
         run = _make_run()
-        run.created_at = datetime.utcnow() - timedelta(hours=24, minutes=1)
+        run.created_at = datetime.now(UTC) - timedelta(hours=24, minutes=1)
         conversation_store.guardar(run)
         loaded = conversation_store.cargar(run.conversation_id)
         assert loaded is None
@@ -139,9 +139,9 @@ class TestEliminar:
 class TestLimpiarExpiradas:
     def test_deletes_expired(self) -> None:
         fresh = _make_run()
-        fresh.created_at = datetime.utcnow() - timedelta(hours=1)
+        fresh.created_at = datetime.now(UTC) - timedelta(hours=1)
         expired = _make_run()
-        expired.created_at = datetime.utcnow() - timedelta(hours=25)
+        expired.created_at = datetime.now(UTC) - timedelta(hours=25)
 
         conversation_store.guardar(fresh)
         conversation_store.guardar(expired)
@@ -153,7 +153,7 @@ class TestLimpiarExpiradas:
 
     def test_returns_zero_when_nothing_expired(self) -> None:
         run = _make_run()
-        run.created_at = datetime.utcnow()
+        run.created_at = datetime.now(UTC)
         conversation_store.guardar(run)
         deleted = conversation_store.limpiar_expiradas()
         assert deleted == 0

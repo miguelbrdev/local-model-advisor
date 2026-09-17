@@ -7,7 +7,7 @@ Rows older than 24 hours are treated as expired (TTL).
 from __future__ import annotations
 
 import sqlite3
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from uuid import UUID
 
@@ -62,7 +62,7 @@ def cargar(conversation_id: UUID) -> ConversationRun | None:
         return None
 
     created_at = datetime.fromisoformat(row[1])
-    if datetime.utcnow() - created_at > timedelta(hours=_TTL_HOURS):
+    if datetime.now(UTC) - created_at > timedelta(hours=_TTL_HOURS):
         eliminar(conversation_id)
         return None
 
@@ -81,7 +81,7 @@ def eliminar(conversation_id: UUID) -> None:
 def limpiar_expiradas() -> int:
     """Delete rows older than TTL. Returns count deleted."""
     conn = _conn()
-    cutoff = (datetime.utcnow() - timedelta(hours=_TTL_HOURS)).isoformat()
+    cutoff = (datetime.now(UTC) - timedelta(hours=_TTL_HOURS)).isoformat()
     cursor = conn.execute(
         "DELETE FROM conversation_runs WHERE created_at < ?", (cutoff,)
     )

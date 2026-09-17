@@ -6,7 +6,7 @@ structured — no semantic evidence ever affects scores.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Literal
 from uuid import UUID, uuid4
 
@@ -137,7 +137,7 @@ class ConversationRun(BaseModel):
     criterios: CriteriosBusqueda = Field(default_factory=CriteriosBusqueda)
     candidatos_elegibles: list[CandidatoRankeado] = Field(default_factory=list)
     historial: list[TurnoConversacion] = Field(default_factory=list)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 # ---------------------------------------------------------------------------
