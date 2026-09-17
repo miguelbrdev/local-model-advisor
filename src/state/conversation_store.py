@@ -6,6 +6,7 @@ Rows older than 24 hours are treated as expired (TTL).
 
 from __future__ import annotations
 
+import os
 import sqlite3
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -13,7 +14,8 @@ from uuid import UUID
 
 from src.models.schemas import ConversationRun
 
-_DB_PATH = Path("data/conversations.db")
+_DEFAULT_DB_PATH = Path("runtime/conversations.db")
+_DB_PATH = Path(os.environ.get("CONVERSATION_DB_PATH", str(_DEFAULT_DB_PATH)))
 _TTL_HOURS = 24
 
 

@@ -28,6 +28,8 @@ docs/technical-design.md
 *.db
 *.sqlite
 *.sqlite3
+runtime/
+data/conversations.db
 
 # Datos persistentes de Qdrant cuando lo añadas
 qdrant_data/
