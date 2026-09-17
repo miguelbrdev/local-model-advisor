@@ -1,0 +1,94 @@
+# Minimum seed catalogue for Semana 0 vertical slice.
+# Only code-focused families that are well-represented on canirun.ai.
+# Each entry maps to a canirun.ai model id for VRAM compatibility checks.
+
+- familia_id: qwen2.5-coder
+  variantes: ["1.5B", "7B", "14B", "32B"]
+  pipeline_tag: code
+  license_declarada: Apache 2.0
+  idiomas_detectados:
+    - en
+    - es
+    - zh
+    - fr
+    - de
+    - ja
+    - ko
+    - pt
+    - ru
+    - ar
+    - it
+    - nl
+    - pl
+    - tr
+    - vi
+    - cs
+  formatos_disponibles: [gguf]
+  canirun_id: qwen2.5-coder-7b
+
+- familia_id: qwen3-coder
+  variantes: ["30B-A3B", "480B-A35B"]
+  pipeline_tag: code
+  license_declarada: Apache 2.0
+  idiomas_detectados:
+    - en
+    - es
+    - zh
+    - fr
+    - de
+    - ja
+    - ko
+    - pt
+    - ru
+    - it
+    - nl
+  formatos_disponibles: [gguf]
+  canirun_id: qwen3-coder-30b
+
+- familia_id: deepseek-v4-flash
+  variantes: ["158B"]
+  pipeline_tag: code
+  license_declarada: MIT
+  idiomas_detectados:
+    - en
+    - es
+    - zh
+    - fr
+    - de
+    - ja
+    - ko
+    - pt
+  formatos_disponibles: [gguf]
+  canirun_id: deepseek-v4-flash
+
+- familia_id: mistral-small
+  variantes: ["24B"]
+  pipeline_tag: code
+  license_declarada: Apache 2.0
+  idiomas_detectados:
+    - en
+    - es
+    - zh
+    - fr
+    - de
+    - ja
+    - ko
+    - pt
+    - ru
+    - it
+  formatos_disponibles: [gguf]
+  canirun_id: mistral-small-24b
+
+- familia_id: ornith-1.0
+  variantes: ["9B", "35B-A3B"]
+  pipeline_tag: code
+  license_declarada: MIT
+  idiomas_detectados:
+    - en
+    - es
+    - zh
+    - fr
+    - de
+    - ja
+  formatos_disponibles: [gguf]
+  canirun_id: ornith-1.0-9b
