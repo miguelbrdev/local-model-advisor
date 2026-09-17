@@ -27,11 +27,22 @@ def ejecutar_pipeline(
     Args:
         criterios: User search criteria.
         familias: Override catalogue (uses seed YAML if ``None``).
-        top_n: Number of top candidates to return.
+        top_n: Number of top candidates to return. Must be >= 0.
+            When ``top_n`` exceeds the number of eligible candidates, all
+            candidates are returned. When ``top_n`` is 0, an empty list is
+            returned.
+
+    Raises:
+        ValueError: If ``top_n`` is negative.
 
     Returns:
         Top N ranked candidates sorted by score descending.
     """
+    if top_n < 0:
+        raise ValueError(f"top_n must be >= 0, got {top_n}")
+    if top_n == 0:
+        return []
+
     if familias is None:
         familias = load_seed()
 
