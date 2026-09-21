@@ -1,0 +1,49 @@
+version: "1.0.0"
+description: >
+  Local policy that defines which canIRun.ai categories map to internal
+  tasks, which tags are informational, and minimum validity rules for
+  importing external model records.
+
+source:
+  endpoint: "https://www.canirun.ai/api/models"
+  sync_interval_days: 21
+
+# Mapping from external useCase tags to internal task identifiers.
+# Keys are external tags, values are lists of internal tasks.
+# A model qualifies for a task if ANY of its useCase tags match a key.
+use_case_mapping:
+  chat:
+    - chat
+  code:
+    - codigo
+  reasoning:
+    - razonamiento
+
+# Tags that are preserved as informational metadata but do not
+# map to any internal task.
+informational_tags:
+  - multilingual
+  - edge
+  - rag
+
+# useCase tags that are out of scope for v1.
+# Models whose useCase contains ONLY these tags are excluded.
+out_of_scope_tags:
+  - vision
+  - image
+  - video
+  - embeddings
+  - rerankers
+
+# Minimum validity rules for a record to be importable.
+validity_rules:
+  require_non_empty_id: true
+  require_unique_id: true
+  require_at_least_one_supported_task: true
+
+# Extension point for future license classification.
+# Not enforced in v1 — placeholder for documentation and testing.
+license_policy:
+  commercial_allowed: []
+  commercial_restricted: []
+  unknown: []

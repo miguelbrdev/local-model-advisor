@@ -1,0 +1,89 @@
+{
+  "count": 6,
+  "models": [
+    {
+      "id": "qwen2.5-coder-7b",
+      "name": "Qwen 2.5 Coder 7B",
+      "provider": "Alibaba",
+      "family": "Qwen",
+      "params": "7B",
+      "paramsBillions": 7,
+      "architecture": "dense",
+      "releaseDate": "2024-11",
+      "contextLength": 131072,
+      "useCase": ["code"],
+      "url": "https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct",
+      "license": "Apache 2.0"
+    },
+    {
+      "id": "llama3.1-8b",
+      "name": "Llama 3.1 8B",
+      "provider": "Meta",
+      "family": "Llama",
+      "params": "8B",
+      "paramsBillions": 8,
+      "architecture": "dense",
+      "releaseDate": "2024-07",
+      "contextLength": 131072,
+      "useCase": ["chat", "code", "reasoning"],
+      "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
+      "license": "Llama 3.1 Community"
+    },
+    {
+      "id": "deepseek-r1-7b",
+      "name": "DeepSeek R1 Distill 7B",
+      "provider": "DeepSeek",
+      "family": "DeepSeek",
+      "params": "7B",
+      "paramsBillions": 7,
+      "architecture": "dense",
+      "releaseDate": "2025-01",
+      "contextLength": 65536,
+      "useCase": ["reasoning"],
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+      "license": "MIT"
+    },
+    {
+      "id": "qwen3-8b",
+      "name": "Qwen 3 8B",
+      "provider": "Alibaba",
+      "family": "Qwen",
+      "params": "8B",
+      "paramsBillions": 8,
+      "architecture": "dense",
+      "releaseDate": "2025-04",
+      "contextLength": 131072,
+      "useCase": ["chat", "code", "reasoning", "multilingual"],
+      "url": "https://huggingface.co/Qwen/Qwen3-8B",
+      "license": "Apache 2.0"
+    },
+    {
+      "id": "flux2-dev",
+      "name": "FLUX.2 Dev",
+      "provider": "Black Forest Labs",
+      "family": "FLUX.2",
+      "params": "12B",
+      "paramsBillions": 12,
+      "architecture": "dense",
+      "releaseDate": "2025-06",
+      "contextLength": 4096,
+      "useCase": ["image"],
+      "url": "https://huggingface.co/black-forest-labs/FLUX.2-dev",
+      "license": "FLUX Non-Commercial"
+    },
+    {
+      "id": "wan2.1-t2v-1.3b",
+      "name": "Wan 2.1 T2V 1.3B",
+      "provider": "Tencent",
+      "family": "Wan",
+      "params": "1.3B",
+      "paramsBillions": 1.3,
+      "architecture": "dense",
+      "releaseDate": "2025-03",
+      "contextLength": 4096,
+      "useCase": ["video"],
+      "url": "https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B",
+      "license": "Tencent Hunyuan Community"
+    }
+  ]
+}

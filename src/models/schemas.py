@@ -17,7 +17,12 @@ from pydantic import BaseModel, Field
 # ---------------------------------------------------------------------------
 
 class FamiliaModelo(BaseModel):
-    """A curated model family with its variants and metadata."""
+    """A curated model family with its variants and metadata.
+
+    Fields marked *sync* are populated during catalogue synchronisation
+    from canIRun.ai.  Fields left as ``None``/``[]`` are not available
+    in the external source and may be enriched later.
+    """
 
     familia_id: str
     variantes: list[str]
@@ -27,6 +32,27 @@ class FamiliaModelo(BaseModel):
     idiomas_detectados: list[str] | None = None
     formatos_disponibles: list[str] = Field(default_factory=list)
     canirun_id: str | None = None  # mapping to canirun.ai model id
+    # --- extended fields (populated by sync normaliser) ---
+    tareas_soportadas: list[str] = Field(default_factory=list)
+    """Internal task identifiers this model qualifies for (e.g. ``["chat", "code"]``)."""
+    tags_informativos: list[str] = Field(default_factory=list)
+    """Non-task tags preserved from the external source (e.g. ``["multilingual"]``)."""
+    nombre_mostrado: str | None = None
+    """Human-readable display name from the external source."""
+    proveedor: str | None = None
+    """Model provider or author."""
+    familia_origen: str | None = None
+    """External family grouping (e.g. ``"Qwen"``)."""
+    parametros_b: float | None = None
+    """Parameter count in billions."""
+    parametros_texto: str | None = None
+    """Parameter count as a human-readable string (e.g. ``"7B"``)."""
+    arquitectura: str | None = None
+    """Model architecture (``"dense"`` or ``"moe"``)."""
+    fecha_lanzamiento: str | None = None
+    """Release date in ``YYYY-MM`` format."""
+    contexto_maximo: int | None = None
+    """Maximum context length in tokens."""
 
 
 # ---------------------------------------------------------------------------
@@ -76,7 +102,7 @@ class CriteriosBusqueda(BaseModel):
     the rest has sensible defaults.
     """
 
-    tarea: Literal["chat", "codigo", "razonamiento", "embeddings", "rerankers"] | None = (
+    tarea: Literal["chat", "codigo", "razonamiento"] | None = (
         None
     )
     vram_gb: float | None = None

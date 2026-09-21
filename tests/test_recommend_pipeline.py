@@ -255,7 +255,7 @@ class TestNoCandidates:
             "src.chains.recommend_pipeline.elegir_provider", return_value=provider
         ):
             results = ejecutar_pipeline(
-                criterios=_criterios(tarea="embeddings"),
+                criterios=_criterios(tarea="chat"),
                 familias=[FAMILIA_A, FAMILIA_C],
             )
 
