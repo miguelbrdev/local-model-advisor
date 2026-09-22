@@ -65,7 +65,7 @@ El vertical slice implementado tiene estas limitaciones respecto al diseño fina
 ## Implementación
 
 - Usa Python, FastAPI y Pydantic v2.
-- Conserva la estructura de carpetas definida en `README.md` y `docs/technical-design.md`.
+- Conserva la estructura de carpetas definida en `README.md`.
 - Implementa cambios pequeños, cohesionados y verificables.
 - Prioriza contratos tipados, separación de responsabilidades e interfaces desacopladas mediante `Protocol` cuando haya proveedores intercambiables.
 - El pipeline de recomendación debe depender de una abstracción de catálogo, no de una ruta YAML concreta. Las implementaciones pueden incluir un catálogo semilla para tests y un repositorio de snapshots sincronizados para producción. **Pendiente**: el loader actual todavía lee directamente `families_seed.yaml`.
