@@ -16,7 +16,7 @@ Embeddings, rerankers, clasificación de imágenes, generación de imagen/vídeo
 
 El vertical slice implementado tiene estas limitaciones respecto al diseño final:
 
-- **Catálogo activo**: `families_seed.yaml` con 5 familias de código. No existe `runtime/catalog/` ni `runtime/catalog/current`. No hay sincronización automática desde canIRun.ai.
+- **Catálogo activo**: `families_seed.yaml` con 5 familias de código. Existe `data/catalog_bootstrap.json`, copia versionada del primer snapshot real validado de canIRun.ai (`CatalogSnapshot` completo con `SnapshotMeta`), y `runtime/catalog/` con el snapshot en ejecución (ignorado por Git, prioridad en tiempo de ejecución). No hay sincronización automática recurrente desde canIRun.ai. **El fallback del pipeline pasará a ser `data/catalog_bootstrap.json`, no `families_seed.yaml`** (este último se conserva temporalmente hasta la migración del pipeline).
 - **Entrada**: JSON estructurado. El usuario envía `tarea`, `vram_gb`, `idiomas_requeridos`, `runtime_preferido` como campos directos. No se interpreta lenguaje natural.
 - **`snapshot_id`**: el campo existe en el esquema `ConversationRun` pero se envía vacío o con valor por defecto — no se persiste porque no hay sincronización que lo genere.
 - **Tareas**: solo código funciona correctamente (el seed solo tiene modelos de código). Si se solicita `chat` o `razonamiento`, el sistema debe informar de que el catálogo para esas tareas aún no está sincronizado.
