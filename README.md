@@ -1,5 +1,15 @@
 # Local Model Advisor
 
+> **⚠️ Documentation status**: this README is **historical and may be outdated** —
+> it is **not the source of truth**. It still describes the Week 0 state
+> (113 tests, seed-only catalog, no synchronization). The real status of the
+> project is documented in [`AGENTS.md`](AGENTS.md) and
+> [`docs/technical-design.md`](docs/technical-design.md).
+> Current facts: **248 automated tests**; catalog synchronization with
+> canIRun.ai is implemented (`src/sync/`), with a validated real snapshot and a
+> versioned bootstrap catalog (`data/catalog_bootstrap.json`); loading that
+> catalog into the pipeline and the recurring scheduler are still pending.
+
 Local Model Advisor is a local FastAPI service that recommends Hugging Face
 models according to a user's task, available VRAM, language requirements,
 runtime preference, and commercial-license needs.
@@ -30,7 +40,7 @@ Implemented:
 - Real VRAM compatibility lookup through canirun.ai
 - Deterministic multi-criteria ranking with explicit sub-scores
 - SQLite-backed server-side conversation state with a 24-hour TTL
-- 113 automated tests and Ruff linting
+- 113 automated tests and Ruff linting *(historical figure — now 248; see banner above)*
 
 Not implemented yet:
 

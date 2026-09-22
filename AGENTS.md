@@ -12,29 +12,37 @@ La v1 solo admite estas tareas:
 
 Embeddings, rerankers, clasificación de imágenes, generación de imagen/vídeo, búsqueda web, despliegue cloud y análisis de imágenes están fuera del alcance de la v1, salvo instrucción explícita del usuario.
 
-## Estado actual (Semana 0)
+## Estado actual (Semana 0–1)
+
+> **Bootstrap implementado; integración runtime → bootstrap → loader pendiente.**
 
 El vertical slice implementado tiene estas limitaciones respecto al diseño final:
 
-- **Catálogo activo**: `families_seed.yaml` con 5 familias de código. Existe `data/catalog_bootstrap.json`, copia versionada del primer snapshot real validado de canIRun.ai (`CatalogSnapshot` completo con `SnapshotMeta`), y `runtime/catalog/` con el snapshot en ejecución (ignorado por Git, prioridad en tiempo de ejecución). No hay sincronización automática recurrente desde canIRun.ai. **El fallback del pipeline pasará a ser `data/catalog_bootstrap.json`, no `families_seed.yaml`** (este último se conserva temporalmente hasta la migración del pipeline).
+- **Estado de la sincronización** (separar tres cosas):
+  - **Sincronización y persistencia**: **implementadas y testeadas**. `src/sync/` (descarga desde `GET /api/models`, política versionada, normalización, hash SHA-256, escritura atómica de snapshot en `runtime/catalog/`, puntero `current`, promoción a bootstrap). Existe el primer snapshot real validado (`snap-176d40242fd0157a`: 104 modelos de origen, 91 incluidos, 13 excluidos, todos `out_of_scope`) y su copia versionada `data/catalog_bootstrap.json`.
+  - **Carga del catálogo en el pipeline**: **pendiente**. `recommend_pipeline.py` sigue cargando `data/families_seed.yaml` vía `load_seed()`; aún no lee `runtime/catalog/current` ni hace fallback a `data/catalog_bootstrap.json`.
+  - **Scheduler recurrente (cada 21 días)**: **pendiente**. No hay `scripts/sync_catalog.py` ni tarea programada; la sincronización se ha ejecutado manualmente una única vez.
+- **Catálogo activo en el pipeline**: `families_seed.yaml` con 5 familias de código, **retenido temporalmente como transición** hasta la migración del loader. El catálogo en ejecución es `runtime/catalog/` (ignorado por Git, prioridad en tiempo de ejecución cuando el loader exista); el fallback versionado será `data/catalog_bootstrap.json`, **no** `families_seed.yaml`.
 - **Entrada**: JSON estructurado. El usuario envía `tarea`, `vram_gb`, `idiomas_requeridos`, `runtime_preferido` como campos directos. No se interpreta lenguaje natural.
-- **`snapshot_id`**: el campo existe en el esquema `ConversationRun` pero se envía vacío o con valor por defecto — no se persiste porque no hay sincronización que lo genere.
-- **Tareas**: solo código funciona correctamente (el seed solo tiene modelos de código). Si se solicita `chat` o `razonamiento`, el sistema debe informar de que el catálogo para esas tareas aún no está sincronizado.
-- **Mapeo de IDs**: `CanIRunProvider` usa el campo `canirun_id` del seed YAML. Cuando la sincronización esté implementada, el identificador canónico se conservará directamente desde el catálogo de canIRun.ai, sin tabla de mapeo manual.
+- **`snapshot_id`**: el campo existe en el esquema `ConversationRun` pero se envía vacío o con valor por defecto — la sincronización ya genera snapshots con `snapshot_id` (`snap-…`), pero el pipeline aún no lo lee ni lo persiste por conversación.
+- **Tareas**: solo código funciona correctamente en el pipeline (el seed solo tiene modelos de código). Si se solicita `chat` o `razonamiento`, el sistema debe informar de que el catálogo para esas tareas aún no está sincronizado **en el pipeline** (el bootstrap ya contiene modelos de esas tareas, pero no está conectado).
+- **Mapeo de IDs**: `CanIRunProvider` usa el campo `canirun_id` del seed YAML. El identificador canónico ya se conserva directamente desde el catálogo sincronizado de canIRun.ai en los snapshots; la conexión al pipeline sigue pendiente y no habrá tabla de mapeo manual.
 
 ## Catálogo sincronizado
 
 - canIRun.ai es la fuente externa de catálogo para la v1.
 - El catálogo de producción no se mantiene manualmente familia por familia.
 - Un proceso de sincronización obtiene el catálogo desde `GET /api/models`, filtra solo las categorías soportadas, normaliza los registros al modelo interno `FamiliaModelo`, los valida y guarda un snapshot local.
-- El proceso se ejecutará externamente cada 21 días; no implementes un scheduler recurrente dentro del proceso FastAPI.
+- El proceso se ejecutará externamente cada 21 días; no implementes un scheduler recurrente dentro del proceso FastAPI. **Aún no existe** el script ni la tarea programada: hasta entonces la sincronización es manual.
 - La API nunca debe descargar el catálogo completo durante `POST /chat`. Debe usar el último snapshot local válido.
 - Si la sincronización falla, la API debe conservar y usar el snapshot anterior válido; nunca debe borrar o sustituir el catálogo actual antes de validar completamente el nuevo.
 - Las categorías, campos y valores de use case de canIRun.ai deben verificarse contra la respuesta real de la API. No inventes ni hardcodees nombres de campos externos sin documentar el contrato observado.
 - La política local versionada define qué categorías externas se incluyen, cómo se mapean a `chat`, `codigo` y `razonamiento`, y qué campos son obligatorios.
 - La sincronización solo excluye: categorías fuera de alcance, registros sin identificador canónico válido, duplicados no resolubles, y registros imposibles de normalizar. **No excluye** por tamaño del modelo, licencia desconocida, idiomas desconocidos, runtime desconocido ni falta de benchmark. Estos campos se mantienen como opcionales en el snapshot y se filtran o aplican como limitaciones en tiempo de recomendación, no en tiempo de sincronización.
-- El snapshot debe incluir identificador, hash, fecha de sincronización, número de modelos de origen, número de modelos incluidos y motivos de exclusión.
-- Cada conversación debe registrar el identificador del snapshot de catálogo usado para preservar reproducibilidad.
+- El snapshot debe incluir identificador, hash, fecha de sincronización, número de modelos de origen, número de modelos incluidos y motivos de exclusión. **Implementado**: `SnapshotMeta` en `src/sync/snapshot.py` con escritura atómica (archivo temporal + `os.replace`) y validación round-trip testeada.
+- Al promover un snapshot a `data/catalog_bootstrap.json` se conserva el `snapshot_id` original dentro del `CatalogSnapshot` (`snap-176d40242fd0157a`); **no** se genera un id `seed-<hash>` para el bootstrap.
+- Cada conversación debe registrar el identificador del snapshot de catálogo usado para preservar reproducibilidad (**pendiente de persistir en el pipeline**).
+- Suite actual: **248 tests** (`python -m pytest`) + `python -m ruff check .` en verde.
 
 ## LangChain y Ollama
 
@@ -60,7 +68,7 @@ El vertical slice implementado tiene estas limitaciones respecto al diseño fina
 - Conserva la estructura de carpetas definida en `README.md` y `docs/technical-design.md`.
 - Implementa cambios pequeños, cohesionados y verificables.
 - Prioriza contratos tipados, separación de responsabilidades e interfaces desacopladas mediante `Protocol` cuando haya proveedores intercambiables.
-- El pipeline de recomendación debe depender de una abstracción de catálogo, no de una ruta YAML concreta. Las implementaciones pueden incluir un catálogo semilla para tests y un repositorio de snapshots sincronizados para producción.
+- El pipeline de recomendación debe depender de una abstracción de catálogo, no de una ruta YAML concreta. Las implementaciones pueden incluir un catálogo semilla para tests y un repositorio de snapshots sincronizados para producción. **Pendiente**: el loader actual todavía lee directamente `families_seed.yaml`.
 - La escritura de un snapshot debe ser atómica: descargar a memoria o archivo temporal, validar, filtrar, normalizar, escribir snapshot y actualizar la referencia `current` solo al final.
 - Conserva snapshots históricos durante un período definido y no elimines el último snapshot válido.
 - Usa `async` solo cuando la librería o la operación de E/S lo justifique.
