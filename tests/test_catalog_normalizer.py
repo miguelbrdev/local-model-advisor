@@ -82,19 +82,50 @@ class TestNormaliseRecord:
         rec = _make_record(id="vision-only", useCase=["vision"])
         result = normalise_record(rec, _POLICY)
         assert isinstance(result, ExclusionReason)
-        assert result.reason == "no_supported_task"
+        assert result.reason == "out_of_scope"
 
     def test_only_image_excluded(self) -> None:
         rec = _make_record(id="image-only", useCase=["image"])
         result = normalise_record(rec, _POLICY)
         assert isinstance(result, ExclusionReason)
-        assert result.reason == "no_supported_task"
+        assert result.reason == "out_of_scope"
 
     def test_only_video_excluded(self) -> None:
         rec = _make_record(id="video-only", useCase=["video"])
         result = normalise_record(rec, _POLICY)
         assert isinstance(result, ExclusionReason)
+        assert result.reason == "out_of_scope"
+
+    def test_image_video_out_of_scope(self) -> None:
+        rec = _make_record(id="img-vid", useCase=["image", "video"])
+        result = normalise_record(rec, _POLICY)
+        assert isinstance(result, ExclusionReason)
+        assert result.reason == "out_of_scope"
+
+    def test_informational_only_no_supported_task(self) -> None:
+        rec = _make_record(id="info-only", useCase=["multilingual", "edge"])
+        result = normalise_record(rec, _POLICY)
+        assert isinstance(result, ExclusionReason)
         assert result.reason == "no_supported_task"
+
+    def test_chat_vision_included_keeps_chat(self) -> None:
+        rec = _make_record(id="chat-vision", useCase=["chat", "vision"])
+        result = normalise_record(rec, _POLICY)
+        from src.models.schemas import FamiliaModelo
+
+        assert isinstance(result, FamiliaModelo)
+        assert result.tareas_soportadas == ["chat"]
+        assert result.pipeline_tag == "chat"
+
+    def test_code_image_rag_included_keeps_codigo(self) -> None:
+        rec = _make_record(id="code-img-rag", useCase=["code", "image", "rag"])
+        result = normalise_record(rec, _POLICY)
+        from src.models.schemas import FamiliaModelo
+
+        assert isinstance(result, FamiliaModelo)
+        assert result.tareas_soportadas == ["codigo"]
+        assert "rag" in result.tags_informativos
+        assert "image" not in result.tags_informativos
 
     def test_informational_tags_preserved(self) -> None:
         rec = _make_record(
@@ -150,7 +181,7 @@ class TestNormaliseRecord:
         rec = _make_record(id="out-of-scope", useCase=["vision", "image"])
         result = normalise_record(rec, _POLICY)
         assert isinstance(result, ExclusionReason)
-        assert result.reason == "no_supported_task"
+        assert result.reason == "out_of_scope"
 
     def test_tags_informativos_not_in_tareas(self) -> None:
         rec = _make_record(
@@ -190,7 +221,7 @@ class TestNormaliseResponse:
         assert "flux2-dev" in excluded_ids
         assert "wan2.1-t2v-1.3b" in excluded_ids
         for exc in result.exclusions:
-            assert exc.reason == "no_supported_task"
+            assert exc.reason == "out_of_scope"
 
     def test_duplicate_id_detected(self) -> None:
         record = _make_record(id="dup-model", useCase=["chat"])
@@ -233,6 +264,15 @@ class TestNormaliseResponse:
         assert len(result.families) == 1
         fam = result.families[0]
         assert len(fam.tareas_soportadas) == 3
+
+    def test_chat_code_reasoning_three_tasks(self) -> None:
+        rec = _make_record(id="all-three", useCase=["chat", "code", "reasoning"])
+        result = normalise_record(rec, _POLICY)
+        from src.models.schemas import FamiliaModelo
+
+        assert isinstance(result, FamiliaModelo)
+        assert result.tareas_soportadas == ["chat", "codigo", "razonamiento"]
+        assert result.pipeline_tag == "chat"
 
     def test_extended_fields_populated(self) -> None:
         resp = _load_response()

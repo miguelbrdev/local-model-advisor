@@ -59,6 +59,17 @@ def normalise_record(
 ) -> FamiliaModelo | ExclusionReason:
     """Normalise a single external record to a ``FamiliaModelo``.
 
+    Multitask rule: a record with at least one supported task
+    (``chat``/``code``/``reasoning``) is always included, even when it
+    also carries out-of-scope tags such as ``vision`` or ``image``.
+    Exclusion reasons:
+
+    * ``empty_id`` — the external id is blank.
+    * ``out_of_scope`` — no supported task and at least one
+      out-of-scope tag (``vision``/``image``/``video``/...).
+    * ``no_supported_task`` — no supported task and only
+      informational or unknown tags.
+
     Returns ``FamiliaModelo`` on success, or ``ExclusionReason`` if
     the record is excluded by the policy.
     """
@@ -70,10 +81,9 @@ def normalise_record(
     # --- task mapping ---
     tasks = policy.tasks_from_use_cases(record.useCase)
     if policy.require_at_least_one_supported_task and not tasks:
-        return ExclusionReason(
-            record_id=record.id,
-            reason="no_supported_task",
-        )
+        if any(policy.is_out_of_scope(t) for t in record.useCase):
+            return ExclusionReason(record_id=record.id, reason="out_of_scope")
+        return ExclusionReason(record_id=record.id, reason="no_supported_task")
 
     # --- preserve informational tags ---
     informational = [t for t in record.useCase if policy.is_informational(t)]
@@ -110,7 +120,10 @@ def normalise_response(
     """Normalise an entire canIRun.ai models response.
 
     Deduplicates by ``id``.  Records that fail validity checks or have
-    no supported tasks are collected in ``exclusions``.
+    no supported tasks are collected in ``exclusions``.  Every record
+    in ``response.models`` contributes to exactly one of
+    ``families``/``exclusions``, so
+    ``included_count + len(exclusions) == len(response.models)``.
     """
     result = NormalizationResult(source_count=response.count)
 

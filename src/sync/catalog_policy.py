@@ -34,6 +34,8 @@ class CatalogPolicy:
 
         self.version: str = raw["version"]
         self.description: str = raw.get("description", "")
+        source = raw.get("source") or {}
+        self.source_endpoint: str | None = source.get("endpoint")
 
         # use_case_mapping: external tag -> list[str] internal tasks
         self._use_case_mapping: dict[str, list[str]] = raw.get("use_case_mapping", {})
