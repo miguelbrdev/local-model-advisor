@@ -1,5 +1,8 @@
 # Local Model Advisor
 
+[![CI](https://github.com/miguelbrdev/local-model-advisor/actions/workflows/ci.yml/badge.svg)](https://github.com/miguelbrdev/local-model-advisor/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Local Model Advisor is a local FastAPI service that recommends Hugging Face
 models according to a user's task, available VRAM, language requirements,
 runtime preference, and commercial-license needs.
@@ -95,7 +98,7 @@ candidate score.
 
 ### Requirements
 
-- Python 3.12 or newer
+- Python 3.11 or newer (CI runs the suite on 3.11 through 3.14)
 - Access to the canirun.ai public API
 
 ### Installation
@@ -202,6 +205,7 @@ Once the server is running, interactive OpenAPI documentation is available at
 
 ```text
 data/
+├── catalog_policy.yaml       # versioned sync policy (categories, required fields)
 ├── families_seed.yaml        # seed catalog (transition until loader migration)
 └── catalog_bootstrap.json    # versioned bootstrap catalog (preserves snapshot_id)
 src/
@@ -245,5 +249,4 @@ heuristic in a future version. The API never downloads the catalog during
 
 ## License
 
-This project is currently for portfolio and educational purposes. A license
-will be selected before external contributions are accepted.
+Licensed under the [MIT License](LICENSE).
