@@ -59,6 +59,10 @@ docs/technical-design.md
 # y se regeneran con `gentle-ai skill-registry refresh --force`
 .atl/
 
+# Documentos de tareas de desarrollo orgánico (ODD): memoria de proceso del
+# agente, no documentación del proyecto. El espejo de recuperación vive en Engram.
+odd/
+
 # IDE y sistema operativo
 .vscode/
 .idea/
