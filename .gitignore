@@ -1,45 +1,73 @@
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
+*$py.class
+*.so
+
+# Distribución y empaquetado (setuptools / pip)
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+pip-wheel-metadata/
 
 # Entornos virtuales
 .venv/
 venv/
 env/
+ENV/
 
-# Tests, cobertura y herramientas
-.pytest_cache/
-.coverage
-htmlcov/
-.mypy_cache/
+# Formateo, lint y análisis estático
 .ruff_cache/
+.mypy_cache/
+.pytype/
+.pyre/
+.pydocstyle/
 
-# Documentos markdown
-docs/technical-design.md
+# Tests, cobertura y benchmarks
+.pytest_cache/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Notebooks
+.ipynb_checkpoints/
 
 # Variables de entorno y secretos
 .env
 .env.*
 !.env.example
 
-# Bases de datos y estado de ejecución local
+# Estado local de ejecución y datos persistentes
+runtime/
 *.db
 *.sqlite
 *.sqlite3
-runtime/
 data/conversations.db
-
-# Datos persistentes de Qdrant cuando lo añadas
 qdrant_data/
 qdrant_storage/
+
+# Documentación local que no se versiona
+docs/technical-design.md
+
+# Índices locales de agentes: contienen rutas absolutas de esta máquina
+# y se regeneran con `gentle-ai skill-registry refresh --force`
+.atl/
 
 # IDE y sistema operativo
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Archivos temporales y logs
 *.log
