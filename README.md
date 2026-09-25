@@ -40,7 +40,8 @@ Implemented:
   91 included, 13 excluded — all out of scope)
 - Versioned bootstrap catalog `data/catalog_bootstrap.json`, which preserves
   the original `snapshot_id` (no synthetic `seed-<hash>` ids)
-- Filtering by task, VRAM, language, runtime, and commercial-license needs
+- Filtering by task, VRAM, language, and commercial-license needs
+  (`runtime_preferido` is accepted in the request but is not applied yet)
 - Real VRAM compatibility lookup through canirun.ai
 - Deterministic multi-criteria ranking with explicit sub-scores
 - SQLite-backed server-side conversation state with a 24-hour TTL
@@ -122,10 +123,11 @@ On macOS/Linux:
 source .venv/bin/activate
 ```
 
-Install the project dependencies:
+Install the project dependencies (the `dev` extra provides `pytest` and
+`ruff`, needed by the test and lint steps below):
 
 ```bash
-pip install -e .
+pip install -e ".[dev]"
 ```
 
 Start the API:
@@ -204,21 +206,29 @@ Once the server is running, interactive OpenAPI documentation is available at
 ## Project structure
 
 ```text
-data/
-├── catalog_policy.yaml       # versioned sync policy (categories, required fields)
-├── families_seed.yaml        # seed catalog (transition until loader migration)
-└── catalog_bootstrap.json    # versioned bootstrap catalog (preserves snapshot_id)
-src/
-├── api/             # FastAPI endpoints
-├── chains/          # Recommendation orchestration
-├── compatibility/   # Interchangeable VRAM providers
-├── models/          # Pydantic contracts
-├── ranking/         # Deterministic weighted scoring
-├── state/           # SQLite conversation persistence
-├── sync/            # Catalog sync: download, policy, normalization, snapshots, bootstrap
-└── tools/           # Seed loading and structured filtering
-runtime/             # gitignored: SQLite conversations + catalog snapshots
-tests/
+├── data/
+│   ├── catalog_policy.yaml    # versioned sync policy (categories, required fields)
+│   ├── families_seed.yaml     # seed catalog (transition until loader migration)
+│   └── catalog_bootstrap.json # versioned bootstrap catalog (preserves snapshot_id)
+├── docs/
+│   └── technical-design.md    # full design (local only — gitignored, not shipped)
+├── scripts/                   # (pending) sync_catalog.py for the OS task scheduler
+├── src/
+│   ├── api/             # FastAPI endpoints
+│   ├── chains/          # Recommendation orchestration
+│   ├── compatibility/   # Interchangeable VRAM providers
+│   ├── models/          # Pydantic contracts
+│   ├── ranking/         # Deterministic weighted scoring
+│   ├── state/           # SQLite conversation persistence
+│   ├── sync/            # Catalog sync: download, policy, normalization, snapshots, bootstrap
+│   └── tools/           # Seed loading and structured filtering
+├── runtime/             # gitignored: SQLite conversations + catalog snapshots
+├── tests/
+├── .github/workflows/   # CI: Ruff + pytest on Python 3.11-3.14
+├── AGENTS.md            # agent instructions and current project state
+├── LICENSE              # MIT
+├── README.md
+└── pyproject.toml
 ```
 
 ## Roadmap
