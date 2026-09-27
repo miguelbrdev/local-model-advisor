@@ -1,15 +1,19 @@
 """Tests for src.chains.recommend_pipeline.
 
-Uses a small test catalogue, valid Pydantic criteria, and a mocked VRAM
+Uses a small test catalogue (served through an in-memory
+``CatalogoModelos`` double), valid Pydantic criteria, and a mocked VRAM
 provider. No HTTP requests, no real SQLite, no external file dependencies.
 """
 
 from __future__ import annotations
 
+import inspect
 from unittest.mock import patch
 
 import pytest
 
+from src.catalog.protocol import CatalogUnavailableError
+from src.chains import recommend_pipeline
 from src.chains.recommend_pipeline import ejecutar_pipeline
 from src.models.schemas import (
     CompatibilityResult,
@@ -56,6 +60,31 @@ def _criterios(**overrides) -> CriteriosBusqueda:
     defaults = {"tarea": "codigo", "vram_gb": 11.0}
     defaults.update(overrides)
     return CriteriosBusqueda(**defaults)
+
+
+class _Catalogo:
+    """In-memory ``CatalogoModelos`` double.
+
+    Mirrors ``tests/test_catalog_loader.py``'s double but also counts
+    loads, so tests can pin *how often* the pipeline touches its
+    dependency (e.g. never on the ``top_n=0`` short-circuit).
+    """
+
+    def __init__(self, familias: list[FamiliaModelo]) -> None:
+        self._familias = list(familias)
+        self.load_count = 0
+
+    @property
+    def snapshot_id(self) -> str | None:
+        return "snap-test"
+
+    def cargar(self) -> list[FamiliaModelo]:
+        self.load_count += 1
+        return list(self._familias)
+
+
+def _catalogo(*familias: FamiliaModelo) -> _Catalogo:
+    return _Catalogo(list(familias))
 
 
 def _compatible(familia_id: str, **overrides) -> CompatibilityResult:
@@ -113,7 +142,7 @@ class TestHappyPath:
         ):
             results = ejecutar_pipeline(
                 criterios=_criterios(),
-                familias=[FAMILIA_A, FAMILIA_B, FAMILIA_C],
+                catalogo=_catalogo(FAMILIA_A, FAMILIA_B, FAMILIA_C),
             )
 
         assert len(results) == 3
@@ -132,7 +161,7 @@ class TestHappyPath:
         ):
             results = ejecutar_pipeline(
                 criterios=_criterios(),
-                familias=[FAMILIA_A, FAMILIA_B, FAMILIA_C],
+                catalogo=_catalogo(FAMILIA_A, FAMILIA_B, FAMILIA_C),
             )
 
         scores = [r.puntuacion_total for r in results]
@@ -152,7 +181,7 @@ class TestHappyPath:
         ):
             results = ejecutar_pipeline(
                 criterios=_criterios(),
-                familias=[FAMILIA_A, FAMILIA_B, FAMILIA_C],
+                catalogo=_catalogo(FAMILIA_A, FAMILIA_B, FAMILIA_C),
                 top_n=2,
             )
 
@@ -173,7 +202,7 @@ class TestHappyPath:
         ):
             results = ejecutar_pipeline(
                 criterios=_criterios(),
-                familias=[FAMILIA_A, FAMILIA_B, FAMILIA_C],
+                catalogo=_catalogo(FAMILIA_A, FAMILIA_B, FAMILIA_C),
             )
 
         for candidate in results:
@@ -201,7 +230,7 @@ class TestHappyPath:
         ):
             ejecutar_pipeline(
                 criterios=_criterios(),
-                familias=[FAMILIA_A, FAMILIA_B, FAMILIA_C],
+                catalogo=_catalogo(FAMILIA_A, FAMILIA_B, FAMILIA_C),
             )
 
         assert provider.call_count == 3
@@ -224,7 +253,7 @@ class TestNoCandidates:
         ):
             results = ejecutar_pipeline(
                 criterios=_criterios(),
-                familias=[],
+                catalogo=_catalogo(),
             )
 
         assert results == []
@@ -242,7 +271,7 @@ class TestNoCandidates:
         ):
             results = ejecutar_pipeline(
                 criterios=_criterios(),
-                familias=[FAMILIA_A, FAMILIA_B],
+                catalogo=_catalogo(FAMILIA_A, FAMILIA_B),
             )
 
         assert results == []
@@ -256,7 +285,7 @@ class TestNoCandidates:
         ):
             results = ejecutar_pipeline(
                 criterios=_criterios(tarea="chat"),
-                familias=[FAMILIA_A, FAMILIA_C],
+                catalogo=_catalogo(FAMILIA_A, FAMILIA_C),
             )
 
         assert results == []
@@ -270,7 +299,7 @@ class TestNoCandidates:
         ):
             ejecutar_pipeline(
                 criterios=_criterios(),
-                familias=[],
+                catalogo=_catalogo(),
             )
 
         assert provider.call_count == 0
@@ -295,7 +324,7 @@ class TestProviderUnavailable:
         ):
             results = ejecutar_pipeline(
                 criterios=_criterios(),
-                familias=[FAMILIA_A, FAMILIA_B],
+                catalogo=_catalogo(FAMILIA_A, FAMILIA_B),
             )
 
         assert len(results) == 2
@@ -315,7 +344,7 @@ class TestProviderUnavailable:
         ):
             results = ejecutar_pipeline(
                 criterios=_criterios(),
-                familias=[FAMILIA_A],
+                catalogo=_catalogo(FAMILIA_A),
             )
 
         assert len(results) == 1
@@ -336,7 +365,7 @@ class TestProviderUnavailable:
         ):
             results = ejecutar_pipeline(
                 criterios=_criterios(),
-                familias=[FAMILIA_A, FAMILIA_B],
+                catalogo=_catalogo(FAMILIA_A, FAMILIA_B),
             )
 
         assert len(results) == 2
@@ -357,7 +386,7 @@ class TestProviderUnavailable:
         ):
             results = ejecutar_pipeline(
                 criterios=_criterios(),
-                familias=[FAMILIA_A],
+                catalogo=_catalogo(FAMILIA_A),
             )
 
         assert len(results) == 1
@@ -383,7 +412,7 @@ class TestTopNEdgeCases:
         ):
             results = ejecutar_pipeline(
                 criterios=_criterios(),
-                familias=[FAMILIA_A, FAMILIA_B],
+                catalogo=_catalogo(FAMILIA_A, FAMILIA_B),
                 top_n=10,
             )
 
@@ -402,30 +431,32 @@ class TestTopNEdgeCases:
         ):
             results = ejecutar_pipeline(
                 criterios=_criterios(),
-                familias=[FAMILIA_A, FAMILIA_B],
+                catalogo=_catalogo(FAMILIA_A, FAMILIA_B),
                 top_n=0,
             )
 
         assert results == []
 
-    def test_top_n_zero_provider_still_called(self) -> None:
+    def test_top_n_zero_short_circuits_before_loading(self) -> None:
         """top_n=0 returns [] without calling provider or loading catalogue."""
         provider_results = {
             "model-a": _compatible("model-a"),
         }
         provider = _MockProvider(provider_results)
+        cat = _catalogo(FAMILIA_A)
 
         with patch(
             "src.chains.recommend_pipeline.elegir_provider", return_value=provider
         ):
             results = ejecutar_pipeline(
                 criterios=_criterios(),
-                familias=[FAMILIA_A],
+                catalogo=cat,
                 top_n=0,
             )
 
         assert results == []
         assert provider.call_count == 0
+        assert cat.load_count == 0
 
     def test_top_n_negative_raises(self) -> None:
         """top_n < 0 raises ValueError, never silent slicing."""
@@ -440,7 +471,7 @@ class TestTopNEdgeCases:
             with pytest.raises(ValueError, match="top_n must be >= 0"):
                 ejecutar_pipeline(
                     criterios=_criterios(),
-                    familias=[FAMILIA_A],
+                    catalogo=_catalogo(FAMILIA_A),
                     top_n=-1,
                 )
 
@@ -457,7 +488,7 @@ class TestTopNEdgeCases:
             with pytest.raises(ValueError, match="top_n must be >= 0"):
                 ejecutar_pipeline(
                     criterios=_criterios(),
-                    familias=[FAMILIA_A],
+                    catalogo=_catalogo(FAMILIA_A),
                     top_n=-2,
                 )
 
@@ -475,11 +506,99 @@ class TestTopNEdgeCases:
         ):
             results = ejecutar_pipeline(
                 criterios=_criterios(),
-                familias=[FAMILIA_A, FAMILIA_B, FAMILIA_C],
+                catalogo=_catalogo(FAMILIA_A, FAMILIA_B, FAMILIA_C),
                 top_n=1,
             )
 
         assert len(results) == 1
+
+
+# ---------------------------------------------------------------------------
+# 5. Catalogue injection (dependency inversion)
+# ---------------------------------------------------------------------------
+
+
+class TestCatalogueInjection:
+    """The pipeline must reach families only through the injected Protocol."""
+
+    def test_reads_families_from_injected_catalogue(self) -> None:
+        """Families served by the double are the ones ranked."""
+        cat = _catalogo(FAMILIA_A, FAMILIA_B, FAMILIA_C)
+        provider = _MockProvider(
+            {
+                "model-a": _compatible("model-a"),
+                "model-b": _compatible("model-b"),
+                "model-c": _compatible("model-c"),
+            }
+        )
+
+        with patch(
+            "src.chains.recommend_pipeline.elegir_provider", return_value=provider
+        ):
+            results = ejecutar_pipeline(criterios=_criterios(), catalogo=cat)
+
+        assert cat.load_count == 1
+        assert {r.familia.familia_id for r in results} == {"model-a", "model-b", "model-c"}
+
+    def test_legacy_seed_path_is_not_reachable(self) -> None:
+        """Two guards against regression: no ``load_seed`` name in the
+        module (an import would bind one), and any call routed through
+        the ``seed_loader`` module attribute raises instead of reading
+        ``data/families_seed.yaml``.
+        """
+        provider = _MockProvider(
+            {
+                "model-a": _compatible("model-a"),
+                "model-b": _compatible("model-b"),
+                "model-c": _compatible("model-c"),
+            }
+        )
+
+        assert not hasattr(recommend_pipeline, "load_seed")
+        with (
+            patch(
+                "src.tools.seed_loader.load_seed",
+                side_effect=AssertionError("legacy seed must not be read"),
+            ),
+            patch(
+                "src.chains.recommend_pipeline.elegir_provider", return_value=provider
+            ),
+        ):
+            results = ejecutar_pipeline(
+                criterios=_criterios(),
+                catalogo=_catalogo(FAMILIA_A, FAMILIA_B, FAMILIA_C),
+            )
+
+        assert len(results) == 3
+
+    def test_catalogue_failure_propagates_untouched(self) -> None:
+        """An exhausted catalogue must surface as its typed error, never
+        as an empty candidate list (the ambiguity this project forbids).
+        """
+
+        class _ExhaustedCatalogo:
+            @property
+            def snapshot_id(self) -> str | None:
+                raise CatalogUnavailableError("no source")
+
+            def cargar(self) -> list[FamiliaModelo]:
+                raise CatalogUnavailableError("no source")
+
+        with pytest.raises(CatalogUnavailableError):
+            ejecutar_pipeline(criterios=_criterios(), catalogo=_ExhaustedCatalogo())
+
+    def test_signature_requires_keyword_only_catalogue(self) -> None:
+        """Pin design (a): no ``familias`` escape hatch, ``catalogo``
+        keyword-only so it can never be confused with a positional
+        familias list again, and *required* — omitting it must be a
+        ``TypeError`` at the call site, never a ``None``-guarded empty
+        result (the ambiguous empty-catalogue path this project forbids).
+        """
+        params = inspect.signature(ejecutar_pipeline).parameters
+        assert "familias" not in params
+        assert params["catalogo"].kind is inspect.Parameter.KEYWORD_ONLY
+        assert params["catalogo"].default is inspect.Parameter.empty
+        assert params["criterios"].kind is inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
 # ---------------------------------------------------------------------------

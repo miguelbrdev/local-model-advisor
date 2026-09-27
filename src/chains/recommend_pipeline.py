@@ -6,27 +6,35 @@ No Qdrant, no reranking, no LLM — purely deterministic.
 
 from __future__ import annotations
 
+from src.catalog.protocol import CatalogoModelos
 from src.compatibility.provider import elegir_provider
 from src.models.schemas import (
     CandidatoRankeado,
     CriteriosBusqueda,
-    FamiliaModelo,
 )
 from src.ranking.scorer import calcular_puntuacion, ordenar_por_puntuacion
-from src.tools.seed_loader import load_seed
 from src.tools.structured_filter import filtrar_candidatos
 
 
 def ejecutar_pipeline(
     criterios: CriteriosBusqueda,
-    familias: list[FamiliaModelo] | None = None,
+    *,
+    catalogo: CatalogoModelos,
     top_n: int = 3,
 ) -> list[CandidatoRankeado]:
-    """Run the full filter → score → rank pipeline.
+    """Run the full load → filter → score → rank pipeline.
+
+    The families come exclusively from the injected ``catalogo``: the
+    pipeline opens no files itself (dependency inversion), so the API can
+    mount one process-wide snapshot behind the Protocol and tests can
+    inject an in-memory double.  A ``load_seed``-style fallback would
+    reintroduce a second source of truth for the same question.
 
     Args:
         criterios: User search criteria.
-        familias: Override catalogue (uses seed YAML if ``None``).
+        catalogo: Source of the model families to rank.  ``cargar()`` is
+            called at most once per invocation, after the ``top_n``
+            short-circuits, so ``top_n=0`` never touches the catalogue.
         top_n: Number of top candidates to return. Must be >= 0.
             When ``top_n`` exceeds the number of eligible candidates, all
             candidates are returned. When ``top_n`` is 0, an empty list is
@@ -34,6 +42,10 @@ def ejecutar_pipeline(
 
     Raises:
         ValueError: If ``top_n`` is negative.
+        CatalogUnavailableError: Propagated untouched from
+            ``catalogo.cargar()`` when no catalogue source resolves.  The
+            API resolves the catalogue during startup precisely so this
+            cannot surface mid-request in production.
 
     Returns:
         Top N ranked candidates sorted by score descending.
@@ -43,8 +55,7 @@ def ejecutar_pipeline(
     if top_n == 0:
         return []
 
-    if familias is None:
-        familias = load_seed()
+    familias = catalogo.cargar()
 
     # 1. Choose VRAM provider based on task
     provider = elegir_provider(criterios.tarea or "codigo")
