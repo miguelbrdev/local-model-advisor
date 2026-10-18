@@ -88,6 +88,7 @@ Embeddings, rerankers, clasificación de imágenes, generación de imagen/vídeo
 ## Calidad y validación
 
 - Añade o actualiza tests para cada comportamiento nuevo o modificado.
+- En Python 3.11, `isinstance` contra un `Protocol` `runtime_checkable` evalúa las propiedades (`hasattr`); en 3.12+ no (`getattr_static`). No compruebes conformidad con instancias cuyo acceso a propiedades pueda lanzar (p. ej. un catálogo con fuentes agotadas): el fallo solo aparece en el job de CI de 3.11.
 - Los tests de sincronización deben usar respuestas HTTP mockeadas; nunca deben depender de canirun.ai, red, hora real o archivos persistentes fuera de `tmp_path`.
 - Prueba como mínimo: respuesta externa válida, timeout/error HTTP, campos externos inesperados, filtrado por categoría, deduplicación, conversión a modelo interno, actualización atómica y conservación del snapshot anterior ante fallo.
 - No cambies contratos públicos de API sin actualizar modelos Pydantic, tests y documentación.

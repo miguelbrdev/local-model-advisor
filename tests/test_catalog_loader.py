@@ -354,8 +354,18 @@ def _declared_members() -> set[str]:
 
 class TestProtocolConformance:
     def test_adapter_satisfies_protocol(self, tmp_path: Path) -> None:
+        """The adapter must be checked with sources that *resolve*.
+
+        On Python 3.11 ``isinstance`` against a ``runtime_checkable``
+        Protocol uses ``hasattr``, which evaluates properties; an adapter
+        whose sources are exhausted would raise ``CatalogUnavailableError``
+        from inside the check.  3.12+ uses ``inspect.getattr_static`` and
+        never evaluates them, which is why this only failed on the 3.11 CI
+        job.  Pointing level 2 at the committed bootstrap keeps the check
+        meaningful on every supported interpreter.
+        """
         catalogo = CatalogoSincronizado(
-            runtime_dir=tmp_path / "absent", bootstrap_path=tmp_path / "absent.json"
+            runtime_dir=tmp_path / "absent", bootstrap_path=DEFAULT_BOOTSTRAP_PATH
         )
         assert isinstance(catalogo, CatalogoModelos)
 
