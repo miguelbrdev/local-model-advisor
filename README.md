@@ -27,7 +27,7 @@ canIRun.ai catalog: the API boots from the local snapshot (or the committed
 bootstrap), filters by task, license, language and VRAM, and ranks with an
 explicit weighted score.
 
-**Pipeline served by the synced catalog; recurring scheduler pending.**
+**Pipeline served by the synced catalog; `scripts/sync_catalog.py` ready for the OS scheduler.**
 
 Implemented:
 
@@ -55,12 +55,13 @@ Implemented:
   the catalog `snapshot_id` that produced each recommendation
 - Limitations reported in every recommendation, so a short result is never
   ambiguous
-- 312 automated tests and Ruff linting
+- `scripts/sync_catalog.py`: the entry point for the 21-day scheduled task,
+  with retention of historical snapshots (`src/sync/retention.py`) that never
+  deletes the active or previous snapshot
+- 336 automated tests and Ruff linting
 
 Not implemented yet:
 
-- Recurring scheduler: no `scripts/sync_catalog.py` and no OS scheduled task
-  yet — synchronization has been run manually once
 - Language data for synced models: the canIRun.ai source exposes no
   language field, so language requirements are not enforced on them
 - Runtime preference filtering
@@ -192,6 +193,40 @@ Example result:
 The exact ranking depends on the catalog snapshot and the compatibility
 response returned by the provider; the figures above are illustrative.
 
+## Catalog synchronization
+
+The API never downloads the catalog during a request. A separate process
+refreshes `runtime/catalog/` and the API picks the new snapshot up on its
+next start:
+
+```bash
+python -m scripts.sync_catalog            # fetch, validate, persist atomically, prune
+python -m scripts.sync_catalog --help     # all options
+```
+
+Exit code `0` means a valid snapshot is active (new or unchanged), `1` that
+the fetch or validation failed and the previous snapshot was kept, `2` that
+an optional post-step failed. Snapshots not referenced by `current.json` are
+deleted after 90 days (`--retain-days`). Pass `--promote-bootstrap` to copy
+the active snapshot to `data/catalog_bootstrap.json`; committing that file is
+a deliberate, reviewed step.
+
+Register it every 21 days. The module must run from the project root, so the
+task wraps it in a `cd`. Windows Task Scheduler, from a PowerShell prompt at
+the project root:
+
+```powershell
+$root = (Get-Location).Path
+schtasks /Create /TN "LocalModelAdvisor catalog sync" /SC DAILY /MO 21 /ST 03:00 /F `
+  /TR "cmd /c cd /d ""$root"" && .venv\Scripts\python.exe -m scripts.sync_catalog >> runtime\sync.log 2>&1"
+```
+
+cron (Linux/macOS), running on the 1st and 22nd of each month:
+
+```cron
+0 3 1,22 * * cd /path/to/local-model-advisor && .venv/bin/python -m scripts.sync_catalog >> runtime/sync.log 2>&1
+```
+
 ## API endpoints
 
 | Method | Endpoint | Purpose |
@@ -219,7 +254,7 @@ Once the server is running, interactive OpenAPI documentation is available at
 │   └── catalog_bootstrap.json # versioned bootstrap catalog (preserves snapshot_id)
 ├── docs/
 │   └── technical-design.md    # full design (local only — gitignored, not shipped)
-├── scripts/                   # (pending) sync_catalog.py for the OS task scheduler
+├── scripts/                   # sync_catalog.py: scheduled catalog sync + snapshot retention
 ├── src/
 │   ├── api/             # FastAPI endpoints and app lifespan (mounts the catalog)
 │   ├── catalog/         # Catalog protocol + synchronized adapter with fallback chain
@@ -228,7 +263,7 @@ Once the server is running, interactive OpenAPI documentation is available at
 │   ├── models/          # Pydantic contracts
 │   ├── ranking/         # Deterministic weighted scoring
 │   ├── state/           # SQLite conversation persistence
-│   ├── sync/            # Catalog sync: download, policy, normalization, snapshots, bootstrap
+│   ├── sync/            # Catalog sync: download, policy, normalization, snapshots, bootstrap, retention
 │   └── tools/           # Structured filtering and license normalization
 ├── runtime/             # gitignored: SQLite conversations + catalog snapshots
 ├── tests/
@@ -248,7 +283,7 @@ Once the server is running, interactive OpenAPI documentation is available at
 - [x] Connect the pipeline loader (runtime catalog → bootstrap fallback)
 - [x] Persist `snapshot_id` per conversation
 - [x] Enable chat and reasoning tasks in the pipeline
-- [ ] Add `scripts/sync_catalog.py` with a recurring scheduled task (every 21 days)
+- [x] Add `scripts/sync_catalog.py` for the recurring scheduled task (every 21 days)
 - [ ] Add Qdrant hybrid retrieval for explanatory evidence
 - [ ] Add reranking of retrieved evidence
 - [ ] Add LangChain-based criteria extraction

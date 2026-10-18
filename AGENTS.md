@@ -14,11 +14,11 @@ Embeddings, rerankers, clasificación de imágenes, generación de imagen/vídeo
 
 ## Estado actual (Semana 1–2)
 
-> **Pipeline servido por el catálogo sincronizado. Scheduler recurrente pendiente.**
+> **Pipeline servido por el catálogo sincronizado. `scripts/sync_catalog.py` listo para la tarea programada del SO.**
 
 - **Catálogo en el pipeline**: `src/catalog/` define el `Protocol CatalogoModelos` y el adaptador `CatalogoSincronizado`, con cadena de fallback `runtime/catalog/current.json` → `data/catalog_bootstrap.json` → `CatalogUnavailableError`. `main.py` monta una única instancia por proceso en `lifespan` (`app.state.catalogo`) y la inyecta en `ejecutar_pipeline(criterios, *, catalogo, top_n)`. Si ninguna fuente resuelve, el arranque falla con ruido; no hay modo degradado. El catálogo semilla (`families_seed.yaml`, `seed_loader.py`) **se ha eliminado**: no es nivel de fallback.
 - **Sincronización y persistencia**: implementadas y testeadas en `src/sync/`. Primer snapshot real validado `snap-176d40242fd0157a` (104 modelos de origen, 91 incluidos, 13 excluidos por `out_of_scope`), promovido a `data/catalog_bootstrap.json` conservando su `snapshot_id`.
-- **Scheduler recurrente (cada 21 días)**: **pendiente**. No hay `scripts/sync_catalog.py` ni tarea programada; la sincronización se ha ejecutado manualmente una única vez.
+- **Sincronización programada (cada 21 días)**: `python -m scripts.sync_catalog` ejecuta un ciclo completo (descarga, validación, snapshot atómico, retención y, opcionalmente, promoción al bootstrap con `--promote-bootstrap`). Códigos de salida: 0 snapshot activo, 1 fallo de sincronización con el snapshot anterior conservado, 2 fallo de un paso posterior. La tarea del SO (`schtasks`/`cron`) la registra el operador; los comandos están en el README. Hasta ahora la sincronización se ha ejecutado manualmente una única vez.
 - **Tareas**: `chat`, `codigo` y `razonamiento` funcionan. El filtro lee `tareas_soportadas` (lista completa de tareas del modelo), no `pipeline_tag` (solo la primera): con el bootstrap pasan 73, 51 y 59 familias respectivamente antes de la comprobación VRAM.
 - **Entrada**: JSON estructurado. El usuario envía `tarea`, `vram_gb`, `idiomas_requeridos`, `runtime_preferido` como campos directos en `mensaje`. No se interpreta lenguaje natural.
 - **`snapshot_id`**: se persiste en cada `ConversationRun` a partir de `app.state.catalogo.snapshot_id`.
@@ -32,7 +32,7 @@ Embeddings, rerankers, clasificación de imágenes, generación de imagen/vídeo
 - canIRun.ai es la fuente externa de catálogo para la v1.
 - El catálogo de producción no se mantiene manualmente familia por familia.
 - Un proceso de sincronización obtiene el catálogo desde `GET /api/models`, filtra solo las categorías soportadas, normaliza los registros al modelo interno `FamiliaModelo`, los valida y guarda un snapshot local.
-- El proceso se ejecutará externamente cada 21 días; no implementes un scheduler recurrente dentro del proceso FastAPI. **Aún no existe** el script ni la tarea programada: hasta entonces la sincronización es manual.
+- El proceso se ejecuta externamente cada 21 días mediante `scripts/sync_catalog.py`; no implementes un scheduler recurrente dentro del proceso FastAPI. La API recoge el snapshot nuevo en su siguiente arranque (una instancia de catálogo por proceso).
 - La API nunca debe descargar el catálogo completo durante `POST /chat`. Debe usar el último snapshot local válido.
 - Si la sincronización falla, la API debe conservar y usar el snapshot anterior válido; nunca debe borrar o sustituir el catálogo actual antes de validar completamente el nuevo.
 - Las categorías, campos y valores de use case de canIRun.ai deben verificarse contra la respuesta real de la API. No inventes ni hardcodees nombres de campos externos sin documentar el contrato observado.
@@ -43,7 +43,7 @@ Embeddings, rerankers, clasificación de imágenes, generación de imagen/vídeo
 - El snapshot debe incluir identificador, hash, fecha de sincronización, número de modelos de origen, número de modelos incluidos y motivos de exclusión. **Implementado**: `SnapshotMeta` en `src/sync/snapshot.py` con escritura atómica (archivo temporal + `os.replace`) y validación round-trip testeada.
 - Al promover un snapshot a `data/catalog_bootstrap.json` se conserva el `snapshot_id` original dentro del `CatalogSnapshot` (`snap-176d40242fd0157a`); **no** se genera un id `seed-<hash>` para el bootstrap.
 - Cada conversación registra el identificador del snapshot de catálogo usado para preservar reproducibilidad (`ConversationRun.snapshot_id`).
-- Suite actual: **312 tests** (`python -m pytest`) + `python -m ruff check .` (reglas `E F I N W UP B SIM`) en verde.
+- Suite actual: **336 tests** (`python -m pytest`) + `python -m ruff check .` (reglas `E F I N W UP B SIM`) en verde.
 
 ## LangChain y Ollama
 
@@ -71,7 +71,7 @@ Embeddings, rerankers, clasificación de imágenes, generación de imagen/vídeo
 - Prioriza contratos tipados, separación de responsabilidades e interfaces desacopladas mediante `Protocol` cuando haya proveedores intercambiables.
 - El pipeline de recomendación depende de la abstracción `CatalogoModelos` (`src/catalog/protocol.py`), nunca de una ruta concreta. Producción usa `CatalogoSincronizado`; los tests inyectan dobles en memoria. No reintroduzcas un catálogo semilla como fuente paralela.
 - La escritura de un snapshot debe ser atómica: descargar a memoria o archivo temporal, validar, filtrar, normalizar, escribir snapshot y actualizar la referencia `current` solo al final.
-- Conserva snapshots históricos durante un período definido y no elimines el último snapshot válido.
+- Conserva snapshots históricos durante un período definido y no elimines el último snapshot válido. **Implementado** en `src/sync/retention.py`: 90 días por defecto, los snapshots `active`/`previous` del manifiesto nunca se borran y sin manifiesto legible no se borra nada.
 - Usa `async` solo cuando la librería o la operación de E/S lo justifique.
 
 ## Documentación del código
