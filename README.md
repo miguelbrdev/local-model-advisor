@@ -22,41 +22,48 @@ pipeline instead of a static, manually maintained list.
 
 ## Current status
 
-Weeks 0–1 are complete: the deterministic vertical slice works, and the
-catalog-synchronization layer with canIRun.ai is implemented and tested.
+The deterministic vertical slice works end to end on the synchronized
+canIRun.ai catalog: the API boots from the local snapshot (or the committed
+bootstrap), filters by task, license, language and VRAM, and ranks with an
+explicit weighted score.
 
-**Bootstrap implemented; runtime → bootstrap → loader integration pending.**
+**Pipeline served by the synced catalog; recurring scheduler pending.**
 
 Implemented:
 
 - FastAPI API with `POST /chat`, `GET /health`, and `GET /families`
 - Structured validation with Pydantic v2
-- Seed catalog with five code-model families (`data/families_seed.yaml`,
-  kept temporarily as a transition until the pipeline loader migrates)
+- Catalog abstraction (`src/catalog/`): `CatalogoModelos` protocol plus a
+  synchronized adapter with a strict fallback chain
+  `runtime/catalog/current.json` → `data/catalog_bootstrap.json` → loud
+  startup failure (no degraded mode, no empty catalog)
 - Catalog synchronization from canIRun.ai (`src/sync/`): versioned local
   policy, normalization, SHA-256 content hash, atomic snapshot writes to
   `runtime/catalog/` (gitignored), and a `current.json` pointer
 - First real validated snapshot (`snap-176d40242fd0157a`: 104 source models,
-  91 included, 13 excluded — all out of scope)
-- Versioned bootstrap catalog `data/catalog_bootstrap.json`, which preserves
-  the original `snapshot_id` (no synthetic `seed-<hash>` ids)
-- Filtering by task, VRAM, language, and commercial-license needs
-  (`runtime_preferido` is accepted in the request but is not applied yet)
+  91 included, 13 excluded — all out of scope), promoted to the versioned
+  bootstrap `data/catalog_bootstrap.json` with its original `snapshot_id`
+- All three v1 tasks (`chat`, `codigo`, `razonamiento`), filtered on the
+  full `tareas_soportadas` list of each model
+- Filtering by VRAM, language and commercial-license needs, with a single
+  license normalizer shared by filter and scorer (`runtime_preferido` is
+  accepted but not applied yet)
 - Real VRAM compatibility lookup through canirun.ai
-- Deterministic multi-criteria ranking with explicit sub-scores
-- SQLite-backed server-side conversation state with a 24-hour TTL
-- 248 automated tests and Ruff linting
+- Deterministic multi-criteria ranking with explicit sub-scores; VRAM fit is
+  measured as headroom on the user's own GPU memory
+- SQLite-backed server-side conversation state with a 24-hour TTL, storing
+  the catalog `snapshot_id` that produced each recommendation
+- Limitations reported in every recommendation, so a short result is never
+  ambiguous
+- 312 automated tests and Ruff linting
 
 Not implemented yet:
 
-- Pipeline loader for the synced catalog: `recommend_pipeline.py` still reads
-  `families_seed.yaml`; it does not yet read `runtime/catalog/current.json`
-  or fall back to `data/catalog_bootstrap.json`
 - Recurring scheduler: no `scripts/sync_catalog.py` and no OS scheduled task
   yet — synchronization has been run manually once
-- `snapshot_id` persistence per conversation (field exists but is not filled)
-- Chat and reasoning tasks in the pipeline (the bootstrap already contains
-  those models, but it is not connected yet; the seed only has code models)
+- Language data for synced models: the canIRun.ai source exposes no
+  language field, so language requirements are not enforced on them
+- Runtime preference filtering
 - Qdrant hybrid retrieval and reranking for explanatory evidence
 - LangChain-based extraction of free-form user requirements
 - Golden-query evaluation metrics
@@ -166,30 +173,31 @@ Example result:
   "tipo": "recomendacion",
   "candidatos": [
     {
-      "familia": "qwen2.5-coder",
-      "puntuacion_total": 0.77
+      "familia": "qwen2.5-coder-7b",
+      "puntuacion_total": 0.86
     },
     {
-      "familia": "ornith-1.0",
-      "puntuacion_total": 0.72
+      "familia": "qwen2.5-coder-1.5b",
+      "puntuacion_total": 0.81
     },
     {
-      "familia": "mistral-small",
-      "puntuacion_total": 0.54
+      "familia": "granite-4.1-3b",
+      "puntuacion_total": 0.75
     }
-  ]
+  ],
+  "limitaciones": ["..."]
 }
 ```
 
-The exact ranking depends on the curated catalog and the compatibility response
-returned by the provider.
+The exact ranking depends on the catalog snapshot and the compatibility
+response returned by the provider; the figures above are illustrative.
 
 ## API endpoints
 
 | Method | Endpoint | Purpose |
 |---|---|---|
 | `GET` | `/health` | Returns API health status |
-| `GET` | `/families` | Lists the seeded model families |
+| `GET` | `/families` | Lists every family of the mounted catalog snapshot |
 | `POST` | `/chat` | Returns a clarification or recommendation response |
 
 Once the server is running, interactive OpenAPI documentation is available at
@@ -208,20 +216,20 @@ Once the server is running, interactive OpenAPI documentation is available at
 ```text
 ├── data/
 │   ├── catalog_policy.yaml    # versioned sync policy (categories, required fields)
-│   ├── families_seed.yaml     # seed catalog (transition until loader migration)
 │   └── catalog_bootstrap.json # versioned bootstrap catalog (preserves snapshot_id)
 ├── docs/
 │   └── technical-design.md    # full design (local only — gitignored, not shipped)
 ├── scripts/                   # (pending) sync_catalog.py for the OS task scheduler
 ├── src/
-│   ├── api/             # FastAPI endpoints
+│   ├── api/             # FastAPI endpoints and app lifespan (mounts the catalog)
+│   ├── catalog/         # Catalog protocol + synchronized adapter with fallback chain
 │   ├── chains/          # Recommendation orchestration
 │   ├── compatibility/   # Interchangeable VRAM providers
 │   ├── models/          # Pydantic contracts
 │   ├── ranking/         # Deterministic weighted scoring
 │   ├── state/           # SQLite conversation persistence
 │   ├── sync/            # Catalog sync: download, policy, normalization, snapshots, bootstrap
-│   └── tools/           # Seed loading and structured filtering
+│   └── tools/           # Structured filtering and license normalization
 ├── runtime/             # gitignored: SQLite conversations + catalog snapshots
 ├── tests/
 ├── .github/workflows/   # CI: Ruff + pytest on Python 3.11-3.14
@@ -237,10 +245,10 @@ Once the server is running, interactive OpenAPI documentation is available at
 - [x] Automated tests for filters, scoring, providers, state, and API
 - [x] Catalog synchronization from canIRun.ai with atomic snapshots
 - [x] First real snapshot and versioned bootstrap catalog
-- [ ] Connect the pipeline loader (runtime catalog → bootstrap fallback)
+- [x] Connect the pipeline loader (runtime catalog → bootstrap fallback)
+- [x] Persist `snapshot_id` per conversation
+- [x] Enable chat and reasoning tasks in the pipeline
 - [ ] Add `scripts/sync_catalog.py` with a recurring scheduled task (every 21 days)
-- [ ] Persist `snapshot_id` per conversation
-- [ ] Enable chat and reasoning tasks in the pipeline
 - [ ] Add Qdrant hybrid retrieval for explanatory evidence
 - [ ] Add reranking of retrieved evidence
 - [ ] Add LangChain-based criteria extraction

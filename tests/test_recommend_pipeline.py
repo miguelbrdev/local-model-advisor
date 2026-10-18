@@ -7,7 +7,9 @@ provider. No HTTP requests, no real SQLite, no external file dependencies.
 
 from __future__ import annotations
 
+import importlib.util
 import inspect
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -25,10 +27,13 @@ from src.models.schemas import (
 # Small test catalogue
 # ---------------------------------------------------------------------------
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
 FAMILIA_A = FamiliaModelo(
     familia_id="model-a",
     variantes=["7B", "14B"],
-    pipeline_tag="code",
+    pipeline_tag="codigo",
+    tareas_soportadas=["codigo"],
     license_declarada="Apache 2.0",
     idiomas_detectados=["en", "es", "zh", "fr"],
     formatos_disponibles=["gguf"],
@@ -38,7 +43,8 @@ FAMILIA_A = FamiliaModelo(
 FAMILIA_B = FamiliaModelo(
     familia_id="model-b",
     variantes=["7B"],
-    pipeline_tag="text-generation",
+    pipeline_tag="chat",
+    tareas_soportadas=["chat", "codigo"],
     license_declarada="MIT",
     idiomas_detectados=["en"],
     formatos_disponibles=["gguf"],
@@ -48,7 +54,8 @@ FAMILIA_B = FamiliaModelo(
 FAMILIA_C = FamiliaModelo(
     familia_id="model-c",
     variantes=["3B"],
-    pipeline_tag="code",
+    pipeline_tag="codigo",
+    tareas_soportadas=["codigo"],
     license_declarada="Apache 2.0",
     idiomas_detectados=["en", "es"],
     formatos_disponibles=["gguf"],
@@ -467,13 +474,12 @@ class TestTopNEdgeCases:
 
         with patch(
             "src.chains.recommend_pipeline.elegir_provider", return_value=provider
-        ):
-            with pytest.raises(ValueError, match="top_n must be >= 0"):
-                ejecutar_pipeline(
-                    criterios=_criterios(),
-                    catalogo=_catalogo(FAMILIA_A),
-                    top_n=-1,
-                )
+        ), pytest.raises(ValueError, match="top_n must be >= 0"):
+            ejecutar_pipeline(
+                criterios=_criterios(),
+                catalogo=_catalogo(FAMILIA_A),
+                top_n=-1,
+            )
 
     def test_top_n_negative_minus_two_raises(self) -> None:
         """top_n=-2 also raises, confirming the guard is general."""
@@ -484,13 +490,12 @@ class TestTopNEdgeCases:
 
         with patch(
             "src.chains.recommend_pipeline.elegir_provider", return_value=provider
-        ):
-            with pytest.raises(ValueError, match="top_n must be >= 0"):
-                ejecutar_pipeline(
-                    criterios=_criterios(),
-                    catalogo=_catalogo(FAMILIA_A),
-                    top_n=-2,
-                )
+        ), pytest.raises(ValueError, match="top_n must be >= 0"):
+            ejecutar_pipeline(
+                criterios=_criterios(),
+                catalogo=_catalogo(FAMILIA_A),
+                top_n=-2,
+            )
 
     def test_top_n_exactly_one(self) -> None:
         """top_n=1 returns only the highest-scoring candidate."""
@@ -540,36 +545,28 @@ class TestCatalogueInjection:
         assert cat.load_count == 1
         assert {r.familia.familia_id for r in results} == {"model-a", "model-b", "model-c"}
 
-    def test_legacy_seed_path_is_not_reachable(self) -> None:
-        """Two guards against regression: no ``load_seed`` name in the
-        module (an import would bind one), and any call routed through
-        the ``seed_loader`` module attribute raises instead of reading
-        ``data/families_seed.yaml``.
+    def test_legacy_seed_catalogue_is_gone(self) -> None:
+        """The YAML seed and its loader were removed so the synced
+        catalogue is the only source of truth; nothing may bring them back.
         """
-        provider = _MockProvider(
-            {
-                "model-a": _compatible("model-a"),
-                "model-b": _compatible("model-b"),
-                "model-c": _compatible("model-c"),
-            }
-        )
-
         assert not hasattr(recommend_pipeline, "load_seed")
-        with (
-            patch(
-                "src.tools.seed_loader.load_seed",
-                side_effect=AssertionError("legacy seed must not be read"),
-            ),
-            patch(
-                "src.chains.recommend_pipeline.elegir_provider", return_value=provider
-            ),
+        assert importlib.util.find_spec("src.tools.seed_loader") is None
+        assert not (PROJECT_ROOT / "data" / "families_seed.yaml").exists()
+
+    def test_scorer_receives_the_users_vram(self) -> None:
+        """``ajuste_vram`` must be computed against ``criterios.vram_gb``:
+        4 GB required of 16 GB available -> 0.75 headroom."""
+        provider = _MockProvider({"model-a": _compatible("model-a", vram_required_gb=4.0)})
+
+        with patch(
+            "src.chains.recommend_pipeline.elegir_provider", return_value=provider
         ):
             results = ejecutar_pipeline(
-                criterios=_criterios(),
-                catalogo=_catalogo(FAMILIA_A, FAMILIA_B, FAMILIA_C),
+                criterios=_criterios(vram_gb=16.0), catalogo=_catalogo(FAMILIA_A)
             )
 
-        assert len(results) == 3
+        ajuste = next(s for s in results[0].subpuntuaciones if s.criterio == "ajuste_vram")
+        assert ajuste.valor == pytest.approx(0.75)
 
     def test_catalogue_failure_propagates_untouched(self) -> None:
         """An exhausted catalogue must surface as its typed error, never

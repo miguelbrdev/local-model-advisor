@@ -12,13 +12,19 @@ from src.models.schemas import (
     CandidatoRankeado,
     CompatibilityResult,
     FamiliaModelo,
+    SubPuntuacion,
 )
-from src.ranking.scorer import PESOS, calcular_puntuacion, ordenar_por_puntuacion
+from src.ranking.scorer import (
+    PESOS,
+    VALOR_NEUTRO,
+    calcular_puntuacion,
+    ordenar_por_puntuacion,
+)
 
 
 def _make_candidate(
     familia_id: str = "test-model",
-    pipeline_tag: str = "code",
+    tareas: list[str] | None = None,
     license_: str | None = "MIT",
     idiomas: list[str] | None = None,
     compatible: bool | None = True,
@@ -27,11 +33,13 @@ def _make_candidate(
     grado: str | None = "comfortable",
 ) -> CandidatoRankeado:
     """Helper to build a CandidatoRankeado with controlled fields."""
+    tareas = ["codigo"] if tareas is None else tareas
     return CandidatoRankeado(
         familia=FamiliaModelo(
             familia_id=familia_id,
             variantes=["7B"],
-            pipeline_tag=pipeline_tag,
+            pipeline_tag=tareas[0] if tareas else "",
+            tareas_soportadas=tareas,
             license_declarada=license_,
             idiomas_detectados=idiomas or ["en"],
             formatos_disponibles=["gguf"],
@@ -49,26 +57,29 @@ def _make_candidate(
     )
 
 
+def _sub(candidato: CandidatoRankeado, criterio: str) -> SubPuntuacion:
+    return next(s for s in candidato.subpuntuaciones if s.criterio == criterio)
+
+
 # ---------------------------------------------------------------------------
 # Determinism
 # ---------------------------------------------------------------------------
 
 class TestDeterminismo:
     def test_same_input_same_output(self) -> None:
-        c1 = _make_candidate()
-        c2 = _make_candidate()
-        calcular_puntuacion(c1)
-        calcular_puntuacion(c2)
+        c1 = calcular_puntuacion(_make_candidate(), vram_disponible_gb=16.0)
+        c2 = calcular_puntuacion(_make_candidate(), vram_disponible_gb=16.0)
         assert c1.puntuacion_total == c2.puntuacion_total
         assert c1.subpuntuaciones == c2.subpuntuaciones
 
     def test_deterministic_across_multiple_calls(self) -> None:
-        scores = []
-        for _ in range(10):
-            c = _make_candidate(vram_required=8.0, tokens_per_second=30.0)
-            calcular_puntuacion(c)
-            scores.append(c.puntuacion_total)
-        assert len(set(scores)) == 1
+        scores = {
+            calcular_puntuacion(
+                _make_candidate(vram_required=8.0), vram_disponible_gb=16.0
+            ).puntuacion_total
+            for _ in range(10)
+        }
+        assert len(scores) == 1
 
 
 # ---------------------------------------------------------------------------
@@ -76,32 +87,26 @@ class TestDeterminismo:
 # ---------------------------------------------------------------------------
 
 class TestSubpuntuaciones:
-    def test_five_dimensions(self) -> None:
-        c = _make_candidate()
-        calcular_puntuacion(c)
-        criterios = [s.criterio for s in c.subpuntuaciones]
-        expected = [
-            "ajuste_vram", "evidencia_codigo", "documentacion",
-            "tamanio", "licencia",
-        ]
-        assert criterios == expected
+    def test_five_dimensions_in_order(self) -> None:
+        c = calcular_puntuacion(_make_candidate())
+        assert [s.criterio for s in c.subpuntuaciones] == list(PESOS)
+
+    def test_weights_sum_to_one(self) -> None:
+        assert sum(PESOS.values()) == pytest.approx(1.0)
 
     def test_all_values_between_0_and_1(self) -> None:
-        c = _make_candidate()
-        calcular_puntuacion(c)
+        c = calcular_puntuacion(_make_candidate(), vram_disponible_gb=16.0)
         for s in c.subpuntuaciones:
             assert 0 <= s.valor <= 1, f"{s.criterio} value {s.valor} out of range"
             assert 0 <= s.peso <= 1, f"{s.criterio} weight {s.peso} out of range"
 
     def test_peso_matches_config(self) -> None:
-        c = _make_candidate()
-        calcular_puntuacion(c)
+        c = calcular_puntuacion(_make_candidate())
         for s in c.subpuntuaciones:
             assert s.peso == PESOS[s.criterio]
 
     def test_justificacion_not_empty(self) -> None:
-        c = _make_candidate()
-        calcular_puntuacion(c)
+        c = calcular_puntuacion(_make_candidate())
         for s in c.subpuntuaciones:
             assert s.justificacion.strip()
 
@@ -111,100 +116,121 @@ class TestSubpuntuaciones:
 # ---------------------------------------------------------------------------
 
 class TestAjusteVRAM:
+    def test_is_headroom_on_available_vram(self) -> None:
+        """4 GB needed of 16 GB available → 75 % headroom → 0.75."""
+        c = calcular_puntuacion(_make_candidate(vram_required=4.0), vram_disponible_gb=16.0)
+        assert _sub(c, "ajuste_vram").valor == pytest.approx(0.75)
+
     def test_high_vram_low_score(self) -> None:
         """Model requiring 30 GB on a 32 GB budget → low ajuste_vram."""
-        c = _make_candidate(vram_required=30.0, tokens_per_second=10.0)
-        calcular_puntuacion(c)
-        ajuste = next(s for s in c.subpuntuaciones if s.criterio == "ajuste_vram")
-        assert ajuste.valor < 0.5
+        c = calcular_puntuacion(_make_candidate(vram_required=30.0), vram_disponible_gb=32.0)
+        assert _sub(c, "ajuste_vram").valor < 0.1
 
     def test_low_vram_high_score(self) -> None:
-        """Model requiring 2 GB → high ajuste_vram."""
-        c = _make_candidate(vram_required=2.0, tokens_per_second=50.0)
-        calcular_puntuacion(c)
-        ajuste = next(s for s in c.subpuntuaciones if s.criterio == "ajuste_vram")
-        assert ajuste.valor > 0.5
+        c = calcular_puntuacion(_make_candidate(vram_required=2.0), vram_disponible_gb=32.0)
+        assert _sub(c, "ajuste_vram").valor > 0.9
 
-    def test_unknown_vram_neutral(self) -> None:
-        c = _make_candidate(vram_required=None, tokens_per_second=None)
-        calcular_puntuacion(c)
-        ajuste = next(s for s in c.subpuntuaciones if s.criterio == "ajuste_vram")
-        assert ajuste.valor == 0.5
+    def test_exceeding_available_clamps_to_zero(self) -> None:
+        c = calcular_puntuacion(_make_candidate(vram_required=24.0), vram_disponible_gb=8.0)
+        assert _sub(c, "ajuste_vram").valor == 0.0
+
+    def test_tokens_per_second_does_not_affect_fit(self) -> None:
+        """Regression: the old formula divided GB by tok/s."""
+        slow = calcular_puntuacion(
+            _make_candidate(vram_required=4.0, tokens_per_second=2.0), vram_disponible_gb=16.0
+        )
+        fast = calcular_puntuacion(
+            _make_candidate(vram_required=4.0, tokens_per_second=200.0), vram_disponible_gb=16.0
+        )
+        assert _sub(slow, "ajuste_vram").valor == _sub(fast, "ajuste_vram").valor
+
+    def test_unknown_required_vram_neutral(self) -> None:
+        c = calcular_puntuacion(_make_candidate(vram_required=None), vram_disponible_gb=16.0)
+        assert _sub(c, "ajuste_vram").valor == VALOR_NEUTRO
+
+    def test_unknown_available_vram_neutral(self) -> None:
+        c = calcular_puntuacion(_make_candidate(vram_required=4.0))
+        assert _sub(c, "ajuste_vram").valor == VALOR_NEUTRO
+
+    def test_justification_names_available_vram(self) -> None:
+        c = calcular_puntuacion(_make_candidate(vram_required=4.0), vram_disponible_gb=16.0)
+        assert "16 GB" in _sub(c, "ajuste_vram").justificacion
 
 
 class TestEvidenciaCodigo:
-    def test_code_pipeline_scores_1(self) -> None:
-        c = _make_candidate(pipeline_tag="code")
-        calcular_puntuacion(c)
-        ev = next(s for s in c.subpuntuaciones if s.criterio == "evidencia_codigo")
+    def test_dedicated_coder_scores_1(self) -> None:
+        c = calcular_puntuacion(_make_candidate(tareas=["codigo"]))
+        ev = _sub(c, "evidencia_codigo")
         assert ev.valor == 1.0
+        assert "Dedicated" in ev.justificacion
 
-    def test_non_code_pipeline_scores_03(self) -> None:
-        c = _make_candidate(pipeline_tag="text-generation")
-        calcular_puntuacion(c)
-        ev = next(s for s in c.subpuntuaciones if s.criterio == "evidencia_codigo")
+    def test_multitask_with_code_scores_03(self) -> None:
+        """Presence of ``codigo`` is not enough: only dedication scores 1.0,
+        otherwise the criterion is a constant for every ``codigo`` query."""
+        c = calcular_puntuacion(_make_candidate(tareas=["chat", "codigo"]))
+        ev = _sub(c, "evidencia_codigo")
         assert ev.valor == 0.3
+        assert "code support" in ev.justificacion
+
+    def test_no_code_scores_03(self) -> None:
+        c = calcular_puntuacion(_make_candidate(tareas=["chat"]))
+        ev = _sub(c, "evidencia_codigo")
+        assert ev.valor == 0.3
+        assert "No code" in ev.justificacion
+
+    def test_reads_tareas_soportadas_not_pipeline_tag(self) -> None:
+        c = _make_candidate(tareas=["chat", "codigo"])
+        c.familia = c.familia.model_copy(update={"pipeline_tag": "codigo"})
+        calcular_puntuacion(c)
+        assert _sub(c, "evidencia_codigo").valor == 0.3
 
 
 class TestDocumentacion:
     def test_with_license_and_many_languages(self) -> None:
-        c = _make_candidate(license_="MIT", idiomas=["en", "es", "fr", "de"])
-        calcular_puntuacion(c)
-        doc = next(s for s in c.subpuntuaciones if s.criterio == "documentacion")
-        assert doc.valor == 1.0  # 0.5 + 0.3 + 0.2
+        c = calcular_puntuacion(_make_candidate(license_="MIT", idiomas=["en", "es", "fr", "de"]))
+        assert _sub(c, "documentacion").valor == 1.0  # 0.5 + 0.3 + 0.2
 
     def test_without_license(self) -> None:
-        c = _make_candidate(license_=None, idiomas=["en"])
-        calcular_puntuacion(c)
-        doc = next(s for s in c.subpuntuaciones if s.criterio == "documentacion")
-        assert doc.valor == 0.5  # base only
+        c = calcular_puntuacion(_make_candidate(license_=None, idiomas=["en"]))
+        assert _sub(c, "documentacion").valor == VALOR_NEUTRO
 
     def test_with_license_few_languages(self) -> None:
-        c = _make_candidate(license_="MIT", idiomas=["en"])
-        calcular_puntuacion(c)
-        doc = next(s for s in c.subpuntuaciones if s.criterio == "documentacion")
-        assert doc.valor == pytest.approx(0.8)  # 0.5 + 0.3
+        c = calcular_puntuacion(_make_candidate(license_="MIT", idiomas=["en"]))
+        assert _sub(c, "documentacion").valor == pytest.approx(0.8)  # 0.5 + 0.3
 
 
 class TestTamanio:
     def test_small_model_high_score(self) -> None:
-        c = _make_candidate(vram_required=1.0)
-        calcular_puntuacion(c)
-        tam = next(s for s in c.subpuntuaciones if s.criterio == "tamanio")
-        assert tam.valor > 0.9
+        c = calcular_puntuacion(_make_candidate(vram_required=1.0))
+        assert _sub(c, "tamanio").valor > 0.9
 
     def test_large_model_low_score(self) -> None:
-        c = _make_candidate(vram_required=28.0)
-        calcular_puntuacion(c)
-        tam = next(s for s in c.subpuntuaciones if s.criterio == "tamanio")
-        assert tam.valor < 0.2
+        c = calcular_puntuacion(_make_candidate(vram_required=28.0))
+        assert _sub(c, "tamanio").valor < 0.2
 
     def test_unknown_vram_neutral(self) -> None:
-        c = _make_candidate(vram_required=None)
-        calcular_puntuacion(c)
-        tam = next(s for s in c.subpuntuaciones if s.criterio == "tamanio")
-        assert tam.valor == 0.5
+        c = calcular_puntuacion(_make_candidate(vram_required=None))
+        assert _sub(c, "tamanio").valor == VALOR_NEUTRO
 
 
 class TestLicencia:
-    @pytest.mark.parametrize("lic", ["MIT", "Apache-2.0", "BSD-2-Clause", "ISC"])
+    @pytest.mark.parametrize("lic", ["MIT", "Apache-2.0", "Apache 2.0", "BSD-2-Clause", "ISC"])
     def test_permissive_scores_1(self, lic: str) -> None:
-        c = _make_candidate(license_=lic)
-        calcular_puntuacion(c)
-        lic_s = next(s for s in c.subpuntuaciones if s.criterio == "licencia")
-        assert lic_s.valor == 1.0
+        c = calcular_puntuacion(_make_candidate(license_=lic))
+        assert _sub(c, "licencia").valor == 1.0
+
+    def test_source_spelling_apache_scores_1(self) -> None:
+        """Regression: ``"Apache 2.0"`` (48 of 91 synced families) scored 0.5."""
+        c = calcular_puntuacion(_make_candidate(license_="Apache 2.0"))
+        assert _sub(c, "licencia").valor == 1.0
 
     def test_other_license_scores_05(self) -> None:
-        c = _make_candidate(license_="Llama 3.1 Community")
-        calcular_puntuacion(c)
-        lic_s = next(s for s in c.subpuntuaciones if s.criterio == "licencia")
-        assert lic_s.valor == 0.5
+        c = calcular_puntuacion(_make_candidate(license_="Llama 3.1 Community"))
+        assert _sub(c, "licencia").valor == 0.5
 
     def test_no_license_scores_0(self) -> None:
-        c = _make_candidate(license_=None)
-        calcular_puntuacion(c)
-        lic_s = next(s for s in c.subpuntuaciones if s.criterio == "licencia")
-        assert lic_s.valor == 0.0
+        c = calcular_puntuacion(_make_candidate(license_=None))
+        assert _sub(c, "licencia").valor == 0.0
 
 
 # ---------------------------------------------------------------------------
@@ -213,19 +239,22 @@ class TestLicencia:
 
 class TestPuntuacionTotal:
     def test_is_weighted_sum(self) -> None:
-        c = _make_candidate()
-        calcular_puntuacion(c)
+        c = calcular_puntuacion(_make_candidate(), vram_disponible_gb=16.0)
         expected = sum(s.valor * s.peso for s in c.subpuntuaciones)
         assert c.puntuacion_total == pytest.approx(expected, abs=0.001)
 
     def test_custom_weights(self) -> None:
-        c1 = _make_candidate(vram_required=2.0)
-        c2 = _make_candidate(vram_required=2.0)
-        custom_pesos = {k: 0.2 for k in PESOS}
-        calcular_puntuacion(c1)
-        calcular_puntuacion(c2, pesos=custom_pesos)
-        # Different weights → different total
+        c1 = calcular_puntuacion(_make_candidate(vram_required=2.0), vram_disponible_gb=16.0)
+        c2 = calcular_puntuacion(
+            _make_candidate(vram_required=2.0),
+            vram_disponible_gb=16.0,
+            pesos={k: 0.2 for k in PESOS},
+        )
         assert c1.puntuacion_total != c2.puntuacion_total
+
+    def test_returns_same_object(self) -> None:
+        c = _make_candidate()
+        assert calcular_puntuacion(c) is c
 
 
 # ---------------------------------------------------------------------------
@@ -234,13 +263,20 @@ class TestPuntuacionTotal:
 
 class TestOrdenarPorPuntuacion:
     def test_descending_order(self) -> None:
-        c_low = _make_candidate("low", vram_required=30.0, license_=None)
-        c_high = _make_candidate("high", vram_required=2.0, license_="MIT")
-        calcular_puntuacion(c_low)
-        calcular_puntuacion(c_high)
+        c_low = calcular_puntuacion(
+            _make_candidate("low", vram_required=30.0, license_=None), vram_disponible_gb=32.0
+        )
+        c_high = calcular_puntuacion(
+            _make_candidate("high", vram_required=2.0, license_="MIT"), vram_disponible_gb=32.0
+        )
         resultado = ordenar_por_puntuacion([c_low, c_high])
-        assert resultado[0].familia.familia_id == "high"
-        assert resultado[1].familia.familia_id == "low"
+        assert [r.familia.familia_id for r in resultado] == ["high", "low"]
+
+    def test_stable_for_ties(self) -> None:
+        a = calcular_puntuacion(_make_candidate("a"))
+        b = calcular_puntuacion(_make_candidate("b"))
+        assert a.puntuacion_total == b.puntuacion_total
+        assert [r.familia.familia_id for r in ordenar_por_puntuacion([a, b])] == ["a", "b"]
 
     def test_empty_list(self) -> None:
         assert ordenar_por_puntuacion([]) == []

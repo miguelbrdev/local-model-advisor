@@ -2,7 +2,7 @@
 
 The ``VRAMCompatibilityProvider`` protocol defines the contract.
 ``CanIRunProvider`` calls the canirun.ai public API for chat/code/reasoning
-tasks. If the service is unreachable, it returns a controlled
+tasks.  If the service is unreachable, it returns a controlled
 ``CompatibilityResult`` with ``fuente="no_disponible"`` — never raises.
 """
 
@@ -28,12 +28,26 @@ CANIRUN_API_BASE = "https://canirun.ai/api"
 CANIRUN_TIMEOUT = 10.0
 
 
+def _variante_por_defecto(familia: FamiliaModelo, *, ultima: bool = False) -> str:
+    """Label of the variant a provider reports when it cannot choose one.
+
+    Synced families carry no nested ``variantes`` (each canIRun.ai record
+    is a single checkpoint), so the parameter-count text (``"7B"``) is the
+    only meaningful label left; ``"unknown"`` is the last resort.
+    """
+    if familia.variantes:
+        return familia.variantes[-1] if ultima else familia.variantes[0]
+    return familia.parametros_texto or "unknown"
+
+
 class CanIRunProvider:
     """Checks VRAM compatibility via the canirun.ai public API.
 
-    Used for chat, code, and reasoning tasks. Maps ``familia.canirun_id``
-    to the canirun.ai model identifier. On any failure returns a controlled
-    result with ``fuente="no_disponible"``.
+    Used for chat, code, and reasoning tasks.  Maps ``familia.canirun_id``
+    to the canirun.ai model identifier.  On any failure returns a
+    controlled result with ``fuente="no_disponible"``.  ``runtime`` is
+    accepted for Protocol compatibility but not sent: the compatibility
+    endpoint has no runtime parameter in the observed contract.
     """
 
     def check(
@@ -43,13 +57,13 @@ class CanIRunProvider:
         if not canirun_id:
             return CompatibilityResult(
                 modelo_id=familia.familia_id,
-                variante=familia.variantes[0] if familia.variantes else "unknown",
+                variante=_variante_por_defecto(familia),
                 compatible=None,
                 fuente="no_disponible",
                 nota="No canirun_id mapping configured for this family.",
             )
 
-        default_variant = familia.variantes[-1] if familia.variantes else "unknown"
+        variante = _variante_por_defecto(familia, ultima=True)
         try:
             response = httpx.post(
                 f"{CANIRUN_API_BASE}/compatibility",
@@ -63,21 +77,22 @@ class CanIRunProvider:
             )
             response.raise_for_status()
             data = response.json()
+            estimado = data.get("estimated", {})
 
             return CompatibilityResult(
                 modelo_id=familia.familia_id,
-                variante=default_variant,
+                variante=variante,
                 compatible=data.get("compatible"),
                 grado=data.get("status"),
                 fuente="canirun_ai",
                 nota="; ".join(data.get("notes", [])),
-                tokens_per_second=data.get("estimated", {}).get("tokensPerSecond"),
-                vram_required_gb=data.get("estimated", {}).get("vramRequiredGb"),
+                tokens_per_second=estimado.get("tokensPerSecond"),
+                vram_required_gb=estimado.get("vramRequiredGb"),
             )
         except Exception as exc:
             return CompatibilityResult(
                 modelo_id=familia.familia_id,
-                variante=default_variant,
+                variante=variante,
                 compatible=None,
                 fuente="no_disponible",
                 nota=f"canirun.ai API error: {exc}",
@@ -85,19 +100,19 @@ class CanIRunProvider:
 
 
 class TamanoDirectoProvider:
-    """Fallback heuristic for embeddings/rerankers.
+    """Fallback heuristic for small models (embeddings/rerankers).
 
-    These models are small (hundreds of MB to ~2 GB) and rarely VRAM-bound.
-    Formula: compatible if ``(model_size_gb * 1.2) <= vram_gb``.
+    These models are small (hundreds of MB to ~2 GB) and rarely VRAM-bound,
+    so they are reported as compatible without an external call.  Not
+    reachable from the v1 API, whose tasks all route to ``CanIRunProvider``.
     """
 
     def check(
         self, familia: FamiliaModelo, vram_gb: float, runtime: str | None = None
     ) -> CompatibilityResult:
-        default_variant = familia.variantes[0] if familia.variantes else "unknown"
         return CompatibilityResult(
             modelo_id=familia.familia_id,
-            variante=default_variant,
+            variante=_variante_por_defecto(familia),
             compatible=True,
             grado="runs_well",
             fuente="heuristica_propia",

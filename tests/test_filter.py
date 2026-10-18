@@ -1,23 +1,17 @@
 """Tests for src.tools.structured_filter.
 
-Covers: task filtering, VRAM compatibility gate, language subset check,
-and commercial-license filter.
+Covers: task filtering on ``tareas_soportadas``, VRAM compatibility gate,
+language subset check, and commercial-license filter.
 """
 
 from __future__ import annotations
-
-import pytest
 
 from src.models.schemas import (
     CompatibilityResult,
     CriteriosBusqueda,
     FamiliaModelo,
 )
-from src.tools.structured_filter import (
-    _es_licencia_comercial,
-    _tarea_match,
-    filtrar_candidatos,
-)
+from src.tools.structured_filter import filtrar_candidatos, soporta_tarea
 from tests.conftest import (
     FAMILIA_CHAT,
     FAMILIA_CODIGO,
@@ -26,63 +20,54 @@ from tests.conftest import (
     MockVRAMProvider,
 )
 
-# A familia that does NOT match any code/chat/reasoning tags
+# A family that declares none of the v1 tasks.
 FAMILIA_IMAGE = FamiliaModelo(
     familia_id="image-model",
     variantes=["7B"],
-    pipeline_tag="image-generation",
+    pipeline_tag="",
+    tareas_soportadas=[],
     license_declarada="MIT",
     idiomas_detectados=["en"],
     formatos_disponibles=["gguf"],
     canirun_id="image-model-7b",
 )
 
-
-# ---------------------------------------------------------------------------
-# _tarea_match helper
-# ---------------------------------------------------------------------------
-
-class TestTareaMatch:
-    def test_code_tag_matches_codigo(self) -> None:
-        assert _tarea_match("code", "codigo") is True
-
-    def test_text_generation_matches_chat(self) -> None:
-        assert _tarea_match("text-generation", "chat") is True
-
-    def test_text_generation_matches_razonamiento(self) -> None:
-        assert _tarea_match("text-generation", "razonamiento") is True
-
-    def test_sentence_similarity_matches_embeddings(self) -> None:
-        assert _tarea_match("sentence-similarity", "embeddings") is True
-
-    def test_text_classification_matches_rerankers(self) -> None:
-        assert _tarea_match("text-classification", "rerankers") is True
-
-    def test_code_does_not_match_chat(self) -> None:
-        assert _tarea_match("code", "chat") is False
-
-    def test_unknown_tag_matches_exact_tarea(self) -> None:
-        assert _tarea_match("my-custom-tag", "my-custom-tag") is True
+# Multi-task family: ``pipeline_tag`` only shows the first task.
+FAMILIA_MULTITAREA = FamiliaModelo(
+    familia_id="generalist",
+    variantes=["8B"],
+    pipeline_tag="chat",
+    tareas_soportadas=["chat", "codigo", "razonamiento"],
+    license_declarada="Apache 2.0",
+    canirun_id="generalist-8b",
+)
 
 
 # ---------------------------------------------------------------------------
-# _es_licencia_comercial helper
+# soporta_tarea helper
 # ---------------------------------------------------------------------------
 
-class TestEsLicenciaComercial:
-    @pytest.mark.parametrize("lic", ["MIT", "Apache-2.0", "BSD-2-Clause", "ISC", "MPL-2.0"])
-    def test_permissive_licenses_return_true(self, lic: str) -> None:
-        assert _es_licencia_comercial(lic) is True
+class TestSoportaTarea:
+    def test_declared_task_matches(self) -> None:
+        assert soporta_tarea(FAMILIA_CODIGO, "codigo") is True
 
-    def test_none_returns_false(self) -> None:
-        assert _es_licencia_comercial(None) is False
+    def test_undeclared_task_does_not_match(self) -> None:
+        assert soporta_tarea(FAMILIA_CODIGO, "chat") is False
 
-    def test_restrictive_license_returns_false(self) -> None:
-        assert _es_licencia_comercial("Llama 3.1 Community") is False
+    def test_reads_every_declared_task_not_only_pipeline_tag(self) -> None:
+        assert FAMILIA_MULTITAREA.pipeline_tag == "chat"
+        assert soporta_tarea(FAMILIA_MULTITAREA, "codigo") is True
+        assert soporta_tarea(FAMILIA_MULTITAREA, "razonamiento") is True
 
-    def test_case_insensitive(self) -> None:
-        assert _es_licencia_comercial("mit") is True
-        assert _es_licencia_comercial("apache-2.0") is True
+    def test_pipeline_tag_alone_is_not_enough(self) -> None:
+        """A family whose ``pipeline_tag`` says ``codigo`` but declares no
+        tasks must not match: ``tareas_soportadas`` is the contract."""
+        familia = FAMILIA_CODIGO.model_copy(update={"tareas_soportadas": []})
+        assert soporta_tarea(familia, "codigo") is False
+
+    def test_empty_tasks_match_nothing(self) -> None:
+        for tarea in ("chat", "codigo", "razonamiento"):
+            assert soporta_tarea(FAMILIA_IMAGE, tarea) is False
 
 
 # ---------------------------------------------------------------------------
@@ -98,18 +83,40 @@ class TestFiltrarPorTarea:
             [FAMILIA_CODIGO, FAMILIA_IMAGE], criterios, mock_vram_provider
         )
         ids = [r.familia.familia_id for r in resultado]
-        assert "qwen2.5-coder" in ids
-        assert "image-model" not in ids
+        assert ids == ["qwen2.5-coder"]
 
-    def test_chat_returns_text_generation_families(
-        self, mock_vram_provider: MockVRAMProvider
-    ) -> None:
+    def test_chat_returns_chat_families(self, mock_vram_provider: MockVRAMProvider) -> None:
         criterios = CriteriosBusqueda(tarea="chat", vram_gb=16.0)
         resultado = filtrar_candidatos(
             [FAMILIA_CODIGO, FAMILIA_CHAT], criterios, mock_vram_provider
         )
         ids = [r.familia.familia_id for r in resultado]
-        assert "llama3.1-8b" in ids
+        assert ids == ["llama3.1-8b"]
+
+    def test_multitask_family_passes_for_every_declared_task(
+        self, mock_vram_provider: MockVRAMProvider
+    ) -> None:
+        for tarea in ("chat", "codigo", "razonamiento"):
+            criterios = CriteriosBusqueda(tarea=tarea, vram_gb=16.0)
+            resultado = filtrar_candidatos([FAMILIA_MULTITAREA], criterios, mock_vram_provider)
+            assert [r.familia.familia_id for r in resultado] == ["generalist"], tarea
+
+    def test_razonamiento_excludes_dedicated_coder(
+        self, mock_vram_provider: MockVRAMProvider
+    ) -> None:
+        criterios = CriteriosBusqueda(tarea="razonamiento", vram_gb=16.0)
+        resultado = filtrar_candidatos(
+            [FAMILIA_CODIGO, FAMILIA_CHAT, FAMILIA_MULTITAREA], criterios, mock_vram_provider
+        )
+        ids = [r.familia.familia_id for r in resultado]
+        assert ids == ["llama3.1-8b", "generalist"]
+
+    def test_provider_not_consulted_for_filtered_out_families(
+        self, mock_vram_provider: MockVRAMProvider
+    ) -> None:
+        criterios = CriteriosBusqueda(tarea="codigo", vram_gb=16.0)
+        filtrar_candidatos([FAMILIA_CHAT, FAMILIA_IMAGE], criterios, mock_vram_provider)
+        assert mock_vram_provider.call_count == 0
 
 
 # ---------------------------------------------------------------------------
@@ -144,6 +151,12 @@ class TestFiltrarPorVRAM:
         resultado = filtrar_candidatos([FAMILIA_CODIGO], criterios, provider)
         assert len(resultado) == 1
 
+    def test_provider_receives_vram_and_runtime(self) -> None:
+        provider = MockVRAMProvider()
+        criterios = CriteriosBusqueda(tarea="codigo", vram_gb=12.0, runtime_preferido="ollama")
+        filtrar_candidatos([FAMILIA_CODIGO], criterios, provider)
+        assert provider.calls == [("qwen2.5-coder", 12.0)]
+
 
 # ---------------------------------------------------------------------------
 # filtrar_candidatos — language filter
@@ -158,12 +171,8 @@ class TestFiltrarPorIdioma:
         resultado = filtrar_candidatos(
             [FAMILIA_CODIGO, FAMILIA_POCOS_IDIOMAS], criterios, provider
         )
-        ids = [r.familia.familia_id for r in resultado]
-        # zh-only has only ["zh"], so "en","es","ja" not subset → excluded
-        assert "zh-only" not in ids
-        # qwen2.5-coder has ["en","es","zh","fr","de"], no "ja" → also excluded
-        assert "qwen2.5-coder" not in ids
-        assert len(resultado) == 0
+        # zh-only has only ["zh"]; qwen2.5-coder lacks "ja" → both excluded
+        assert resultado == []
 
     def test_family_with_matching_languages_passes(self) -> None:
         provider = MockVRAMProvider()
@@ -174,10 +183,7 @@ class TestFiltrarPorIdioma:
             [FAMILIA_CODIGO, FAMILIA_POCOS_IDIOMAS], criterios, provider
         )
         ids = [r.familia.familia_id for r in resultado]
-        # qwen2.5-coder has en+es → passes
-        assert "qwen2.5-coder" in ids
-        # zh-only has only zh → fails
-        assert "zh-only" not in ids
+        assert ids == ["qwen2.5-coder"]
 
     def test_empty_language_list_passes_all(self) -> None:
         provider = MockVRAMProvider()
@@ -188,13 +194,11 @@ class TestFiltrarPorIdioma:
         assert len(resultado) == 2
 
     def test_family_with_none_languages_passes_language_filter(self) -> None:
-        familia_none_lang = FAMILIA_CODIGO.model_copy(
-            update={"idiomas_detectados": None}
-        )
+        """Synced families declare no languages (``None``); the filter must
+        not exclude them, only report the limitation."""
+        familia_none_lang = FAMILIA_CODIGO.model_copy(update={"idiomas_detectados": None})
         provider = MockVRAMProvider()
-        criterios = CriteriosBusqueda(
-            tarea="codigo", vram_gb=16.0, idiomas_requeridos=["en"]
-        )
+        criterios = CriteriosBusqueda(tarea="codigo", vram_gb=16.0, idiomas_requeridos=["en"])
         resultado = filtrar_candidatos([familia_none_lang], criterios, provider)
         assert len(resultado) == 1
 
@@ -204,20 +208,24 @@ class TestFiltrarPorIdioma:
 # ---------------------------------------------------------------------------
 
 class TestFiltrarPorLicencia:
-    def test_commercial_filter_excludes_restrictive(self) -> None:
+    def test_commercial_filter_excludes_restrictive_and_unknown(self) -> None:
         provider = MockVRAMProvider()
         criterios = CriteriosBusqueda(
             tarea="codigo", vram_gb=16.0, requiere_licencia_comercial=True
         )
         resultado = filtrar_candidatos(
-            [FAMILIA_CODIGO, FAMILIA_SIN_LICENCIA],
-            criterios,
-            provider,
+            [FAMILIA_CODIGO, FAMILIA_SIN_LICENCIA], criterios, provider
         )
         ids = [r.familia.familia_id for r in resultado]
-        # Apache 2.0 → permitted; None → not
-        assert "qwen2.5-coder" in ids
-        assert "mystery-model" not in ids
+        assert ids == ["qwen2.5-coder"]  # "Apache 2.0" permitted; None not
+
+    def test_commercial_filter_accepts_source_spelling(self) -> None:
+        """The synced source spells it ``"Apache 2.0"`` (space, no dash)."""
+        provider = MockVRAMProvider()
+        criterios = CriteriosBusqueda(tarea="chat", vram_gb=16.0, requiere_licencia_comercial=True)
+        resultado = filtrar_candidatos([FAMILIA_MULTITAREA, FAMILIA_CHAT], criterios, provider)
+        ids = [r.familia.familia_id for r in resultado]
+        assert ids == ["generalist"]  # Llama Community is not permissive
 
     def test_commercial_filter_false_passes_all(self) -> None:
         provider = MockVRAMProvider()
@@ -225,9 +233,7 @@ class TestFiltrarPorLicencia:
             tarea="codigo", vram_gb=16.0, requiere_licencia_comercial=False
         )
         resultado = filtrar_candidatos(
-            [FAMILIA_CODIGO, FAMILIA_SIN_LICENCIA],
-            criterios,
-            provider,
+            [FAMILIA_CODIGO, FAMILIA_SIN_LICENCIA], criterios, provider
         )
         assert len(resultado) == 2
 
@@ -251,14 +257,14 @@ class TestFiltrarIntegracion:
             criterios,
             provider,
         )
-        # Only qwen2.5-coder passes: code tag, en+es, Apache 2.0, compatible
-        assert len(resultado) == 1
-        assert resultado[0].familia.familia_id == "qwen2.5-coder"
+        # Only qwen2.5-coder passes: declares codigo, en+es, Apache 2.0, compatible
+        assert [r.familia.familia_id for r in resultado] == ["qwen2.5-coder"]
 
-    def test_provider_called_for_each_candidate(self) -> None:
+    def test_preserves_catalogue_order(self) -> None:
         provider = MockVRAMProvider()
         criterios = CriteriosBusqueda(tarea="codigo", vram_gb=16.0)
-        filtrar_candidatos([FAMILIA_CODIGO, FAMILIA_SIN_LICENCIA], criterios, provider)
-        # Provider is called AFTER task/license/language filters
-        # FAMILIA_CODIGO passes task, so provider is called
-        assert provider.call_count >= 1
+        resultado = filtrar_candidatos(
+            [FAMILIA_POCOS_IDIOMAS, FAMILIA_CODIGO, FAMILIA_SIN_LICENCIA], criterios, provider
+        )
+        ids = [r.familia.familia_id for r in resultado]
+        assert ids == ["zh-only", "qwen2.5-coder", "mystery-model"]

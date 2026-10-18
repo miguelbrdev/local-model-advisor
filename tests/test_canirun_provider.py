@@ -105,6 +105,33 @@ class TestCanIRunExito:
         assert result.variante == "14B"  # last variant
 
 
+    @patch("src.compatibility.provider.httpx.post")
+    def test_synced_family_without_variants_reports_parameter_text(
+        self, mock_post: MagicMock
+    ) -> None:
+        """Synced records carry no ``variantes``; the parameter text is the
+        only meaningful label left (never a bare ``"unknown"``)."""
+        mock_response = MagicMock()
+        mock_response.raise_for_status = MagicMock()
+        mock_response.json.return_value = {"compatible": True, "status": "ok", "notes": []}
+        mock_post.return_value = mock_response
+        familia = FamiliaModelo(
+            familia_id="qwen3.5-0.8b",
+            variantes=[],
+            pipeline_tag="chat",
+            canirun_id="qwen3.5-0.8b",
+            parametros_texto="0.8B",
+        )
+
+        result = CanIRunProvider().check(familia, vram_gb=11.0)
+        assert result.variante == "0.8B"
+
+    def test_without_variants_or_parameter_text_is_unknown(self) -> None:
+        familia = FamiliaModelo(familia_id="x", variantes=[], pipeline_tag="chat")
+        result = CanIRunProvider().check(familia, vram_gb=11.0)
+        assert result.variante == "unknown"
+
+
 # ---------------------------------------------------------------------------
 # CanIRunProvider — timeout
 # ---------------------------------------------------------------------------

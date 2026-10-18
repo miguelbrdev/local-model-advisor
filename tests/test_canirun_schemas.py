@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from src.sync.canirun_schemas import CanIRunModelRecord, CanIRunModelsResponse
 
@@ -35,13 +36,13 @@ class TestModelsResponse:
     def test_missing_count_rejected(self) -> None:
         raw = _load_fixture()
         del raw["count"]
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             CanIRunModelsResponse.model_validate(raw)
 
     def test_missing_models_rejected(self) -> None:
         raw = _load_fixture()
         del raw["models"]
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             CanIRunModelsResponse.model_validate(raw)
 
     def test_count_mismatch_does_not_crash(self) -> None:
@@ -85,7 +86,7 @@ class TestModelRecord:
             "params": "1B",
             "paramsBillions": 1,
         }
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             CanIRunModelRecord.model_validate(data)
 
     def test_use_case_list_preserved(self) -> None:

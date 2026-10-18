@@ -16,12 +16,12 @@ from collections.abc import Iterator
 from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import MagicMock, patch
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
 
-from src.api.main import app
+from src.api.main import LIMITACIONES_ACTUALES, app
 from src.catalog import synced
 from src.catalog.protocol import CatalogUnavailableError
 from src.models.schemas import (
@@ -30,6 +30,7 @@ from src.models.schemas import (
     CriteriosBusqueda,
     FamiliaModelo,
 )
+from src.state import conversation_store
 from src.sync.bootstrap import DEFAULT_BOOTSTRAP_PATH
 from src.sync.snapshot import CatalogSnapshot, SnapshotMeta, compute_content_hash
 
@@ -111,6 +112,12 @@ class _SentinelCatalogue:
 
     def cargar(self) -> list[FamiliaModelo]:
         return list(self._familias)
+
+
+@pytest.fixture(autouse=True)
+def _conversaciones_en_tmp(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep every conversation written by these tests out of ``runtime/``."""
+    monkeypatch.setattr(conversation_store, "_DB_PATH", tmp_path / "conversations.db")
 
 
 @pytest.fixture
@@ -252,8 +259,6 @@ class TestChatNuevaConversacion:
         }
         data = client.post("/chat", json=payload).json()
         assert "conversation_id" in data
-        uuid4()  # validate it's a valid UUID
-        from uuid import UUID
         UUID(data["conversation_id"])  # raises if invalid
 
     @patch("src.api.main.ejecutar_pipeline")
@@ -298,6 +303,45 @@ class TestChatNuevaConversacion:
         }
         client.post("/chat", json=payload)
         assert mock_pipeline.call_args.kwargs["catalogo"] is app.state.catalogo
+
+    @patch("src.api.main.ejecutar_pipeline")
+    def test_reports_current_limitations(
+        self, mock_pipeline: MagicMock, client: TestClient
+    ) -> None:
+        mock_pipeline.return_value = _mock_pipeline_result()
+        payload = {"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
+        data = client.post("/chat", json=payload).json()
+        assert data["limitaciones"] == LIMITACIONES_ACTUALES
+        assert data["datos_actualizados_hace"] == ""
+
+    @patch("src.api.main.ejecutar_pipeline")
+    def test_persists_snapshot_id_of_mounted_catalogue(
+        self, mock_pipeline: MagicMock, client: TestClient
+    ) -> None:
+        """Reproducibility: the stored run must name the snapshot that
+        produced it, taken from the process-wide catalogue."""
+        mock_pipeline.return_value = _mock_pipeline_result()
+        payload = {"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
+        data = client.post("/chat", json=payload).json()
+
+        run = conversation_store.cargar(UUID(data["conversation_id"]))
+        assert run is not None
+        assert run.snapshot_id == app.state.catalogo.snapshot_id
+        assert run.snapshot_id.startswith("snap-")
+
+    @patch("src.api.main.ejecutar_pipeline")
+    def test_unknown_conversation_id_starts_a_new_conversation(
+        self, mock_pipeline: MagicMock, client: TestClient
+    ) -> None:
+        mock_pipeline.return_value = _mock_pipeline_result()
+        stale_id = str(uuid4())
+        payload = {
+            "conversation_id": stale_id,
+            "mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0}),
+        }
+        data = client.post("/chat", json=payload).json()
+        assert data["tipo"] == "recomendacion"
+        assert data["conversation_id"] != stale_id
 
     @patch("src.api.main.ejecutar_pipeline")
     def test_persists_conversation(self, mock_pipeline: MagicMock, client: TestClient) -> None:
@@ -439,9 +483,8 @@ class TestCatalogueWiring:
             bootstrap_path=tmp_path / "absent.json",
         )
 
-        with pytest.raises(CatalogUnavailableError):
-            with TestClient(app):
-                pass  # pragma: no cover — startup must never get here
+        with pytest.raises(CatalogUnavailableError), TestClient(app):
+            pass  # pragma: no cover — startup must never get here
 
     def test_unresolvable_sources_are_not_served_as_empty(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -456,9 +499,8 @@ class TestCatalogueWiring:
             monkeypatch, runtime_dir=runtime, bootstrap_path=bootstrap
         )
 
-        with pytest.raises(CatalogUnavailableError) as excinfo:
-            with TestClient(app):
-                pass  # pragma: no cover — startup must never get here
+        with pytest.raises(CatalogUnavailableError) as excinfo, TestClient(app):
+            pass  # pragma: no cover — startup must never get here
 
         message = str(excinfo.value)
         assert str(runtime) in message

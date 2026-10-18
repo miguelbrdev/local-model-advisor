@@ -63,6 +63,12 @@ docs/technical-design.md
 # agente, no documentación del proyecto. El espejo de recuperación vive en Engram.
 odd/
 
+# Tooling local de agentes de código (índices, skills descargadas, lockfile)
+.codegraph/
+.agents/
+.claude/skills/
+skills-lock.json
+
 # IDE y sistema operativo
 .vscode/
 .idea/

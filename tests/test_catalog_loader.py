@@ -269,7 +269,7 @@ class TestDefaultPaths:
         # guards against is src/runtime/catalog, which would silently
         # leave production bootstrap-only forever.
         repo_root = Path(__file__).resolve().parents[1]
-        assert DEFAULT_RUNTIME_CATALOG_DIR == repo_root / "runtime" / "catalog"
+        assert repo_root / "runtime" / "catalog" == DEFAULT_RUNTIME_CATALOG_DIR
         assert not DEFAULT_RUNTIME_CATALOG_DIR.is_relative_to(repo_root / "src")
 
         # Zero-argument construction performs no I/O (documented on the

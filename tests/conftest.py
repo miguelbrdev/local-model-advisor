@@ -2,6 +2,10 @@
 
 Provides reusable sample catalogue families, search criteria, and a
 deterministic mock VRAM provider that never calls external APIs.
+
+The sample families use the synced-catalogue dialect: ``pipeline_tag`` is
+the first internal task and ``tareas_soportadas`` lists every task, which
+is the field the filter and scorer read.
 """
 
 from __future__ import annotations
@@ -21,7 +25,8 @@ from src.models.schemas import (
 FAMILIA_CODIGO = FamiliaModelo(
     familia_id="qwen2.5-coder",
     variantes=["1.5B", "7B", "14B", "32B"],
-    pipeline_tag="code",
+    pipeline_tag="codigo",
+    tareas_soportadas=["codigo"],
     license_declarada="Apache 2.0",
     idiomas_detectados=["en", "es", "zh", "fr", "de"],
     formatos_disponibles=["gguf"],
@@ -31,7 +36,8 @@ FAMILIA_CODIGO = FamiliaModelo(
 FAMILIA_CHAT = FamiliaModelo(
     familia_id="llama3.1-8b",
     variantes=["8B"],
-    pipeline_tag="text-generation",
+    pipeline_tag="chat",
+    tareas_soportadas=["chat", "razonamiento"],
     license_declarada="Llama 3.1 Community",
     idiomas_detectados=["en", "es"],
     formatos_disponibles=["gguf"],
@@ -41,7 +47,8 @@ FAMILIA_CHAT = FamiliaModelo(
 FAMILIA_SIN_LICENCIA = FamiliaModelo(
     familia_id="mystery-model",
     variantes=["7B"],
-    pipeline_tag="code",
+    pipeline_tag="codigo",
+    tareas_soportadas=["codigo"],
     license_declarada=None,
     idiomas_detectados=["en"],
     formatos_disponibles=["gguf"],
@@ -51,7 +58,8 @@ FAMILIA_SIN_LICENCIA = FamiliaModelo(
 FAMILIA_POCOS_IDIOMAS = FamiliaModelo(
     familia_id="zh-only",
     variantes=["7B"],
-    pipeline_tag="code",
+    pipeline_tag="codigo",
+    tareas_soportadas=["codigo"],
     license_declarada="MIT",
     idiomas_detectados=["zh"],
     formatos_disponibles=["gguf"],
