@@ -58,7 +58,7 @@ Implemented:
 - `scripts/sync_catalog.py`: the entry point for the 21-day scheduled task,
   with retention of historical snapshots (`src/sync/retention.py`) that never
   deletes the active or previous snapshot
-- 336 automated tests and Ruff linting
+- 340 automated tests and Ruff linting
 
 Not implemented yet:
 
@@ -233,7 +233,7 @@ cron (Linux/macOS), running on the 1st and 22nd of each month:
 |---|---|---|
 | `GET` | `/health` | Returns API health status |
 | `GET` | `/families` | Lists every family of the mounted catalog snapshot |
-| `POST` | `/chat` | Returns a clarification or recommendation response |
+| `POST` | `/chat` | Returns a clarification or recommendation response; `422` when `mensaje` is not valid criteria JSON |
 
 Once the server is running, interactive OpenAPI documentation is available at
 `/docs`.

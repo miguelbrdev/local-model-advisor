@@ -14,7 +14,8 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from uuid import UUID, uuid4
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
+from pydantic import ValidationError
 
 from src.catalog.synced import CatalogoSincronizado
 from src.chains.recommend_pipeline import ejecutar_pipeline
@@ -107,11 +108,17 @@ def chat(peticion: PeticionChat) -> RespuestaChat:
     criteria stored server-side under ``conversation_id``; the client is
     never the source of truth for criteria, candidates or scores.
 
+    Raises:
+        HTTPException: ``422`` when a new conversation's ``mensaje`` is not
+            a valid ``CriteriosBusqueda`` JSON document.  The detail lists
+            the validation errors so the client can fix its payload.
+
     Side effects:
-        Persists the ``ConversationRun`` — including the ``snapshot_id``
-        of the mounted catalogue, for reproducibility — in SQLite.
+        Persists the ``ConversationRun`` — cumulative history plus the
+        ``snapshot_id`` of the mounted catalogue, for reproducibility — in
+        SQLite.
     """
-    conversation_id, criterios = _resolver_conversacion(peticion)
+    conversation_id, criterios, historial = _resolver_conversacion(peticion)
 
     faltantes = criterios.campos_faltantes()
     if faltantes:
@@ -139,6 +146,7 @@ def chat(peticion: PeticionChat) -> RespuestaChat:
             criterios=criterios,
             candidatos_elegibles=candidatos,
             historial=[
+                *historial,
                 TurnoConversacion(rol="usuario", contenido=peticion.mensaje),
                 TurnoConversacion(rol="sistema", contenido=respuesta.model_dump_json()),
             ],
@@ -147,19 +155,42 @@ def chat(peticion: PeticionChat) -> RespuestaChat:
     return respuesta
 
 
-def _resolver_conversacion(peticion: PeticionChat) -> tuple[UUID, CriteriosBusqueda]:
-    """Return the conversation id and criteria the request refers to.
+def _resolver_conversacion(
+    peticion: PeticionChat,
+) -> tuple[UUID, CriteriosBusqueda, list[TurnoConversacion]]:
+    """Return the conversation id, criteria and prior history for a request.
 
     An unknown or expired ``conversation_id`` is treated as a new
-    conversation: a fresh id is issued and the criteria are parsed from
-    ``mensaje``, exactly as for a first message.
+    conversation: a fresh id is issued, the criteria are parsed from
+    ``mensaje`` and the history starts empty, exactly as for a first
+    message.
 
     Raises:
-        pydantic.ValidationError: If a new conversation's ``mensaje`` is
-            not a valid ``CriteriosBusqueda`` JSON document.
+        HTTPException: ``422`` if a new conversation's ``mensaje`` is not a
+            valid ``CriteriosBusqueda`` JSON document.
     """
     if peticion.conversation_id is not None:
         existente = conversation_store.cargar(peticion.conversation_id)
         if existente is not None:
-            return peticion.conversation_id, existente.criterios
-    return uuid4(), CriteriosBusqueda.model_validate_json(peticion.mensaje)
+            return peticion.conversation_id, existente.criterios, list(existente.historial)
+    return uuid4(), _parsear_criterios(peticion.mensaje), []
+
+
+def _parsear_criterios(mensaje: str) -> CriteriosBusqueda:
+    """Parse the first message of a conversation as ``CriteriosBusqueda`` JSON.
+
+    Malformed input is a client error, not a server fault: it is reported
+    as ``422`` with FastAPI's usual ``loc``/``msg``/``type`` error items
+    instead of leaking a ``500``.
+    """
+    try:
+        return CriteriosBusqueda.model_validate_json(mensaje)
+    except ValidationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=[
+                {"loc": ["body", "mensaje", *error["loc"]], "msg": error["msg"],
+                 "type": error["type"]}
+                for error in exc.errors(include_url=False)
+            ],
+        ) from exc

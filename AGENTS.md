@@ -20,7 +20,7 @@ Embeddings, rerankers, clasificación de imágenes, generación de imagen/vídeo
 - **Sincronización y persistencia**: implementadas y testeadas en `src/sync/`. Primer snapshot real validado `snap-176d40242fd0157a` (104 modelos de origen, 91 incluidos, 13 excluidos por `out_of_scope`), promovido a `data/catalog_bootstrap.json` conservando su `snapshot_id`.
 - **Sincronización programada (cada 21 días)**: `python -m scripts.sync_catalog` ejecuta un ciclo completo (descarga, validación, snapshot atómico, retención y, opcionalmente, promoción al bootstrap con `--promote-bootstrap`). Códigos de salida: 0 snapshot activo, 1 fallo de sincronización con el snapshot anterior conservado, 2 fallo de un paso posterior. La tarea del SO (`schtasks`/`cron`) la registra el operador; los comandos están en el README. Hasta ahora la sincronización se ha ejecutado manualmente una única vez.
 - **Tareas**: `chat`, `codigo` y `razonamiento` funcionan. El filtro lee `tareas_soportadas` (lista completa de tareas del modelo), no `pipeline_tag` (solo la primera): con el bootstrap pasan 73, 51 y 59 familias respectivamente antes de la comprobación VRAM.
-- **Entrada**: JSON estructurado. El usuario envía `tarea`, `vram_gb`, `idiomas_requeridos`, `runtime_preferido` como campos directos en `mensaje`. No se interpreta lenguaje natural.
+- **Entrada**: JSON estructurado. El usuario envía `tarea`, `vram_gb`, `idiomas_requeridos`, `runtime_preferido` como campos directos en `mensaje`. No se interpreta lenguaje natural. Un `mensaje` que no valide como `CriteriosBusqueda` devuelve `422` con los errores (`loc`/`msg`/`type`), nunca un 500. El `historial` de la conversación es acumulativo: cada turno añade la entrada del usuario y la respuesta del sistema.
 - **`snapshot_id`**: se persiste en cada `ConversationRun` a partir de `app.state.catalogo.snapshot_id`.
 - **Licencias**: `src/tools/licencias.py` es la única fuente de normalización (`"Apache 2.0"` → `apache-2.0`) y del conjunto permisivo; filtro y scorer la comparten. Antes discrepaban y 48 de 91 familias puntuaban como restrictivas.
 - **Scorer** (`src/ranking/scorer.py`, `PESOS` suman 1.0): `ajuste_vram` = margen sobre la VRAM del usuario (`1 − requerida/disponible`); `evidencia_codigo` = 1.0 solo si `tareas_soportadas == ["codigo"]` (6 de 91), 0.3 en el resto; `tamanio` sobre escala absoluta de 32 GB; `licencia` vía `licencias.py`; `documentacion` sigue siendo un marcador de posición (licencia declarada + nº de idiomas). Valor neutro 0.5 cuando falta el dato.
@@ -43,7 +43,7 @@ Embeddings, rerankers, clasificación de imágenes, generación de imagen/vídeo
 - El snapshot debe incluir identificador, hash, fecha de sincronización, número de modelos de origen, número de modelos incluidos y motivos de exclusión. **Implementado**: `SnapshotMeta` en `src/sync/snapshot.py` con escritura atómica (archivo temporal + `os.replace`) y validación round-trip testeada.
 - Al promover un snapshot a `data/catalog_bootstrap.json` se conserva el `snapshot_id` original dentro del `CatalogSnapshot` (`snap-176d40242fd0157a`); **no** se genera un id `seed-<hash>` para el bootstrap.
 - Cada conversación registra el identificador del snapshot de catálogo usado para preservar reproducibilidad (`ConversationRun.snapshot_id`).
-- Suite actual: **336 tests** (`python -m pytest`) + `python -m ruff check .` (reglas `E F I N W UP B SIM`) en verde.
+- Suite actual: **340 tests** (`python -m pytest`) + `python -m ruff check .` (reglas `E F I N W UP B SIM`) en verde.
 
 ## LangChain y Ollama
 

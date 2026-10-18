@@ -344,6 +344,22 @@ class TestChatNuevaConversacion:
         assert data["conversation_id"] != stale_id
 
     @patch("src.api.main.ejecutar_pipeline")
+    def test_history_accumulates_across_turns(
+        self, mock_pipeline: MagicMock, client: TestClient
+    ) -> None:
+        """Each turn appends a user and a system entry; earlier turns are kept."""
+        mock_pipeline.return_value = _mock_pipeline_result()
+        first = json.dumps({"tarea": "codigo", "vram_gb": 11.0})
+        conv_id = client.post("/chat", json={"mensaje": first}).json()["conversation_id"]
+        client.post("/chat", json={"conversation_id": conv_id, "mensaje": "tell me more"})
+
+        run = conversation_store.cargar(UUID(conv_id))
+        assert run is not None
+        assert [t.rol for t in run.historial] == ["usuario", "sistema", "usuario", "sistema"]
+        assert run.historial[0].contenido == first
+        assert run.historial[2].contenido == "tell me more"
+
+    @patch("src.api.main.ejecutar_pipeline")
     def test_persists_conversation(self, mock_pipeline: MagicMock, client: TestClient) -> None:
         mock_pipeline.return_value = _mock_pipeline_result()
         payload = {
@@ -389,23 +405,34 @@ class TestChatCamposFaltantes:
 # ---------------------------------------------------------------------------
 
 class TestChatInvalidMessage:
-    def test_invalid_json_returns_error(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        # This test builds its own client (to disable
-        # raise_server_exceptions), so it must pin the catalogue sources
-        # itself before the lifespan runs.
-        bootstrap = tmp_path / "data" / "catalog_bootstrap.json"
-        _write_bootstrap(bootstrap, [_fam("test-model")])
-        _point_catalogue_sources(
-            monkeypatch,
-            runtime_dir=tmp_path / "runtime" / "catalog",
-            bootstrap_path=bootstrap,
+    """Malformed criteria are a client error (422), never a server fault (500)."""
+
+    def test_invalid_json_returns_422(self, client: TestClient) -> None:
+        response = client.post("/chat", json={"mensaje": "not valid json {"})
+        assert response.status_code == 422
+        detail = response.json()["detail"]
+        assert isinstance(detail, list) and detail
+        assert detail[0]["loc"][:2] == ["body", "mensaje"]
+        assert {"loc", "msg", "type"} <= set(detail[0])
+
+    def test_wrong_field_type_returns_422_naming_the_field(self, client: TestClient) -> None:
+        response = client.post(
+            "/chat", json={"mensaje": json.dumps({"tarea": "codigo", "vram_gb": "many"})}
         )
-        with TestClient(app, raise_server_exceptions=False) as client:
-            payload = {"mensaje": "not valid json {"}
-            response = client.post("/chat", json=payload)
-            assert response.status_code == 500
+        assert response.status_code == 422
+        assert response.json()["detail"][0]["loc"] == ["body", "mensaje", "vram_gb"]
+
+    def test_unknown_task_returns_422(self, client: TestClient) -> None:
+        response = client.post(
+            "/chat", json={"mensaje": json.dumps({"tarea": "embeddings", "vram_gb": 8})}
+        )
+        assert response.status_code == 422
+        assert response.json()["detail"][0]["loc"] == ["body", "mensaje", "tarea"]
+
+    def test_invalid_message_persists_nothing(self, client: TestClient) -> None:
+        with patch("src.api.main.conversation_store.guardar") as guardar:
+            client.post("/chat", json={"mensaje": "not valid json {"})
+        guardar.assert_not_called()
 
 
 # ---------------------------------------------------------------------------
