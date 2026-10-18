@@ -23,7 +23,7 @@ from src.catalog import synced
 from src.catalog.protocol import CatalogoModelos, CatalogUnavailableError
 from src.catalog.synced import DEFAULT_RUNTIME_CATALOG_DIR, CatalogoSincronizado
 from src.models.schemas import FamiliaModelo
-from src.sync.bootstrap import DEFAULT_BOOTSTRAP_PATH
+from src.sync.bootstrap import DEFAULT_BOOTSTRAP_PATH, load_bootstrap
 from src.sync.snapshot import (
     CatalogSnapshot,
     SnapshotMeta,
@@ -316,6 +316,10 @@ class _InMemoryCatalogo:
     def snapshot_id(self) -> str | None:
         return "snap-in-memory"
 
+    @property
+    def fecha_sincronizacion(self) -> datetime | None:
+        return datetime(2026, 1, 1, tzinfo=UTC)
+
     def cargar(self) -> list[FamiliaModelo]:
         return list(self._familias)
 
@@ -362,9 +366,19 @@ class TestProtocolConformance:
         assert not isinstance(object(), CatalogoModelos)
         assert not isinstance(_PartialCatalogo(), CatalogoModelos)
 
-    def test_protocol_declares_both_required_members(self) -> None:
+    def test_protocol_declares_all_required_members(self) -> None:
         # Pin the declarations themselves: the positive conformance tests
         # only prove the implementations carry the members the protocol
         # currently declares, so nothing else fails if those declarations
         # are deleted.
-        assert _declared_members() == {"cargar", "snapshot_id"}
+        assert _declared_members() == {"cargar", "snapshot_id", "fecha_sincronizacion"}
+
+    def test_adapter_reports_the_snapshot_sync_date(self, tmp_path: Path) -> None:
+        """``fecha_sincronizacion`` must come from the resolved snapshot's
+        meta and be timezone-aware, so the API can report data age."""
+        catalogo = CatalogoSincronizado(
+            runtime_dir=tmp_path / "absent", bootstrap_path=DEFAULT_BOOTSTRAP_PATH
+        )
+        fecha = catalogo.fecha_sincronizacion
+        assert fecha is not None and fecha.tzinfo is not None
+        assert fecha == load_bootstrap(DEFAULT_BOOTSTRAP_PATH).meta.fecha_sincronizacion

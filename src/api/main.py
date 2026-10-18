@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from fastapi import FastAPI, HTTPException, status
@@ -137,6 +138,7 @@ def chat(peticion: PeticionChat) -> RespuestaChat:
         criterios_interpretados=criterios,
         candidatos=candidatos,
         limitaciones=list(LIMITACIONES_ACTUALES),
+        datos_actualizados_hace=describir_antiguedad(catalogo.fecha_sincronizacion),
     )
 
     conversation_store.guardar(
@@ -153,6 +155,29 @@ def chat(peticion: PeticionChat) -> RespuestaChat:
         )
     )
     return respuesta
+
+
+def describir_antiguedad(fecha: datetime | None, ahora: datetime | None = None) -> str:
+    """Describe how old the catalogue data is, in Spanish, for the response.
+
+    Args:
+        fecha: Timezone-aware synchronisation instant of the served
+            snapshot, or ``None`` when the catalogue has no date.
+        ahora: Reference instant; defaults to the current UTC time.  Tests
+            inject it to keep the output deterministic.
+
+    Returns:
+        ``""`` when the date is unknown (the field's documented "no
+        information" value), otherwise e.g. ``"hace 26 días (sincronizado
+        el 2026-09-22)"``.  Negative ages (clock skew) are reported as
+        ``hace 0 días``.
+    """
+    if fecha is None:
+        return ""
+    referencia = ahora or datetime.now(UTC)
+    dias = max(0, (referencia - fecha).days)
+    unidad = "día" if dias == 1 else "días"
+    return f"hace {dias} {unidad} (sincronizado el {fecha.date().isoformat()})"
 
 
 def _resolver_conversacion(

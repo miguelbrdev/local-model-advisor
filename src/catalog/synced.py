@@ -27,6 +27,7 @@ catalogue synchronisation is an external process.
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from pathlib import Path
 
 from src.catalog.protocol import CatalogUnavailableError
@@ -97,6 +98,18 @@ class CatalogoSincronizado:
                 the bootstrap file are missing or invalid.
         """
         return self._resolver().meta.snapshot_id
+
+    @property
+    def fecha_sincronizacion(self) -> datetime | None:
+        """Timezone-aware instant the resolved snapshot was synchronised.
+
+        Taken from ``SnapshotMeta.fecha_sincronizacion``; never ``None``
+        for this implementation because every snapshot carries the field.
+
+        Raises:
+            CatalogUnavailableError: If both sources are missing or invalid.
+        """
+        return self._resolver().meta.fecha_sincronizacion
 
     def cargar(self) -> list[FamiliaModelo]:
         """Return the families of the resolved snapshot.

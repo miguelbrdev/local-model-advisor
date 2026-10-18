@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import importlib.util
 import inspect
+from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import patch
 
@@ -84,6 +85,10 @@ class _Catalogo:
     @property
     def snapshot_id(self) -> str | None:
         return "snap-test"
+
+    @property
+    def fecha_sincronizacion(self) -> datetime | None:
+        return datetime(2026, 1, 1, tzinfo=UTC)
 
     def cargar(self) -> list[FamiliaModelo]:
         self.load_count += 1
@@ -576,6 +581,10 @@ class TestCatalogueInjection:
         class _ExhaustedCatalogo:
             @property
             def snapshot_id(self) -> str | None:
+                raise CatalogUnavailableError("no source")
+
+            @property
+            def fecha_sincronizacion(self) -> datetime | None:
                 raise CatalogUnavailableError("no source")
 
             def cargar(self) -> list[FamiliaModelo]:

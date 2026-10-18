@@ -53,12 +53,12 @@ Implemented:
   measured as headroom on the user's own GPU memory
 - SQLite-backed server-side conversation state with a 24-hour TTL, storing
   the catalog `snapshot_id` that produced each recommendation
-- Limitations reported in every recommendation, so a short result is never
-  ambiguous
+- Limitations and the age of the catalog data reported in every
+  recommendation, so a short result is never ambiguous
 - `scripts/sync_catalog.py`: the entry point for the 21-day scheduled task,
   with retention of historical snapshots (`src/sync/retention.py`) that never
   deletes the active or previous snapshot
-- 340 automated tests and Ruff linting
+- 347 automated tests and Ruff linting
 
 Not implemented yet:
 

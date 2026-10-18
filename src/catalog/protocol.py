@@ -1,10 +1,9 @@
 """Catalogue contract consumed by the recommendation pipeline.
 
-Task T1 of the catalog-loader migration: the pipeline must depend on a
-catalogue *abstraction*, never on a concrete YAML/JSON path.  The API
-layer mounts one concrete implementation per process, so a single
-snapshot id backs the whole process, and injects it into the pipeline,
-which only ever sees this Protocol.
+The pipeline must depend on a catalogue *abstraction*, never on a concrete
+YAML/JSON path.  The API layer mounts one concrete implementation per
+process, so a single snapshot id backs the whole process, and injects it
+into the pipeline, which only ever sees this Protocol.
 
 ``CatalogUnavailableError`` lives here rather than inside a concrete
 adapter because it is part of the contract: callers catch a single type
@@ -13,6 +12,7 @@ regardless of which implementation exhausted its sources.
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Protocol, runtime_checkable
 
 from src.models.schemas import FamiliaModelo
@@ -47,6 +47,9 @@ class CatalogoModelos(Protocol):
             describe exactly the data :meth:`cargar` returns, because it
             is persisted per conversation to keep recommendations
             reproducible.
+        fecha_sincronizacion: When the served snapshot was synchronised
+            from the external source, or ``None`` when unknown.  Reported
+            to users as the age of the data behind a recommendation.
     """
 
     @property
@@ -62,6 +65,19 @@ class CatalogoModelos(Protocol):
                 source was exhausted.  It must not degrade to a silent
                 ``None`` in that case — a missing id would silently
                 break reproducibility.
+        """
+        ...
+
+    @property
+    def fecha_sincronizacion(self) -> datetime | None:
+        """Timezone-aware instant the served snapshot was synchronised.
+
+        Returns:
+            The synchronisation timestamp, or ``None`` for implementations
+            that have no snapshot concept.
+
+        Raises:
+            CatalogUnavailableError: When every source was exhausted.
         """
         ...
 

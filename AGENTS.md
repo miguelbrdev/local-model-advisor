@@ -24,7 +24,7 @@ Embeddings, rerankers, clasificación de imágenes, generación de imagen/vídeo
 - **`snapshot_id`**: se persiste en cada `ConversationRun` a partir de `app.state.catalogo.snapshot_id`.
 - **Licencias**: `src/tools/licencias.py` es la única fuente de normalización (`"Apache 2.0"` → `apache-2.0`) y del conjunto permisivo; filtro y scorer la comparten. Antes discrepaban y 48 de 91 familias puntuaban como restrictivas.
 - **Scorer** (`src/ranking/scorer.py`, `PESOS` suman 1.0): `ajuste_vram` = margen sobre la VRAM del usuario (`1 − requerida/disponible`); `evidencia_codigo` = 1.0 solo si `tareas_soportadas == ["codigo"]` (6 de 91), 0.3 en el resto; `tamanio` sobre escala absoluta de 32 GB; `licencia` vía `licencias.py`; `documentacion` sigue siendo un marcador de posición (licencia declarada + nº de idiomas). Valor neutro 0.5 cuando falta el dato.
-- **Limitaciones comunicadas**: `POST /chat` devuelve en `limitaciones` las carencias actuales (sin benchmarks, sin evidencia explicativa, sin idiomas en la fuente, runtime no aplicado). `datos_actualizados_hace` se deja vacío hasta que el `Protocol` exponga la fecha del snapshot.
+- **Limitaciones comunicadas**: `POST /chat` devuelve en `limitaciones` las carencias actuales (sin benchmarks, sin evidencia explicativa, sin idiomas en la fuente, runtime no aplicado). `datos_actualizados_hace` se calcula a partir de `CatalogoModelos.fecha_sincronizacion` (p. ej. `hace 26 días (sincronizado el 2026-09-22)`); vacío solo si el catálogo no tiene fecha.
 - **Mapeo de IDs**: `canirun_id` se conserva directamente desde el catálogo sincronizado; no hay tabla de mapeo manual. Las familias sincronizadas no tienen `variantes`; el proveedor reporta `parametros_texto` (p. ej. `"7B"`) como variante.
 
 ## Catálogo sincronizado
@@ -43,7 +43,7 @@ Embeddings, rerankers, clasificación de imágenes, generación de imagen/vídeo
 - El snapshot debe incluir identificador, hash, fecha de sincronización, número de modelos de origen, número de modelos incluidos y motivos de exclusión. **Implementado**: `SnapshotMeta` en `src/sync/snapshot.py` con escritura atómica (archivo temporal + `os.replace`) y validación round-trip testeada.
 - Al promover un snapshot a `data/catalog_bootstrap.json` se conserva el `snapshot_id` original dentro del `CatalogSnapshot` (`snap-176d40242fd0157a`); **no** se genera un id `seed-<hash>` para el bootstrap.
 - Cada conversación registra el identificador del snapshot de catálogo usado para preservar reproducibilidad (`ConversationRun.snapshot_id`).
-- Suite actual: **340 tests** (`python -m pytest`) + `python -m ruff check .` (reglas `E F I N W UP B SIM`) en verde.
+- Suite actual: **347 tests** (`python -m pytest`) + `python -m ruff check .` (reglas `E F I N W UP B SIM`) en verde.
 
 ## LangChain y Ollama
 

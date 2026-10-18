@@ -21,7 +21,7 @@ from uuid import UUID, uuid4
 import pytest
 from fastapi.testclient import TestClient
 
-from src.api.main import LIMITACIONES_ACTUALES, app
+from src.api.main import LIMITACIONES_ACTUALES, app, describir_antiguedad
 from src.catalog import synced
 from src.catalog.protocol import CatalogUnavailableError
 from src.models.schemas import (
@@ -109,6 +109,10 @@ class _SentinelCatalogue:
     @property
     def snapshot_id(self) -> str | None:
         return "snap-sentinel"
+
+    @property
+    def fecha_sincronizacion(self) -> datetime | None:
+        return datetime(2026, 1, 1, tzinfo=UTC)
 
     def cargar(self) -> list[FamiliaModelo]:
         return list(self._familias)
@@ -312,7 +316,18 @@ class TestChatNuevaConversacion:
         payload = {"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
         data = client.post("/chat", json=payload).json()
         assert data["limitaciones"] == LIMITACIONES_ACTUALES
-        assert data["datos_actualizados_hace"] == ""
+
+    @patch("src.api.main.ejecutar_pipeline")
+    def test_reports_age_of_the_mounted_snapshot(
+        self, mock_pipeline: MagicMock, client: TestClient
+    ) -> None:
+        """``datos_actualizados_hace`` must derive from the mounted
+        catalogue's sync date (pinned to 2026-01-01 by the fixture)."""
+        mock_pipeline.return_value = _mock_pipeline_result()
+        payload = {"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
+        data = client.post("/chat", json=payload).json()
+        assert data["datos_actualizados_hace"].startswith("hace ")
+        assert data["datos_actualizados_hace"].endswith("(sincronizado el 2026-01-01)")
 
     @patch("src.api.main.ejecutar_pipeline")
     def test_persists_snapshot_id_of_mounted_catalogue(
@@ -376,6 +391,32 @@ class TestChatNuevaConversacion:
         }
         data2 = client.post("/chat", json=followup).json()
         assert data2["conversation_id"] == conv_id
+
+
+class TestDescribirAntiguedad:
+    AHORA = datetime(2026, 10, 18, 12, 0, tzinfo=UTC)
+
+    def test_unknown_date_is_empty_string(self) -> None:
+        assert describir_antiguedad(None, self.AHORA) == ""
+
+    def test_days_and_date(self) -> None:
+        fecha = datetime(2026, 9, 22, 10, 0, tzinfo=UTC)
+        assert describir_antiguedad(fecha, self.AHORA) == (
+            "hace 26 días (sincronizado el 2026-09-22)"
+        )
+
+    def test_singular_day(self) -> None:
+        fecha = datetime(2026, 10, 17, 11, 0, tzinfo=UTC)
+        assert describir_antiguedad(fecha, self.AHORA) == "hace 1 día (sincronizado el 2026-10-17)"
+
+    def test_same_day_and_clock_skew_are_zero_days(self) -> None:
+        assert describir_antiguedad(self.AHORA, self.AHORA).startswith("hace 0 días")
+        future = datetime(2026, 10, 19, tzinfo=UTC)
+        assert describir_antiguedad(future, self.AHORA).startswith("hace 0 días")
+
+    def test_defaults_to_now(self) -> None:
+        texto = describir_antiguedad(datetime(2026, 1, 1, tzinfo=UTC))
+        assert texto.startswith("hace ") and texto.endswith("(sincronizado el 2026-01-01)")
 
 
 # ---------------------------------------------------------------------------
