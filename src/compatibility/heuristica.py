@@ -28,6 +28,7 @@ active per token.
 
 from __future__ import annotations
 
+from src.compatibility.vram import FRACCION_VRAM_UTIL
 from src.models.schemas import CompatibilityResult, FamiliaModelo
 
 GB_POR_B_PARAMETROS_Q4 = 0.6
@@ -36,9 +37,9 @@ GB_POR_B_PARAMETROS_Q4 = 0.6
 SOBRECARGA_GB = 1.0
 """Fixed allowance for KV cache and runtime buffers."""
 
-UMBRAL_HOLGADO = 0.8
+UMBRAL_HOLGADO = FRACCION_VRAM_UTIL
 """A model using at most this share of the available VRAM is ``comfortable``;
-above it (but still fitting) it is ``tight``."""
+above it (but still fitting) it is ``tight``.  Shared with the scorer."""
 
 
 def estimar_vram_gb(parametros_b: float) -> float:

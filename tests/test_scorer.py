@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import pytest
 
+from src.compatibility.vram import FRACCION_VRAM_UTIL
 from src.models.schemas import (
     CandidatoRankeado,
     CompatibilityResult,
@@ -116,23 +117,43 @@ class TestSubpuntuaciones:
 # ---------------------------------------------------------------------------
 
 class TestAjusteVRAM:
-    def test_is_headroom_on_available_vram(self) -> None:
-        """4 GB needed of 16 GB available → 75 % headroom → 0.75."""
-        c = calcular_puntuacion(_make_candidate(vram_required=4.0), vram_disponible_gb=16.0)
-        assert _sub(c, "ajuste_vram").valor == pytest.approx(0.75)
+    """Safety margin: full score up to FRACCION_VRAM_UTIL, zero at 100 %."""
 
-    def test_high_vram_low_score(self) -> None:
-        """Model requiring 30 GB on a 32 GB budget → low ajuste_vram."""
-        c = calcular_puntuacion(_make_candidate(vram_required=30.0), vram_disponible_gb=32.0)
-        assert _sub(c, "ajuste_vram").valor < 0.1
+    @pytest.mark.parametrize("required", [1.0, 4.0, 12.8])
+    def test_comfortable_fit_scores_full_regardless_of_size(self, required: float) -> None:
+        """Being smaller than the threshold earns nothing extra (that was the bias)."""
+        c = calcular_puntuacion(_make_candidate(vram_required=required), vram_disponible_gb=16.0)
+        assert _sub(c, "ajuste_vram").valor == 1.0
 
-    def test_low_vram_high_score(self) -> None:
-        c = calcular_puntuacion(_make_candidate(vram_required=2.0), vram_disponible_gb=32.0)
-        assert _sub(c, "ajuste_vram").valor > 0.9
+    def test_tight_fit_decays_linearly(self) -> None:
+        """90 % of 16 GB → halfway between the 80 % threshold and 100 % → 0.5."""
+        c = calcular_puntuacion(_make_candidate(vram_required=14.4), vram_disponible_gb=16.0)
+        assert _sub(c, "ajuste_vram").valor == pytest.approx(0.5)
+
+    def test_full_budget_scores_zero(self) -> None:
+        c = calcular_puntuacion(_make_candidate(vram_required=32.0), vram_disponible_gb=32.0)
+        assert _sub(c, "ajuste_vram").valor == pytest.approx(0.0)
 
     def test_exceeding_available_clamps_to_zero(self) -> None:
         c = calcular_puntuacion(_make_candidate(vram_required=24.0), vram_disponible_gb=8.0)
         assert _sub(c, "ajuste_vram").valor == 0.0
+
+    def test_threshold_is_the_shared_constant(self) -> None:
+        at = calcular_puntuacion(
+            _make_candidate(vram_required=16.0 * FRACCION_VRAM_UTIL), vram_disponible_gb=16.0
+        )
+        above = calcular_puntuacion(
+            _make_candidate(vram_required=16.0 * FRACCION_VRAM_UTIL + 0.1),
+            vram_disponible_gb=16.0,
+        )
+        assert _sub(at, "ajuste_vram").valor == 1.0
+        assert _sub(above, "ajuste_vram").valor < 1.0
+
+    def test_justification_names_margin(self) -> None:
+        c = calcular_puntuacion(_make_candidate(vram_required=14.4), vram_disponible_gb=16.0)
+        assert "tight margin" in _sub(c, "ajuste_vram").justificacion
+        c = calcular_puntuacion(_make_candidate(vram_required=4.0), vram_disponible_gb=16.0)
+        assert "comfortable margin" in _sub(c, "ajuste_vram").justificacion
 
     def test_tokens_per_second_does_not_affect_fit(self) -> None:
         """Regression: the old formula divided GB by tok/s."""
@@ -199,18 +220,52 @@ class TestDocumentacion:
         assert _sub(c, "documentacion").valor == pytest.approx(0.8)  # 0.5 + 0.3
 
 
-class TestTamanio:
-    def test_small_model_high_score(self) -> None:
-        c = calcular_puntuacion(_make_candidate(vram_required=1.0))
-        assert _sub(c, "tamanio").valor > 0.9
+class TestCapacidad:
+    """Use of the usable budget as capability proxy: bigger is better up to the threshold."""
 
-    def test_large_model_low_score(self) -> None:
-        c = calcular_puntuacion(_make_candidate(vram_required=28.0))
-        assert _sub(c, "tamanio").valor < 0.2
+    def test_proportional_to_usable_budget(self) -> None:
+        """4 GB of a 12.8 GB usable budget (80 % of 16) → 0.3125."""
+        c = calcular_puntuacion(_make_candidate(vram_required=4.0), vram_disponible_gb=16.0)
+        assert _sub(c, "capacidad").valor == pytest.approx(0.3125)
 
-    def test_unknown_vram_neutral(self) -> None:
-        c = calcular_puntuacion(_make_candidate(vram_required=None))
-        assert _sub(c, "tamanio").valor == VALOR_NEUTRO
+    def test_at_threshold_scores_full(self) -> None:
+        c = calcular_puntuacion(_make_candidate(vram_required=12.8), vram_disponible_gb=16.0)
+        assert _sub(c, "capacidad").valor == pytest.approx(1.0)
+
+    def test_above_threshold_clamps_to_one(self) -> None:
+        c = calcular_puntuacion(_make_candidate(vram_required=15.0), vram_disponible_gb=16.0)
+        assert _sub(c, "capacidad").valor == 1.0
+
+    def test_bigger_model_scores_higher_when_both_fit(self) -> None:
+        small = calcular_puntuacion(_make_candidate(vram_required=2.0), vram_disponible_gb=16.0)
+        big = calcular_puntuacion(_make_candidate(vram_required=10.0), vram_disponible_gb=16.0)
+        assert _sub(big, "capacidad").valor > _sub(small, "capacidad").valor
+        assert big.puntuacion_total > small.puntuacion_total
+
+    def test_unknown_required_vram_neutral(self) -> None:
+        c = calcular_puntuacion(_make_candidate(vram_required=None), vram_disponible_gb=16.0)
+        assert _sub(c, "capacidad").valor == VALOR_NEUTRO
+
+    def test_unknown_available_vram_neutral(self) -> None:
+        c = calcular_puntuacion(_make_candidate(vram_required=4.0))
+        assert _sub(c, "capacidad").valor == VALOR_NEUTRO
+
+
+class TestPoliticaVRAM:
+    """The two criteria together: most capable that fits comfortably."""
+
+    def test_comfortable_large_beats_tight_larger(self) -> None:
+        """14B at 59 % must outrank a 20B at 85 % (the gpt-oss-20b case)."""
+        comfortable = calcular_puntuacion(
+            _make_candidate(vram_required=9.4), vram_disponible_gb=16.0
+        )
+        tight = calcular_puntuacion(_make_candidate(vram_required=13.6), vram_disponible_gb=16.0)
+        assert comfortable.puntuacion_total > tight.puntuacion_total
+
+    def test_tiny_model_no_longer_wins_on_a_big_gpu(self) -> None:
+        tiny = calcular_puntuacion(_make_candidate(vram_required=1.4), vram_disponible_gb=48.0)
+        mid = calcular_puntuacion(_make_candidate(vram_required=20.2), vram_disponible_gb=48.0)
+        assert mid.puntuacion_total > tiny.puntuacion_total
 
 
 class TestLicencia:
@@ -264,10 +319,10 @@ class TestPuntuacionTotal:
 class TestOrdenarPorPuntuacion:
     def test_descending_order(self) -> None:
         c_low = calcular_puntuacion(
-            _make_candidate("low", vram_required=30.0, license_=None), vram_disponible_gb=32.0
+            _make_candidate("low", vram_required=31.0, license_=None), vram_disponible_gb=32.0
         )
         c_high = calcular_puntuacion(
-            _make_candidate("high", vram_required=2.0, license_="MIT"), vram_disponible_gb=32.0
+            _make_candidate("high", vram_required=20.0, license_="MIT"), vram_disponible_gb=32.0
         )
         resultado = ordenar_por_puntuacion([c_low, c_high])
         assert [r.familia.familia_id for r in resultado] == ["high", "low"]

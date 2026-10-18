@@ -222,9 +222,9 @@ class TestHappyPath:
             names = {s.criterio for s in candidate.subpuntuaciones}
             assert names == {
                 "ajuste_vram",
+                "capacidad",
                 "evidencia_codigo",
                 "documentacion",
-                "tamanio",
                 "licencia",
             }
 
@@ -559,8 +559,8 @@ class TestCatalogueInjection:
         assert not (PROJECT_ROOT / "data" / "families_seed.yaml").exists()
 
     def test_scorer_receives_the_users_vram(self) -> None:
-        """``ajuste_vram`` must be computed against ``criterios.vram_gb``:
-        4 GB required of 16 GB available -> 0.75 headroom."""
+        """``capacidad`` must be computed against ``criterios.vram_gb``:
+        4 GB required of a 12.8 GB usable budget (80 % of 16) -> 0.3125."""
         provider = _MockProvider({"model-a": _compatible("model-a", vram_required_gb=4.0)})
 
         with patch(
@@ -570,8 +570,8 @@ class TestCatalogueInjection:
                 criterios=_criterios(vram_gb=16.0), catalogo=_catalogo(FAMILIA_A)
             )
 
-        ajuste = next(s for s in results[0].subpuntuaciones if s.criterio == "ajuste_vram")
-        assert ajuste.valor == pytest.approx(0.75)
+        capacidad = next(s for s in results[0].subpuntuaciones if s.criterio == "capacidad")
+        assert capacidad.valor == pytest.approx(0.3125)
 
     def test_catalogue_failure_propagates_untouched(self) -> None:
         """An exhausted catalogue must surface as its typed error, never

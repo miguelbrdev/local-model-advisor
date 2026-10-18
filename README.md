@@ -51,8 +51,9 @@ Implemented:
 - Real VRAM compatibility lookup through canirun.ai, plus an offline
   parameter-count heuristic (`src/compatibility/heuristica.py`) used by the
   evaluation and injectable into the pipeline
-- Deterministic multi-criteria ranking with explicit sub-scores; VRAM fit is
-  measured as headroom on the user's own GPU memory
+- Deterministic multi-criteria ranking with explicit sub-scores, following
+  "the most capable model that still fits comfortably": a VRAM safety margin
+  plus a capacity score for using the usable budget
 - SQLite-backed server-side conversation state with a 24-hour TTL, storing
   the catalog `snapshot_id` that produced each recommendation
 - Limitations and the age of the catalog data reported in every
@@ -64,7 +65,7 @@ Implemented:
   `scripts/evaluate_golden.py`): reviewed cases pin filter and ranking
   behaviour per catalog snapshot and report pass rate, hit rate and
   exclusion rate
-- 391 automated tests and Ruff linting
+- 403 automated tests and Ruff linting
 
 Not implemented yet:
 

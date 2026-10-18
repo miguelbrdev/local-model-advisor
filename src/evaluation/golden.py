@@ -58,6 +58,9 @@ class CasoGolden(BaseModel):
         top_n: Size of the window ``debe_incluir`` and ``primero`` refer to.
         debe_incluir: Family ids that must appear within the top ``top_n``.
         debe_excluir: Family ids that must not survive the filter at all.
+        debe_quedar_fuera_del_top: Family ids that may be candidates but
+            must not rank within the top ``top_n`` (pins "no longer
+            recommended first" without forbidding the model).
         primero: Family id expected at rank 1, if the case pins it.
         min_candidatos: Minimum number of eligible candidates; the default
             of 1 makes an empty answer a failure unless a case opts out.
@@ -69,6 +72,7 @@ class CasoGolden(BaseModel):
     top_n: int = Field(default=3, ge=1)
     debe_incluir: list[str] = Field(default_factory=list)
     debe_excluir: list[str] = Field(default_factory=list)
+    debe_quedar_fuera_del_top: list[str] = Field(default_factory=list)
     primero: str | None = None
     min_candidatos: int = Field(default=1, ge=0)
 
@@ -77,8 +81,16 @@ class CasoGolden(BaseModel):
         solapados = set(self.debe_incluir) & set(self.debe_excluir)
         if solapados:
             raise ValueError(f"case {self.id!r}: families both included and excluded: {solapados}")
-        if self.primero is not None and self.primero in self.debe_excluir:
-            raise ValueError(f"case {self.id!r}: 'primero' {self.primero!r} is also excluded")
+        fuera = set(self.debe_quedar_fuera_del_top)
+        if fuera & set(self.debe_incluir):
+            raise ValueError(
+                f"case {self.id!r}: families both included and kept out of the top: "
+                f"{fuera & set(self.debe_incluir)}"
+            )
+        if self.primero is not None and self.primero in set(self.debe_excluir) | fuera:
+            raise ValueError(
+                f"case {self.id!r}: 'primero' {self.primero!r} is also excluded or kept out"
+            )
         if self.criterios.campos_faltantes():
             raise ValueError(
                 f"case {self.id!r}: criteria missing mandatory fields "
@@ -229,6 +241,10 @@ def evaluar_caso(
     presentes = [fid for fid in caso.debe_excluir if fid in todos]
     if presentes:
         fallos.append(f"should have been filtered out: {presentes}")
+
+    colados = [fid for fid in caso.debe_quedar_fuera_del_top if fid in top]
+    if colados:
+        fallos.append(f"should not rank in top {caso.top_n}: {colados}")
 
     primero_ok: bool | None = None
     if caso.primero is not None:

@@ -84,6 +84,14 @@ class TestCasoGoldenValidation:
         with pytest.raises(ValidationError, match="'primero'"):
             _caso(primero="a", debe_excluir=["a"])
 
+    def test_primero_cannot_be_kept_out_of_the_top(self) -> None:
+        with pytest.raises(ValidationError, match="'primero'"):
+            _caso(primero="a", debe_quedar_fuera_del_top=["a"])
+
+    def test_included_and_kept_out_overlap_rejected(self) -> None:
+        with pytest.raises(ValidationError, match="kept out of the top"):
+            _caso(debe_incluir=["a"], debe_quedar_fuera_del_top=["a"])
+
     def test_criteria_must_be_complete(self) -> None:
         with pytest.raises(ValidationError, match="mandatory fields"):
             _caso(criterios={"tarea": "codigo"})
@@ -128,6 +136,22 @@ class TestEvaluarCaso:
         r = evaluar_caso(caso, catalogo=CATALOGO, vram_provider=PROVIDER)
         assert not r.aprobado
         assert any("should have been filtered out" in f for f in r.fallos)
+
+    def test_kept_out_of_top_fails_when_it_ranks(self) -> None:
+        """``coder-small`` ranks first; demanding it stays out of the top 1
+        must fail, while the same demand with a model outside the window passes."""
+        r = evaluar_caso(
+            _caso(top_n=1, debe_quedar_fuera_del_top=["coder-small"]),
+            catalogo=CATALOGO, vram_provider=PROVIDER,
+        )
+        assert not r.aprobado
+        assert any("should not rank in top 1" in f for f in r.fallos)
+
+        r = evaluar_caso(
+            _caso(top_n=1, debe_quedar_fuera_del_top=["chat-mid"]),
+            catalogo=CATALOGO, vram_provider=PROVIDER,
+        )
+        assert r.aprobado
 
     def test_wrong_first_fails(self) -> None:
         caso = _caso(primero="chat-mid")

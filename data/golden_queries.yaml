@@ -4,36 +4,47 @@
 # catalogue snapshot named below, evaluated with the offline parameter-count
 # VRAM heuristic (src/compatibility/heuristica.py), never with live
 # canirun.ai answers. Expectations pin *defensible* properties (fits / does
-# not fit, task and licence filtering, obvious strong candidates) rather than
-# the exact order, which may legitimately move when weights are tuned.
+# not fit, task and licence filtering, obvious strong candidates, models that
+# must no longer lead) rather than the exact order, which may legitimately
+# move when weights are tuned.
+#
+# Ranking policy pinned since 1.1.0: "the most capable model that still fits
+# comfortably" (ajuste_vram = safety margin, capacidad = use of the usable
+# budget). 1.0.0 encoded the previous smallest-wins bias and was re-reviewed.
 #
 # Run: python -m scripts.evaluate_golden
-version: "1.0.0"
+version: "1.1.0"
 snapshot_id: "snap-176d40242fd0157a"
 descripcion: >
-  First suite, written against the bootstrap snapshot. Covers the three v1
-  tasks, VRAM budgets from 1 GB to 48 GB, the commercial-licence filter and
-  the empty-result case.
+  Suite written against the bootstrap snapshot. Covers the three v1 tasks,
+  VRAM budgets from 1 GB to 48 GB, the commercial-licence filter, the
+  empty-result case and the "no longer smallest-first" policy.
 
 casos:
   - id: codigo-8gb
-    descripcion: Mid-range GPU for coding; both Qwen coders fit, large coders must not.
+    descripcion: >
+      Mid-range GPU for coding. The dedicated 7B coder uses ~65 % of 8 GB and
+      must lead; both Qwen coders are in the top 3; 24B+ coders do not fit.
     criterios: {tarea: codigo, vram_gb: 8}
     top_n: 3
+    primero: qwen2.5-coder-7b
     debe_incluir: [qwen2.5-coder-7b, qwen2.5-coder-1.5b]
     debe_excluir: [qwen3-coder-30b, devstral-small-2-24b, qwen3-coder-480b]
     min_candidatos: 5
 
   - id: codigo-24gb-comercial
-    descripcion: Commercial use excludes Llama/GLM licences; Devstral fits and ranks high.
+    descripcion: >
+      Commercial use excludes Llama/GLM licences. The 24B and 30B Apache coders
+      fit comfortably and must rank in the top 8 together with the 7B coder.
     criterios: {tarea: codigo, vram_gb: 24, requiere_licencia_comercial: true}
     top_n: 8
-    debe_incluir: [devstral-small-2-24b, qwen2.5-coder-7b]
+    debe_incluir: [devstral-small-2-24b, qwen3-coder-30b, qwen2.5-coder-7b]
     debe_excluir: [llama3.2-3b, llama3.1-8b, glm-4-9b, llama3.3-70b]
     min_candidatos: 10
 
   - id: codigo-48gb
-    descripcion: Large GPU surfaces the strong 24B-30B coders; 80B+ MoE still does not fit.
+    descripcion: >
+      Large GPU surfaces the strong 24B-30B coders; 80B+ MoE still does not fit.
     criterios: {tarea: codigo, vram_gb: 48}
     top_n: 5
     debe_incluir: [qwen3-coder-30b, devstral-small-2-24b]
@@ -41,37 +52,50 @@ casos:
     min_candidatos: 20
 
   - id: chat-6gb
-    descripcion: Entry-level GPU; small Qwen chat models lead, 12B+ and dedicated coders are out.
+    descripcion: >
+      Entry-level GPU. 3B-4B chat models are the right size and must lead; the
+      0.6B/0.8B models still fit but must no longer be recommended first;
+      12B+ and dedicated coders are out.
     criterios: {tarea: chat, vram_gb: 6}
     top_n: 5
-    debe_incluir: [qwen3-0.6b, qwen3-1.7b]
+    debe_incluir: [qwen3.5-4b, smollm3-3b]
+    debe_quedar_fuera_del_top: [qwen3-0.6b, qwen3.5-0.8b]
     debe_excluir: [gemma3-12b, mistral-nemo-12b, qwen3-14b, qwen2.5-coder-7b]
     min_candidatos: 10
 
   - id: chat-12gb-comercial
-    descripcion: Gemma, Llama and MRL licences are not permissive; Apache Qwen 4B stays.
+    descripcion: >
+      Gemma, Llama and MRL licences are not permissive. Apache Qwen 14B (78 % of
+      the budget) and 8B must rank; the 0.6B model must not.
     criterios: {tarea: chat, vram_gb: 12, requiere_licencia_comercial: true}
     top_n: 8
-    debe_incluir: [qwen3.5-4b]
+    debe_incluir: [qwen3-14b, qwen3-8b]
+    debe_quedar_fuera_del_top: [qwen3-0.6b]
     debe_excluir: [gemma3-4b, gemma4-e2b-it, llama3.2-1b, ministral-8b]
     min_candidatos: 10
 
   - id: razonamiento-16gb
-    descripcion: DeepSeek R1 distils fit; the 32B distil and the 671B original do not; coders are out.
+    descripcion: >
+      The 14B reasoning models fit at ~59 % and must lead; the 1.5B distil must
+      not; the 32B distil and the 671B original do not fit; coders are out.
     criterios: {tarea: razonamiento, vram_gb: 16}
     top_n: 5
-    debe_incluir: [deepseek-r1-7b, deepseek-r1-1.5b]
+    debe_incluir: [deepseek-r1-14b, phi-4-14b]
+    debe_quedar_fuera_del_top: [deepseek-r1-1.5b]
     debe_excluir: [deepseek-r1-32b, deepseek-r1, qwen2.5-coder-7b]
     min_candidatos: 10
 
   - id: razonamiento-4gb
-    descripcion: Tiny budget; the 1.5B distil is the only dedicated reasoning model that fits comfortably.
+    descripcion: >
+      Tiny budget; exactly three reasoning models fit. The 1.5B distil (47 % of
+      the budget) must not be first. Which 3B model leads is a margin-versus-
+      dedication trade-off (smollm3 at 70 % vs phi-4-mini at 82 %) that is
+      deliberately not pinned.
     criterios: {tarea: razonamiento, vram_gb: 4}
-    top_n: 3
-    primero: deepseek-r1-1.5b
-    debe_incluir: [deepseek-r1-1.5b]
+    top_n: 1
+    debe_quedar_fuera_del_top: [deepseek-r1-1.5b]
     debe_excluir: [deepseek-r1-7b, phi-4-14b]
-    min_candidatos: 1
+    min_candidatos: 3
 
   - id: chat-1gb-sin-candidatos
     descripcion: Nothing fits in 1 GB; the honest answer is an empty list, not an invented fit.
