@@ -48,7 +48,9 @@ Implemented:
 - Filtering by VRAM, language and commercial-license needs, with a single
   license normalizer shared by filter and scorer (`runtime_preferido` is
   accepted but not applied yet)
-- Real VRAM compatibility lookup through canirun.ai
+- Real VRAM compatibility lookup through canirun.ai, plus an offline
+  parameter-count heuristic (`src/compatibility/heuristica.py`) used by the
+  evaluation and injectable into the pipeline
 - Deterministic multi-criteria ranking with explicit sub-scores; VRAM fit is
   measured as headroom on the user's own GPU memory
 - SQLite-backed server-side conversation state with a 24-hour TTL, storing
@@ -58,7 +60,11 @@ Implemented:
 - `scripts/sync_catalog.py`: the entry point for the 21-day scheduled task,
   with retention of historical snapshots (`src/sync/retention.py`) that never
   deletes the active or previous snapshot
-- 347 automated tests and Ruff linting
+- Golden-query evaluation (`data/golden_queries.yaml`,
+  `scripts/evaluate_golden.py`): reviewed cases pin filter and ranking
+  behaviour per catalog snapshot and report pass rate, hit rate and
+  exclusion rate
+- 391 automated tests and Ruff linting
 
 Not implemented yet:
 
@@ -67,7 +73,6 @@ Not implemented yet:
 - Runtime preference filtering
 - Qdrant hybrid retrieval and reranking for explanatory evidence
 - LangChain-based extraction of free-form user requirements
-- Golden-query evaluation metrics
 - Docker Compose packaging
 
 ## Architecture
@@ -227,6 +232,26 @@ cron (Linux/macOS), running on the 1st and 22nd of each month:
 0 3 1,22 * * cd /path/to/local-model-advisor && .venv/bin/python -m scripts.sync_catalog >> runtime/sync.log 2>&1
 ```
 
+## Evaluation
+
+`data/golden_queries.yaml` holds reviewed query cases written against one
+catalog snapshot: the criteria a client would send, the families that must be
+in the top N, the families that must be filtered out, optionally the expected
+first result, and a minimum candidate count so an ambiguous empty answer is a
+failure. The suite runs offline with the parameter-count VRAM heuristic, so it
+pins the deterministic part of the pipeline (filter + scorer), not live
+canirun.ai answers.
+
+```bash
+python -m scripts.evaluate_golden                     # text report, exit 1 on any failure
+python -m scripts.evaluate_golden --json              # full report as JSON
+python -m scripts.evaluate_golden --strict-snapshot   # also fail on snapshot mismatch
+```
+
+The committed suite also runs inside `pytest`, so a ranking change that
+breaks an expectation fails CI. When the bootstrap is re-promoted, re-review
+the cases and update `snapshot_id` in the suite.
+
 ## API endpoints
 
 | Method | Endpoint | Purpose |
@@ -251,15 +276,17 @@ Once the server is running, interactive OpenAPI documentation is available at
 ```text
 ├── data/
 │   ├── catalog_policy.yaml    # versioned sync policy (categories, required fields)
-│   └── catalog_bootstrap.json # versioned bootstrap catalog (preserves snapshot_id)
+│   ├── catalog_bootstrap.json # versioned bootstrap catalog (preserves snapshot_id)
+│   └── golden_queries.yaml    # reviewed golden queries for the evaluation
 ├── docs/
 │   └── technical-design.md    # full design (local only — gitignored, not shipped)
-├── scripts/                   # sync_catalog.py: scheduled catalog sync + snapshot retention
+├── scripts/                   # sync_catalog.py (scheduled sync + retention), evaluate_golden.py
 ├── src/
 │   ├── api/             # FastAPI endpoints and app lifespan (mounts the catalog)
 │   ├── catalog/         # Catalog protocol + synchronized adapter with fallback chain
 │   ├── chains/          # Recommendation orchestration
-│   ├── compatibility/   # Interchangeable VRAM providers
+│   ├── compatibility/   # Interchangeable VRAM providers (canirun.ai, offline heuristic)
+│   ├── evaluation/      # Golden-query evaluation and metrics
 │   ├── models/          # Pydantic contracts
 │   ├── ranking/         # Deterministic weighted scoring
 │   ├── state/           # SQLite conversation persistence
@@ -287,7 +314,7 @@ Once the server is running, interactive OpenAPI documentation is available at
 - [ ] Add Qdrant hybrid retrieval for explanatory evidence
 - [ ] Add reranking of retrieved evidence
 - [ ] Add LangChain-based criteria extraction
-- [ ] Add golden-query evaluation metrics
+- [x] Add golden-query evaluation metrics
 - [ ] Add Docker Compose packaging and GPU passthrough
 - [ ] Record a demo GIF
 

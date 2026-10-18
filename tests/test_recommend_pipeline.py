@@ -593,6 +593,20 @@ class TestCatalogueInjection:
         with pytest.raises(CatalogUnavailableError):
             ejecutar_pipeline(criterios=_criterios(), catalogo=_ExhaustedCatalogo())
 
+    def test_injected_vram_provider_replaces_task_routing(self) -> None:
+        """When a provider is injected, ``elegir_provider`` must not be
+        consulted at all — the evaluation relies on that to stay offline."""
+        provider = _MockProvider({"model-a": _compatible("model-a")})
+
+        with patch("src.chains.recommend_pipeline.elegir_provider") as routing:
+            results = ejecutar_pipeline(
+                criterios=_criterios(), catalogo=_catalogo(FAMILIA_A), vram_provider=provider
+            )
+
+        routing.assert_not_called()
+        assert provider.call_count == 1
+        assert [r.familia.familia_id for r in results] == ["model-a"]
+
     def test_signature_requires_keyword_only_catalogue(self) -> None:
         """Pin design (a): no ``familias`` escape hatch, ``catalogo``
         keyword-only so it can never be confused with a positional

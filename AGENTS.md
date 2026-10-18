@@ -25,6 +25,8 @@ Embeddings, rerankers, clasificación de imágenes, generación de imagen/vídeo
 - **Licencias**: `src/tools/licencias.py` es la única fuente de normalización (`"Apache 2.0"` → `apache-2.0`) y del conjunto permisivo; filtro y scorer la comparten. Antes discrepaban y 48 de 91 familias puntuaban como restrictivas.
 - **Scorer** (`src/ranking/scorer.py`, `PESOS` suman 1.0): `ajuste_vram` = margen sobre la VRAM del usuario (`1 − requerida/disponible`); `evidencia_codigo` = 1.0 solo si `tareas_soportadas == ["codigo"]` (6 de 91), 0.3 en el resto; `tamanio` sobre escala absoluta de 32 GB; `licencia` vía `licencias.py`; `documentacion` sigue siendo un marcador de posición (licencia declarada + nº de idiomas). Valor neutro 0.5 cuando falta el dato.
 - **Limitaciones comunicadas**: `POST /chat` devuelve en `limitaciones` las carencias actuales (sin benchmarks, sin evidencia explicativa, sin idiomas en la fuente, runtime no aplicado). `datos_actualizados_hace` se calcula a partir de `CatalogoModelos.fecha_sincronizacion` (p. ej. `hace 26 días (sincronizado el 2026-09-22)`); vacío solo si el catálogo no tiene fecha.
+- **Evaluación golden**: `data/golden_queries.yaml` (versionada, ligada a un `snapshot_id`) + `src/evaluation/golden.py` + `python -m scripts.evaluate_golden`. Métricas: tasa de aprobación, hit rate de inclusiones, tasa de exclusiones, aciertos de primer puesto. Se ejecuta offline con `HeuristicaParametrosProvider` (`src/compatibility/heuristica.py`, `fuente="heuristica_propia"`, fórmula documentada por número de parámetros), inyectado vía `ejecutar_pipeline(..., vram_provider=...)`; la heurística **no** está enrutada en producción. La suite también corre en `pytest`: si cambias filtro, scorer o pesos y un caso falla, revisa el caso con criterio y actualízalo de forma consciente, nunca ajustes la expectativa al resultado sin razonarlo. Al re-promover el bootstrap, actualiza `snapshot_id` en la suite.
+- **Hallazgo de la evaluación**: el scorer favorece sistemáticamente a los modelos más pequeños (`ajuste_vram` + `tamanio` suman el 50 % del peso), de modo que `qwen3-0.6b` encabeza `chat` incluso con 48 GB. Es comportamiento actual, no deseado; pendiente de decidir una señal de capacidad (p. ej. tamaño objetivo relativo a la VRAM) antes de retocar pesos.
 - **Mapeo de IDs**: `canirun_id` se conserva directamente desde el catálogo sincronizado; no hay tabla de mapeo manual. Las familias sincronizadas no tienen `variantes`; el proveedor reporta `parametros_texto` (p. ej. `"7B"`) como variante.
 
 ## Catálogo sincronizado
@@ -43,7 +45,7 @@ Embeddings, rerankers, clasificación de imágenes, generación de imagen/vídeo
 - El snapshot debe incluir identificador, hash, fecha de sincronización, número de modelos de origen, número de modelos incluidos y motivos de exclusión. **Implementado**: `SnapshotMeta` en `src/sync/snapshot.py` con escritura atómica (archivo temporal + `os.replace`) y validación round-trip testeada.
 - Al promover un snapshot a `data/catalog_bootstrap.json` se conserva el `snapshot_id` original dentro del `CatalogSnapshot` (`snap-176d40242fd0157a`); **no** se genera un id `seed-<hash>` para el bootstrap.
 - Cada conversación registra el identificador del snapshot de catálogo usado para preservar reproducibilidad (`ConversationRun.snapshot_id`).
-- Suite actual: **347 tests** (`python -m pytest`) + `python -m ruff check .` (reglas `E F I N W UP B SIM`) en verde.
+- Suite actual: **391 tests** (`python -m pytest`) + `python -m ruff check .` (reglas `E F I N W UP B SIM`) en verde.
 
 ## LangChain y Ollama
 
@@ -89,6 +91,6 @@ Embeddings, rerankers, clasificación de imágenes, generación de imagen/vídeo
 - Los tests de sincronización deben usar respuestas HTTP mockeadas; nunca deben depender de canirun.ai, red, hora real o archivos persistentes fuera de `tmp_path`.
 - Prueba como mínimo: respuesta externa válida, timeout/error HTTP, campos externos inesperados, filtrado por categoría, deduplicación, conversión a modelo interno, actualización atómica y conservación del snapshot anterior ante fallo.
 - No cambies contratos públicos de API sin actualizar modelos Pydantic, tests y documentación.
-- Antes de terminar una tarea, ejecuta `python -m pytest` y `python -m ruff check .`.
+- Antes de terminar una tarea, ejecuta `python -m pytest` y `python -m ruff check .`. Si tocas filtro, scorer o pesos, ejecuta también `python -m scripts.evaluate_golden` y justifica cualquier cambio en `data/golden_queries.yaml`.
 - Si un comando falla por una limitación del entorno, indícalo claramente junto con el error y no afirmes que la validación ha pasado.
 - Resume siempre los archivos modificados, las decisiones tomadas, los comandos ejecutados y las limitaciones pendientes.

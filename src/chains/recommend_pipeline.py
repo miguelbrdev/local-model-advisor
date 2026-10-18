@@ -6,7 +6,7 @@ No Qdrant, no reranking, no LLM — purely deterministic.
 from __future__ import annotations
 
 from src.catalog.protocol import CatalogoModelos
-from src.compatibility.provider import elegir_provider
+from src.compatibility.provider import VRAMCompatibilityProvider, elegir_provider
 from src.models.schemas import CandidatoRankeado, CriteriosBusqueda
 from src.ranking.scorer import calcular_puntuacion, ordenar_por_puntuacion
 from src.tools.structured_filter import filtrar_candidatos
@@ -17,6 +17,7 @@ def ejecutar_pipeline(
     *,
     catalogo: CatalogoModelos,
     top_n: int = 3,
+    vram_provider: VRAMCompatibilityProvider | None = None,
 ) -> list[CandidatoRankeado]:
     """Run the full load → filter → score → rank pipeline.
 
@@ -32,6 +33,9 @@ def ejecutar_pipeline(
             short-circuit, so ``top_n=0`` never touches the catalogue.
         top_n: Number of top candidates to return.  Must be >= 0.  When it
             exceeds the number of eligible candidates, all are returned.
+        vram_provider: Compatibility oracle.  ``None`` (production) routes
+            by task through :func:`elegir_provider`; the golden-query
+            evaluation injects a deterministic offline heuristic instead.
 
     Raises:
         ValueError: If ``top_n`` is negative.
@@ -49,7 +53,7 @@ def ejecutar_pipeline(
         return []
 
     familias = catalogo.cargar()
-    provider = elegir_provider(criterios.tarea or "codigo")
+    provider = vram_provider or elegir_provider(criterios.tarea or "codigo")
 
     candidatos = filtrar_candidatos(familias, criterios, provider)
     for candidato in candidatos:
