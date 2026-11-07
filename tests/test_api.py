@@ -244,6 +244,36 @@ class TestHealth:
         data = client.get("/health").json()
         assert data["status"] == "ok"
 
+    def test_reports_what_the_process_serves(self, client: TestClient) -> None:
+        data = client.get("/health").json()
+        assert data["snapshot_id"] == app.state.catalogo.snapshot_id
+        assert data["catalogo_sincronizado"].startswith("2026-01-01")
+        assert data["texto_libre"] is False  # fixture disables the LLM
+        assert data["evidencia"] is False    # fixture disables the index
+
+    def test_expired_conversations_are_removed_at_startup(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from datetime import timedelta
+
+        from src.models.schemas import ConversationRun
+
+        monkeypatch.setattr(conversation_store, "_DB_PATH", tmp_path / "c.db")
+        viejo = ConversationRun(
+            criterios=CriteriosBusqueda(tarea="codigo", vram_gb=8),
+            created_at=datetime.now(UTC) - timedelta(hours=48),
+        )
+        conversation_store.guardar(viejo)
+        bootstrap = tmp_path / "data" / "catalog_bootstrap.json"
+        _write_bootstrap(bootstrap, [_fam("test-model")])
+        _point_catalogue_sources(
+            monkeypatch, runtime_dir=tmp_path / "runtime" / "catalog", bootstrap_path=bootstrap
+        )
+        monkeypatch.setenv("LMA_EXTRACCION_LLM", "0")
+        monkeypatch.setenv("LMA_EVIDENCIA", "0")
+        with TestClient(app):
+            assert conversation_store.cargar(viejo.conversation_id) is None
+
 
 # ---------------------------------------------------------------------------
 # GET /families
@@ -528,6 +558,15 @@ class TestChatCamposFaltantes:
         data = client.post("/chat", json=payload).json()
         assert data["tipo"] == "clarificacion"
         assert data["campo_faltante"] == "tarea"
+        assert data["pregunta"] == (
+            "Entendido: vram_gb=11. Falta indicar la tarea (chat, codigo o razonamiento)."
+        )
+
+    def test_clarification_without_anything_understood(self, client: TestClient) -> None:
+        data = client.post("/chat", json={"mensaje": "{}"}).json()
+        assert data["pregunta"] == (
+            "Falta indicar la tarea (chat, codigo o razonamiento) y la VRAM en GB."
+        )
 
     def test_missing_vram_returns_clarificacion(self, client: TestClient) -> None:
         payload = {

@@ -75,6 +75,35 @@ class TestFusionar:
 
 
 # ---------------------------------------------------------------------------
+# Normalisation of languages and runtime
+# ---------------------------------------------------------------------------
+
+class TestNormalizacion:
+    def test_language_names_become_iso_codes(self) -> None:
+        c = CriteriosExtraidos(idiomas_requeridos=["Español", "english", "fr", " Alemán "])
+        assert c.idiomas_requeridos == ["es", "en", "fr", "de"]
+
+    def test_duplicates_and_blanks_removed(self) -> None:
+        c = CriteriosExtraidos(idiomas_requeridos=["es", "español", "", "ES"])
+        assert c.idiomas_requeridos == ["es"]
+
+    def test_unknown_language_kept_lowercase(self) -> None:
+        assert CriteriosExtraidos(idiomas_requeridos=["Klingon"]).idiomas_requeridos == ["klingon"]
+
+    def test_runtime_lowercased_and_trimmed(self) -> None:
+        c = CriteriosExtraidos(runtime_preferido="  LM  Studio ")
+        assert c.runtime_preferido == "lm studio"
+        assert CriteriosExtraidos(runtime_preferido="   ").runtime_preferido is None
+
+    def test_json_clients_get_the_same_normalisation(self) -> None:
+        c = ExtractorJson().extraer(
+            '{"idiomas_requeridos": ["Español"], "runtime_preferido": "Ollama"}'
+        )
+        assert c.idiomas_requeridos == ["es"]
+        assert c.runtime_preferido == "ollama"
+
+
+# ---------------------------------------------------------------------------
 # ExtractorJson
 # ---------------------------------------------------------------------------
 

@@ -19,6 +19,7 @@ Configuration (environment variables, read once at startup):
 
 from __future__ import annotations
 
+import logging
 import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -59,7 +60,30 @@ from src.models.schemas import (
 )
 from src.state import conversation_store
 
+logger = logging.getLogger(__name__)
+
 TOP_N_RECOMENDACIONES = 3
+
+ETIQUETAS_CAMPOS = {"tarea": "la tarea (chat, codigo o razonamiento)", "vram_gb": "la VRAM en GB"}
+
+
+def pregunta_aclaracion(criterios: CriteriosBusqueda, faltantes: list[str]) -> str:
+    """Deterministic clarification text: what was understood, what is missing.
+
+    Saying what *was* understood lets the user answer with just the missing
+    value ("12 GB") instead of repeating the whole request, which is exactly
+    what the follow-up merge supports.
+    """
+    entendido = []
+    if criterios.tarea:
+        entendido.append(f"tarea={criterios.tarea}")
+    if criterios.vram_gb is not None:
+        entendido.append(f"vram_gb={criterios.vram_gb:g}")
+    if criterios.idiomas_requeridos:
+        entendido.append("idiomas=" + ",".join(criterios.idiomas_requeridos))
+    prefijo = f"Entendido: {', '.join(entendido)}. " if entendido else ""
+    pedidos = " y ".join(ETIQUETAS_CAMPOS.get(campo, campo) for campo in faltantes)
+    return f"{prefijo}Falta indicar {pedidos}."
 
 LIMITACIONES_BASE = [
     "Benchmark evidence not yet available (OpenEvals pending).",
@@ -213,6 +237,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.catalogo = catalogo
     app.state.extractor = construir_extractor()
     app.state.evidencia = construir_buscador_evidencia()
+    try:
+        borradas = conversation_store.limpiar_expiradas()
+        if borradas:
+            logger.info("Removed %d expired conversations at startup.", borradas)
+    except Exception as exc:  # a broken store must not block serving
+        logger.warning("Could not clean expired conversations: %s", exc)
     yield
 
 
@@ -221,7 +251,23 @@ app = FastAPI(title="Local Model Advisor", version="0.1.0", lifespan=lifespan)
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok"}
+    """Liveness plus what this process is serving with.
+
+    ``status`` stays ``"ok"`` for existing probes; the other keys say which
+    catalogue snapshot is mounted and whether free-text input and
+    explanatory evidence are enabled (not whether their backends are up:
+    that is only known per request and reported in ``limitaciones``).
+    """
+    catalogo = getattr(app.state, "catalogo", None)
+    extractor = getattr(app.state, "extractor", None)
+    fecha = catalogo.fecha_sincronizacion if catalogo is not None else None
+    return {
+        "status": "ok",
+        "snapshot_id": catalogo.snapshot_id if catalogo is not None else None,
+        "catalogo_sincronizado": fecha.isoformat() if fecha is not None else None,
+        "texto_libre": bool(extractor is not None and extractor.acepta_texto_libre),
+        "evidencia": getattr(app.state, "evidencia", None) is not None,
+    }
 
 
 @app.get("/families")
@@ -268,8 +314,7 @@ def chat(peticion: PeticionChat) -> RespuestaChat:
     if faltantes:
         respuesta = ClarificacionNecesaria(
             conversation_id=conversation_id,
-            pregunta=f"Faltan campos obligatorios: {', '.join(faltantes)}. "
-            "Proporcione tarea y VRAM en GB.",
+            pregunta=pregunta_aclaracion(criterios, faltantes),
             campo_faltante=faltantes[0],
         )
     else:

@@ -11,7 +11,7 @@ from pathlib import Path
 import httpx
 import pytest
 
-from src.evidence.chunker import FRAGMENTO_MINIMO, limpiar_markdown, trocear
+from src.evidence.chunker import FRAGMENTO_MINIMO, limpiar_markdown, seccion_omitida, trocear
 from src.evidence.docs_store import AlmacenDocumentos, DocumentoModelo
 from src.evidence.hf_readme import (
     base_model_de,
@@ -309,6 +309,38 @@ class TestTrocear:
 
     def test_empty_input(self) -> None:
         assert trocear("") == []
+
+    def test_boilerplate_sections_are_skipped(self) -> None:
+        texto = "\n\n".join([
+            "# Model",
+            "A capable assistant tuned for long multi-turn conversations in many languages.",
+            "## Quickstart",
+            "Install the package and call generate with your prompt as shown in the snippet.",
+            "## Citation",
+            "If you use this model please cite the technical report listed below here.",
+            "## Intended use",
+            "The model is intended for chat assistants and summarisation of documents.",
+        ])
+        fragmentos = trocear(texto)
+        assert any(f.startswith("Intended use: ") for f in fragmentos)
+        assert not any(f.startswith(("Quickstart: ", "Citation: ")) for f in fragmentos)
+
+    @pytest.mark.parametrize("titulo", ["Quickstart", "How to use", "Usage", "License", "BibTeX",
+                                        "Community Model> Qwen", "Special thanks"])
+    def test_seccion_omitida(self, titulo: str) -> None:
+        assert seccion_omitida(titulo)
+
+    @pytest.mark.parametrize("titulo", ["Introduction", "Model Summary", "Intended use", ""])
+    def test_seccion_conservada(self, titulo: str) -> None:
+        assert not seccion_omitida(titulo)
+
+    def test_table_heavy_fragments_are_dropped(self) -> None:
+        tabla = "\n".join(f"| bench{i} | {i*10} | {i*11} |" for i in range(8))
+        resumen = "Strong results on reasoning and code with a compact size overall."
+        texto = f"# Results\n\n{tabla}\n\n## Summary\n\n{resumen}\n"
+        fragmentos = trocear(texto)
+        assert len(fragmentos) == 1
+        assert fragmentos[0].startswith("Summary: ")
 
     def test_invalid_size(self) -> None:
         with pytest.raises(ValueError):

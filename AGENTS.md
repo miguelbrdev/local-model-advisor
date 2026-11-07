@@ -48,7 +48,7 @@ Embeddings, rerankers, clasificación de imágenes, generación de imagen/vídeo
 - El snapshot debe incluir identificador, hash, fecha de sincronización, número de modelos de origen, número de modelos incluidos y motivos de exclusión. **Implementado**: `SnapshotMeta` en `src/sync/snapshot.py` con escritura atómica (archivo temporal + `os.replace`) y validación round-trip testeada.
 - Al promover un snapshot a `data/catalog_bootstrap.json` se conserva el `snapshot_id` original dentro del `CatalogSnapshot` (`snap-176d40242fd0157a`); **no** se genera un id `seed-<hash>` para el bootstrap.
 - Cada conversación registra el identificador del snapshot de catálogo usado para preservar reproducibilidad (`ConversationRun.snapshot_id`).
-- Suite actual: **561 tests** (`python -m pytest`) + `python -m ruff check .` (reglas `E F I N W UP B SIM`) en verde.
+- Suite actual: **582 tests** (`python -m pytest`) + `python -m ruff check .` (reglas `E F I N W UP B SIM`) en verde.
 
 ## LangChain y Ollama
 

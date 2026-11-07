@@ -19,6 +19,22 @@ TAMANO_FRAGMENTO = 800
 FRAGMENTO_MINIMO = 40
 """Fragments shorter than this (after cleaning) carry no explanation."""
 
+SECCIONES_OMITIDAS = (
+    "quickstart", "quick start", "getting started", "usage", "how to use", "how to run",
+    "installation", "install", "requirements", "deployment", "deploy", "inference",
+    "running", "download", "citation", "cite", "bibtex", "license", "licence",
+    "acknowledg", "special thanks", "community model", "contact", "changelog",
+    "table of contents", "sponsor",
+)
+"""Section headings (case-insensitive substrings) whose content is operational
+boilerplate — install commands, API calls, citations — rather than an
+explanation of what the model is good for.  Indexing them produced the
+generic "Quickstart" fragments that surfaced for every query."""
+
+FRACCION_TABLA_MAXIMA = 0.4
+"""Fragments where more than this share of lines are table rows are
+benchmark dumps, unreadable as prose evidence."""
+
 _BLOQUE_CODIGO = re.compile(r"```.*?```", re.S)
 _HTML = re.compile(r"<[^>]+>")
 _IMAGEN = re.compile(r"!\[[^\]]*\]\([^)]*\)")
@@ -58,12 +74,28 @@ def trocear(texto: str, *, tamano: int = TAMANO_FRAGMENTO) -> list[str]:
         raise ValueError(f"tamano must be > 0, got {tamano}")
     fragmentos: list[str] = []
     for encabezado, parrafos in _secciones(limpiar_markdown(texto)):
+        if seccion_omitida(encabezado):
+            continue
         prefijo = f"{encabezado}: " if encabezado else ""
         for cuerpo in _empaquetar(parrafos, tamano - len(prefijo)):
             fragmento = prefijo + cuerpo
-            if len(fragmento.strip()) >= FRAGMENTO_MINIMO:
+            if len(fragmento.strip()) >= FRAGMENTO_MINIMO and not _es_tabla(cuerpo):
                 fragmentos.append(fragmento)
     return fragmentos
+
+
+def seccion_omitida(encabezado: str) -> bool:
+    """Whether a section heading marks operational boilerplate."""
+    titulo = encabezado.lower()
+    return any(clave in titulo for clave in SECCIONES_OMITIDAS)
+
+
+def _es_tabla(cuerpo: str) -> bool:
+    lineas = [linea for linea in cuerpo.split("\n") if linea.strip()]
+    if not lineas:
+        return False
+    tabla = sum(1 for linea in lineas if linea.count("|") >= 2)
+    return tabla / len(lineas) > FRACCION_TABLA_MAXIMA
 
 
 def _secciones(texto: str) -> list[tuple[str, list[str]]]:

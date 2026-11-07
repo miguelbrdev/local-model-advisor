@@ -27,7 +27,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Literal, Protocol, runtime_checkable
 
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field, ValidationError, field_validator
 
 from src.models.schemas import CriteriosBusqueda
 
@@ -61,11 +61,50 @@ The user may write in Spanish or English. Respond only with the structured objec
 """
 
 
+ALIAS_IDIOMAS: dict[str, str] = {
+    "español": "es", "espanol": "es", "spanish": "es", "castellano": "es",
+    "inglés": "en", "ingles": "en", "english": "en",
+    "francés": "fr", "frances": "fr", "french": "fr",
+    "alemán": "de", "aleman": "de", "german": "de",
+    "italiano": "it", "italian": "it",
+    "portugués": "pt", "portugues": "pt", "portuguese": "pt",
+    "catalán": "ca", "catalan": "ca", "català": "ca",
+    "euskera": "eu", "vasco": "eu", "basque": "eu",
+    "gallego": "gl", "galician": "gl", "galego": "gl",
+    "chino": "zh", "chinese": "zh", "mandarín": "zh", "mandarin": "zh",
+    "japonés": "ja", "japones": "ja", "japanese": "ja",
+    "coreano": "ko", "korean": "ko",
+    "ruso": "ru", "russian": "ru",
+    "árabe": "ar", "arabe": "ar", "arabic": "ar",
+    "hindi": "hi",
+    "neerlandés": "nl", "neerlandes": "nl", "holandés": "nl", "dutch": "nl",
+    "polaco": "pl", "polish": "pl",
+    "turco": "tr", "turkish": "tr",
+}
+"""Language names (Spanish and English) → ISO 639-1.  Small models often
+answer with the name instead of the code the prompt asks for."""
+
+
+def normalizar_idiomas(valores: list[str]) -> list[str]:
+    """Lower-case, map known names to ISO codes, drop blanks and duplicates."""
+    resultado: list[str] = []
+    for valor in valores:
+        clave = str(valor).strip().lower()
+        if not clave:
+            continue
+        codigo = ALIAS_IDIOMAS.get(clave, clave)
+        if codigo not in resultado:
+            resultado.append(codigo)
+    return resultado
+
+
 class CriteriosExtraidos(BaseModel):
     """What an extractor may fill in from one message.  Every field optional.
 
     Mirrors ``CriteriosBusqueda`` but with ``requiere_licencia_comercial``
     nullable so "not stated" can be told apart from "false" when merging.
+    Languages are normalised to ISO codes and the runtime to lower case,
+    whether they come from the model or from a JSON client.
     """
 
     tarea: Literal["chat", "codigo", "razonamiento"] | None = None
@@ -73,6 +112,19 @@ class CriteriosExtraidos(BaseModel):
     idiomas_requeridos: list[str] = Field(default_factory=list)
     runtime_preferido: str | None = None
     requiere_licencia_comercial: bool | None = None
+
+    @field_validator("idiomas_requeridos", mode="after")
+    @classmethod
+    def _idiomas_iso(cls, valores: list[str]) -> list[str]:
+        return normalizar_idiomas(valores)
+
+    @field_validator("runtime_preferido", mode="after")
+    @classmethod
+    def _runtime_minusculas(cls, valor: str | None) -> str | None:
+        if valor is None:
+            return None
+        limpio = " ".join(valor.strip().lower().split())
+        return limpio or None
 
     def fusionar(self, base: CriteriosBusqueda | None) -> CriteriosBusqueda:
         """Overlay these values on ``base``: stated fields win, unstated keep.
