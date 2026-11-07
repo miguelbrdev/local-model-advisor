@@ -355,7 +355,17 @@ python -m scripts.evaluate_golden --strict-snapshot   # also fail on snapshot mi
 ```
 
 The committed suite also runs inside `pytest`, so a ranking change that
-breaks an expectation fails CI. When the bootstrap is re-promoted, re-review
+breaks an expectation fails CI.
+
+Free-text extraction has its own suite, `data/golden_extraccion.yaml` (20
+Spanish and English messages; a `null` expectation pins that a field must not
+be invented). It needs the local model, so it runs as a script:
+
+```bash
+python -m scripts.evaluate_extraction      # exit 1 below --min-aprobacion (0.8)
+```
+
+Last measured with `gemma4:e4b`: 20/20 cases, 2.5 s per message. When the bootstrap is re-promoted, re-review
 the cases and update `snapshot_id` in the suite.
 
 ## API endpoints
