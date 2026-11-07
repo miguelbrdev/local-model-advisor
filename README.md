@@ -72,7 +72,7 @@ Implemented:
   `scripts/evaluate_golden.py`): reviewed cases pin filter and ranking
   behaviour per catalog snapshot and report pass rate, hit rate and
   exclusion rate
-- 452 automated tests and Ruff linting
+- 505 automated tests and Ruff linting
 
 Not implemented yet:
 
@@ -112,6 +112,7 @@ candidate score.
 - httpx
 - PyYAML
 - LangChain (`langchain-core`, `langchain-ollama`) with a local Ollama model
+- Qdrant (`qdrant-client`) for the explanatory-evidence index
 - canirun.ai compatibility API
 - pytest and Ruff
 
@@ -202,6 +203,7 @@ docker compose up --build                                        # CPU
 docker compose -f compose.yaml -f compose.gpu.yaml up --build    # NVIDIA GPU
 LMA_OLLAMA_MODEL=gemma4:e2b docker compose up --build            # lighter model
 docker compose run --rm sync                                     # catalog sync cycle
+docker compose run --rm index                                    # READMEs -> Qdrant evidence index
 ```
 
 First free-text request after start pays the model load (about 100 s for
@@ -338,15 +340,16 @@ Once the server is running, interactive OpenAPI documentation is available at
 │   └── golden_queries.yaml    # reviewed golden queries for the evaluation
 ├── docs/
 │   └── technical-design.md    # full design (local only — gitignored, not shipped)
-├── scripts/                   # sync_catalog.py (scheduled sync + retention), evaluate_golden.py
+├── scripts/                   # sync_catalog.py (sync + retention), evaluate_golden.py, index_docs.py
 ├── Dockerfile                 # API image (sources run from /app, deps from pyproject)
-├── compose.yaml               # api + ollama (+ model pull) + sync profile; compose.gpu.yaml overlay
+├── compose.yaml               # api + ollama + qdrant (+ model pull); sync and index profiles; compose.gpu.yaml overlay
 ├── src/
 │   ├── api/             # FastAPI endpoints and app lifespan (mounts the catalog)
 │   ├── catalog/         # Catalog protocol + synchronized adapter with fallback chain
 │   ├── chains/          # Recommendation orchestration and criteria extraction (JSON / Ollama)
 │   ├── compatibility/   # Interchangeable VRAM providers (canirun.ai, offline heuristic)
 │   ├── evaluation/      # Golden-query evaluation and metrics
+│   ├── evidence/        # Explanatory evidence: HF README fetch/store, chunking, Qdrant index
 │   ├── models/          # Pydantic contracts
 │   ├── ranking/         # Deterministic weighted scoring
 │   ├── state/           # SQLite conversation persistence
