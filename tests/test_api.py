@@ -617,7 +617,7 @@ class TestConstruirExtractor:
         assert extractor.acepta_texto_libre is True
         llm = extractor._llm
         assert isinstance(llm, ExtractorOllama)
-        assert llm.modelo == "qwen2.5:3b"
+        assert llm.modelo == "gemma4:e4b"
         assert llm.base_url == "http://127.0.0.1:11434"
 
     def test_env_overrides_model_and_url(self) -> None:

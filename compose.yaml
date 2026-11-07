@@ -1,0 +1,63 @@
+# Local Model Advisor: API + local Ollama model.
+#
+#   docker compose up --build            # API on :8000, Ollama on :11434 (CPU)
+#   docker compose -f compose.yaml -f compose.gpu.yaml up --build   # NVIDIA GPU
+#   docker compose run --rm sync         # one catalogue synchronisation cycle
+#
+# LMA_OLLAMA_MODEL (default gemma4:e4b) selects the model; it is pulled once
+# into the ollama_models volume before the API starts.
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_models:/root/.ollama
+    ports:
+      - "127.0.0.1:11434:11434"
+    environment:
+      # Keep the model loaded between requests: loading gemma4:e4b took ~100 s
+      # on first use, later requests 4-9 s.  Ollama's default is 5 minutes.
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-1h}
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  ollama-pull:
+    image: ollama/ollama:latest
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      LMA_OLLAMA_MODEL: ${LMA_OLLAMA_MODEL:-gemma4:e4b}
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["ollama pull \"$$LMA_OLLAMA_MODEL\""]
+
+  api:
+    build: .
+    depends_on:
+      ollama-pull:
+        condition: service_completed_successfully
+    environment:
+      LMA_OLLAMA_BASE_URL: http://ollama:11434
+      LMA_OLLAMA_MODEL: ${LMA_OLLAMA_MODEL:-gemma4:e4b}
+      LMA_EXTRACCION_LLM: ${LMA_EXTRACCION_LLM:-1}
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - runtime:/app/runtime
+    restart: unless-stopped
+
+  sync:
+    build: .
+    profiles: ["sync"]
+    command: ["python", "-m", "scripts.sync_catalog"]
+    volumes:
+      - runtime:/app/runtime
+
+volumes:
+  ollama_models:
+  runtime:

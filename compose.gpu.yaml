@@ -1,0 +1,13 @@
+# Overlay: give the Ollama container the NVIDIA GPU.
+# Requires the NVIDIA driver on the host and, on Windows, Docker Desktop with
+# the WSL2 backend.  Without it `docker compose up` fails at startup, which is
+# why this is an opt-in overlay rather than part of compose.yaml.
+services:
+  ollama:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

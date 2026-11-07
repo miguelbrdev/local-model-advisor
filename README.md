@@ -78,7 +78,6 @@ Not implemented yet:
   language field, so language requirements are not enforced on them
 - Runtime preference filtering
 - Qdrant hybrid retrieval and reranking for explanatory evidence
-- Docker Compose packaging
 
 ## Architecture
 
@@ -170,22 +169,48 @@ fills the criteria fields it can read from the message, the output is
 validated with Pydantic, and the deterministic pipeline runs exactly as with
 JSON. The model never sees the catalog and never influences the ranking.
 
+The recommended way to run it is Docker Compose (see below), which pulls the
+model for you. For a host install instead:
+
 ```bash
-# one-off setup
 winget install Ollama.Ollama        # or https://ollama.com/download
-ollama pull qwen2.5:3b
+ollama pull gemma4:e4b
 ```
 
 | Variable | Default | Purpose |
 |---|---|---|
 | `LMA_EXTRACCION_LLM` | `1` | Set to `0` to accept only criteria JSON |
-| `LMA_OLLAMA_MODEL` | `qwen2.5:3b` | Ollama model tag |
+| `LMA_OLLAMA_MODEL` | `gemma4:e4b` | Ollama model tag |
 | `LMA_OLLAMA_BASE_URL` | `http://127.0.0.1:11434` | Local Ollama server |
 
 If Ollama is unreachable or returns invalid output, a free-text message gets
 `503` with a hint to send JSON; JSON input keeps working. The first message
 may be incomplete: `"necesito razonar"` returns a clarification, and
 `"tengo 12 GB"` sent with the same `conversation_id` completes the criteria.
+
+## Docker Compose
+
+`compose.yaml` runs the API and a local Ollama server side by side, pulls the
+model once into a volume, and keeps `runtime/` (SQLite conversations and
+catalog snapshots) in another volume so recreating the containers loses
+nothing:
+
+```bash
+docker compose up --build                                        # CPU
+docker compose -f compose.yaml -f compose.gpu.yaml up --build    # NVIDIA GPU
+LMA_OLLAMA_MODEL=gemma4:e2b docker compose up --build            # lighter model
+docker compose run --rm sync                                     # catalog sync cycle
+```
+
+First free-text request after start pays the model load (about 100 s for
+`gemma4:e4b` on an RTX 2080 Ti); later ones take a few seconds. The model
+stays loaded for `OLLAMA_KEEP_ALIVE` (default `1h`).
+
+The API listens on `127.0.0.1:8000` and Ollama on `127.0.0.1:11434`, both bound
+to localhost only. The GPU overlay needs the NVIDIA driver on the host and, on
+Windows, Docker Desktop with the WSL2 backend; without it Ollama runs on CPU.
+Tests and the golden evaluation still run in the local virtualenv; the image
+is for running the service, not for development.
 
 ## Example
 
@@ -312,6 +337,8 @@ Once the server is running, interactive OpenAPI documentation is available at
 ├── docs/
 │   └── technical-design.md    # full design (local only — gitignored, not shipped)
 ├── scripts/                   # sync_catalog.py (scheduled sync + retention), evaluate_golden.py
+├── Dockerfile                 # API image (sources run from /app, deps from pyproject)
+├── compose.yaml               # api + ollama (+ model pull) + sync profile; compose.gpu.yaml overlay
 ├── src/
 │   ├── api/             # FastAPI endpoints and app lifespan (mounts the catalog)
 │   ├── catalog/         # Catalog protocol + synchronized adapter with fallback chain
@@ -346,7 +373,7 @@ Once the server is running, interactive OpenAPI documentation is available at
 - [ ] Add reranking of retrieved evidence
 - [x] Add LangChain-based criteria extraction
 - [x] Add golden-query evaluation metrics
-- [ ] Add Docker Compose packaging and GPU passthrough
+- [x] Add Docker Compose packaging and GPU passthrough
 - [ ] Record a demo GIF
 
 ## Notes

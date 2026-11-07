@@ -9,7 +9,7 @@ Endpoints:
 Configuration (environment variables, read once at startup):
 - ``LMA_EXTRACCION_LLM``: ``"0"``/``"false"`` disables free-text input;
   only criteria JSON is then accepted (default: enabled).
-- ``LMA_OLLAMA_MODEL``: Ollama model tag (default ``qwen2.5:3b``).
+- ``LMA_OLLAMA_MODEL``: Ollama model tag (default ``gemma4:e4b``).
 - ``LMA_OLLAMA_BASE_URL``: Ollama server (default ``http://127.0.0.1:11434``).
 """
 

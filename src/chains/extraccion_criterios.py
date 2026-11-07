@@ -33,8 +33,9 @@ from src.models.schemas import CriteriosBusqueda
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_OLLAMA_MODEL = "qwen2.5:3b"
-"""Small instruct model with reliable JSON-schema output; ``ollama pull`` it."""
+DEFAULT_OLLAMA_MODEL = "gemma4:e4b"
+"""Gemma 4 (4B effective, ~6.6 GB at Q4): strong Spanish, reliable JSON-schema
+output.  ``gemma4:e2b`` is the lighter choice for small GPUs."""
 
 DEFAULT_OLLAMA_BASE_URL = "http://127.0.0.1:11434"
 
@@ -149,7 +150,7 @@ class ExtractorOllama:
     """Free-text extractor backed by a local Ollama model via LangChain.
 
     Args:
-        modelo: Ollama model tag (e.g. ``"qwen2.5:3b"``).
+        modelo: Ollama model tag (e.g. ``"gemma4:e4b"``).
         base_url: Ollama server URL; must be local.
         llm: Injected structured-output runnable whose ``invoke(messages)``
             returns a :class:`CriteriosExtraidos` or a dict.  Tests pass a
