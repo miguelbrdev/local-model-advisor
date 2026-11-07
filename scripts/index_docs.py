@@ -15,6 +15,11 @@ unreachable; stored documents are kept), ``2`` no catalogue snapshot
 resolves.  Fetch failures never abort the run: they are stored per family
 as ``gated`` / ``not_found`` / ``error`` and summarised.
 
+Defaults for the Qdrant URL, the embedding model and the Ollama server come
+from the same ``LMA_QDRANT_URL`` / ``LMA_EMBEDDING_MODEL`` /
+``LMA_OLLAMA_BASE_URL`` variables the API reads, so inside Compose a plain
+``python -m scripts.index_docs --skip-fetch`` targets the right services.
+
 Usage::
 
     python -m scripts.index_docs [--skip-fetch] [--skip-index] [--refetch]
@@ -26,6 +31,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import os
 import sys
 from collections import Counter
 from collections.abc import Sequence
@@ -63,10 +69,18 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--bootstrap-path", type=Path, default=DEFAULT_BOOTSTRAP_PATH)
     parser.add_argument("--docs-dir", type=Path, default=DEFAULT_DOCS_DIR,
                         help="Where READMEs are stored (default: runtime/docs).")
-    parser.add_argument("--qdrant-url", default=DEFAULT_QDRANT_URL)
+    parser.add_argument(
+        "--qdrant-url", default=os.environ.get("LMA_QDRANT_URL", DEFAULT_QDRANT_URL)
+    )
     parser.add_argument("--coleccion", default=DEFAULT_COLECCION)
-    parser.add_argument("--embedding-model", default=DEFAULT_EMBEDDING_MODEL)
-    parser.add_argument("--ollama-base-url", default=DEFAULT_OLLAMA_BASE_URL)
+    parser.add_argument(
+        "--embedding-model",
+        default=os.environ.get("LMA_EMBEDDING_MODEL", DEFAULT_EMBEDDING_MODEL),
+    )
+    parser.add_argument(
+        "--ollama-base-url",
+        default=os.environ.get("LMA_OLLAMA_BASE_URL", DEFAULT_OLLAMA_BASE_URL),
+    )
     parser.add_argument("--timeout", type=float, default=20.0, help="HTTP timeout (seconds).")
     parser.add_argument("--skip-fetch", action="store_true",
                         help="Index what is already stored; do not contact Hugging Face.")

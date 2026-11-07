@@ -52,12 +52,25 @@ def _run(tmp_path: Path, *extra: str, client=None, embedder=None, qdrant=None) -
 
 
 class TestParser:
-    def test_defaults(self) -> None:
+    def test_defaults(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        for var in ("LMA_QDRANT_URL", "LMA_EMBEDDING_MODEL", "LMA_OLLAMA_BASE_URL"):
+            monkeypatch.delenv(var, raising=False)
         args = script.build_parser().parse_args([])
         assert args.docs_dir.parts[-2:] == ("runtime", "docs")
         assert args.qdrant_url == "http://127.0.0.1:6333"
         assert args.embedding_model == "embeddinggemma"
+        assert args.ollama_base_url == "http://127.0.0.1:11434"
         assert not (args.skip_fetch or args.skip_index or args.refetch)
+
+    def test_defaults_come_from_the_api_environment(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setenv("LMA_QDRANT_URL", "http://qdrant:6333")
+        monkeypatch.setenv("LMA_EMBEDDING_MODEL", "other-embed")
+        monkeypatch.setenv("LMA_OLLAMA_BASE_URL", "http://ollama:11434")
+        args = script.build_parser().parse_args([])
+        assert args.qdrant_url == "http://qdrant:6333"
+        assert args.embedding_model == "other-embed"
+        assert args.ollama_base_url == "http://ollama:11434"
+        assert script.build_parser().parse_args(["--qdrant-url", "http://x:1"]).qdrant_url == "http://x:1"
 
 
 class TestFetchAndIndex:

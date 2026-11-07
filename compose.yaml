@@ -4,6 +4,7 @@
 #   docker compose -f compose.yaml -f compose.gpu.yaml up --build   # NVIDIA GPU
 #   docker compose run --rm sync         # one catalogue synchronisation cycle
 #   docker compose run --rm index        # fetch READMEs + index them in Qdrant
+#   docker compose run --rm index python -m scripts.index_docs --skip-fetch   # re-index only
 #
 # LMA_OLLAMA_MODEL (default gemma4:e4b) and LMA_EMBEDDING_MODEL (default
 # embeddinggemma) are pulled once into the ollama_models volume before the
@@ -79,16 +80,13 @@ services:
         condition: service_completed_successfully
       qdrant:
         condition: service_started
-    command:
-      - python
-      - -m
-      - scripts.index_docs
-      - --qdrant-url
-      - http://qdrant:6333
-      - --ollama-base-url
-      - http://ollama:11434
-      - --embedding-model
-      - ${LMA_EMBEDDING_MODEL:-embeddinggemma}
+    environment:
+      LMA_QDRANT_URL: http://qdrant:6333
+      LMA_OLLAMA_BASE_URL: http://ollama:11434
+      LMA_EMBEDDING_MODEL: ${LMA_EMBEDDING_MODEL:-embeddinggemma}
+    # `docker compose run` replaces the command, so extra flags need the
+    # full command: docker compose run --rm index python -m scripts.index_docs --skip-fetch
+    command: ["python", "-m", "scripts.index_docs"]
     volumes:
       - runtime:/app/runtime
 

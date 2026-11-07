@@ -230,6 +230,7 @@ docker compose -f compose.yaml -f compose.gpu.yaml up --build    # NVIDIA GPU
 LMA_OLLAMA_MODEL=gemma4:e2b docker compose up --build            # lighter model
 docker compose run --rm sync                                     # catalog sync cycle
 docker compose run --rm index                                    # READMEs -> Qdrant evidence index
+docker compose run --rm index python -m scripts.index_docs --skip-fetch   # re-index stored READMEs
 ```
 
 First free-text request after start pays the model load (about 100 s for
