@@ -76,7 +76,7 @@ Implemented:
   `scripts/evaluate_golden.py`): reviewed cases pin filter and ranking
   behaviour per catalog snapshot and report pass rate, hit rate and
   exclusion rate
-- 582 automated tests and Ruff linting
+- 587 automated tests and Ruff linting
 
 Not implemented yet:
 
