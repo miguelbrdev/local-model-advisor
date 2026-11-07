@@ -1,0 +1,96 @@
+# Golden extraction suite: free-text messages and the criteria a reviewer
+# expects the local model to extract.
+#
+# Only the keys listed under `esperado` are evaluated. A `null` value pins
+# that the field must NOT be filled: the extractor is forbidden to invent a
+# VRAM figure from a GPU name or a task from an unrelated request.
+# Languages are compared as sets of ISO 639-1 codes; VRAM with a 0.01 GB
+# tolerance; the runtime after lower-casing.
+#
+# Run against the local model: python -m scripts.evaluate_extraction
+version: "1.0.0"
+descripcion: >
+  Spanish and English requests covering the three tasks, explicit VRAM
+  figures, GPU names without a figure, languages by name, runtimes and
+  commercial-use statements.
+
+casos:
+  - id: codigo-python-12gb
+    mensaje: "Quiero un modelo para programar en Python, tengo una GPU con 12 GB de VRAM"
+    esperado: {tarea: codigo, vram_gb: 12}
+
+  - id: razonamiento-mates-es
+    mensaje: "Necesito un asistente para razonamiento y matemáticas en español"
+    esperado: {tarea: razonamiento, idiomas_requeridos: [es], vram_gb: null}
+
+  - id: gpu-sin-memoria
+    mensaje: "Tengo una RTX 3060 y quiero chatear"
+    esperado: {tarea: chat, vram_gb: null}
+
+  - id: en-comercial-ollama
+    mensaje: "I need a coding model for commercial use on a 24 GB card, running on ollama"
+    esperado: {tarea: codigo, vram_gb: 24, requiere_licencia_comercial: true, runtime_preferido: ollama}
+
+  - id: chat-en-fr-8gb
+    mensaje: "algo para charlar en inglés y francés con 8 GB"
+    esperado: {tarea: chat, vram_gb: 8, idiomas_requeridos: [en, fr]}
+
+  - id: razonamiento-16gb
+    mensaje: "modelo de razonamiento lógico para 16GB"
+    esperado: {tarea: razonamiento, vram_gb: 16}
+
+  - id: codigo-personal-6gb
+    mensaje: "Busco un LLM para escribir código, 6 gigas de vram, uso personal"
+    esperado: {tarea: codigo, vram_gb: 6, requiere_licencia_comercial: false}
+
+  - id: mates-paso-a-paso-32gb
+    mensaje: "Quiero resolver problemas de matemáticas paso a paso. Tengo 32 GB."
+    esperado: {tarea: razonamiento, vram_gb: 32}
+
+  - id: en-soporte-empresa-48gb
+    mensaje: "A chatbot for my company's customer support, 48 GB GPU"
+    esperado: {tarea: chat, vram_gb: 48, requiere_licencia_comercial: true}
+
+  - id: rust-lmstudio-11gb
+    mensaje: "¿Qué modelo me recomiendas para generar código en Rust? Uso LM Studio y tengo 11 GB"
+    esperado: {tarea: codigo, vram_gb: 11, runtime_preferido: lm studio}
+
+  - id: asistente-general-sin-datos
+    mensaje: "un asistente general"
+    esperado: {tarea: chat, vram_gb: null}
+
+  - id: portatil-4gb
+    mensaje: "quiero un modelo pequeño para mi portátil de 4 GB de VRAM para conversar"
+    esperado: {tarea: chat, vram_gb: 4}
+
+  - id: traduccion-de-es
+    mensaje: "necesito traducir textos del alemán al español"
+    esperado: {idiomas_requeridos: [de, es], vram_gb: null}
+
+  - id: en-code-review-licencias
+    mensaje: "code review and refactoring assistant, 16GB, must be Apache or MIT licensed for a commercial product"
+    esperado: {tarea: codigo, vram_gb: 16, requiere_licencia_comercial: true}
+
+  - id: fuera-de-alcance-finetuning
+    mensaje: "Quiero hacer fine-tuning de un modelo con mis datos"
+    esperado: {vram_gb: null}
+
+  - id: en-fisica-6gb
+    mensaje: "Explain step by step physics problems; my laptop has 6 GB VRAM"
+    esperado: {tarea: razonamiento, vram_gb: 6}
+
+  - id: chat-catalan-8gb
+    mensaje: "chat en catalán con 8 GB"
+    esperado: {tarea: chat, vram_gb: 8, idiomas_requeridos: [ca]}
+
+  - id: codigo-llamacpp-10gb
+    mensaje: "programar con llama.cpp en 10 GB"
+    esperado: {tarea: codigo, vram_gb: 10, runtime_preferido: llama.cpp}
+
+  - id: razonamiento-en-no-comercial-24gb
+    mensaje: "Modelo para razonar en inglés, sin uso comercial, 24 GB"
+    esperado: {tarea: razonamiento, vram_gb: 24, idiomas_requeridos: [en], requiere_licencia_comercial: false}
+
+  - id: solo-gpu-4090
+    mensaje: "tengo una 4090"
+    esperado: {vram_gb: null}
