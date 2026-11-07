@@ -19,6 +19,7 @@ from src.ranking.scorer import (
     PESOS,
     VALOR_NEUTRO,
     calcular_puntuacion,
+    meses_entre,
     ordenar_por_puntuacion,
 )
 
@@ -178,32 +179,99 @@ class TestAjusteVRAM:
         assert "16 GB" in _sub(c, "ajuste_vram").justificacion
 
 
-class TestEvidenciaCodigo:
-    def test_dedicated_coder_scores_1(self) -> None:
-        c = calcular_puntuacion(_make_candidate(tareas=["codigo"]))
-        ev = _sub(c, "evidencia_codigo")
+class TestEspecializacion:
+    def test_dedicated_coder_scores_1_for_code(self) -> None:
+        c = calcular_puntuacion(_make_candidate(tareas=["codigo"]), tarea="codigo")
+        ev = _sub(c, "especializacion")
         assert ev.valor == 1.0
-        assert "Dedicated" in ev.justificacion
+        assert "Dedicated codigo" in ev.justificacion
 
-    def test_multitask_with_code_scores_03(self) -> None:
-        """Presence of ``codigo`` is not enough: only dedication scores 1.0,
-        otherwise the criterion is a constant for every ``codigo`` query."""
-        c = calcular_puntuacion(_make_candidate(tareas=["chat", "codigo"]))
-        ev = _sub(c, "evidencia_codigo")
+    def test_multitask_scores_03_for_code(self) -> None:
+        """Presence of the task is not enough: only dedication scores 1.0,
+        otherwise the criterion is a constant for every query."""
+        c = calcular_puntuacion(_make_candidate(tareas=["chat", "codigo"]), tarea="codigo")
+        ev = _sub(c, "especializacion")
         assert ev.valor == 0.3
-        assert "code support" in ev.justificacion
+        assert "also supports codigo" in ev.justificacion
 
-    def test_no_code_scores_03(self) -> None:
-        c = calcular_puntuacion(_make_candidate(tareas=["chat"]))
-        ev = _sub(c, "evidencia_codigo")
-        assert ev.valor == 0.3
-        assert "No code" in ev.justificacion
+    def test_dedicated_reasoner_scores_1_for_reasoning(self) -> None:
+        c = calcular_puntuacion(_make_candidate(tareas=["razonamiento"]), tarea="razonamiento")
+        assert _sub(c, "especializacion").valor == 1.0
+
+    def test_dedicated_coder_is_not_special_for_reasoning(self) -> None:
+        c = calcular_puntuacion(_make_candidate(tareas=["codigo"]), tarea="razonamiento")
+        assert _sub(c, "especializacion").valor == 0.3
+
+    @pytest.mark.parametrize("tarea", ["chat", None])
+    def test_chat_and_unknown_task_are_neutral(self, tarea: str | None) -> None:
+        for tareas in (["chat"], ["chat", "codigo"], ["codigo"]):
+            c = calcular_puntuacion(_make_candidate(tareas=tareas), tarea=tarea)
+            assert _sub(c, "especializacion").valor == VALOR_NEUTRO
 
     def test_reads_tareas_soportadas_not_pipeline_tag(self) -> None:
         c = _make_candidate(tareas=["chat", "codigo"])
         c.familia = c.familia.model_copy(update={"pipeline_tag": "codigo"})
-        calcular_puntuacion(c)
-        assert _sub(c, "evidencia_codigo").valor == 0.3
+        calcular_puntuacion(c, tarea="codigo")
+        assert _sub(c, "especializacion").valor == 0.3
+
+
+class TestRecencia:
+    def _con_fecha(self, fecha: str | None):
+        c = _make_candidate()
+        c.familia = c.familia.model_copy(update={"fecha_lanzamiento": fecha})
+        return c
+
+    def test_newest_scores_1(self) -> None:
+        c = calcular_puntuacion(self._con_fecha("2026-08"), fecha_referencia="2026-08")
+        assert _sub(c, "recencia").valor == 1.0
+        assert "newest generation" in _sub(c, "recencia").justificacion
+
+    def test_linear_decay_to_zero_at_24_months(self) -> None:
+        c = calcular_puntuacion(self._con_fecha("2025-08"), fecha_referencia="2026-08")
+        assert _sub(c, "recencia").valor == pytest.approx(0.5)
+        c = calcular_puntuacion(self._con_fecha("2024-08"), fecha_referencia="2026-08")
+        assert _sub(c, "recencia").valor == 0.0
+        c = calcular_puntuacion(self._con_fecha("2023-12"), fecha_referencia="2026-08")
+        assert _sub(c, "recencia").valor == 0.0
+
+    def test_future_date_clamps_to_one(self) -> None:
+        c = calcular_puntuacion(self._con_fecha("2027-01"), fecha_referencia="2026-08")
+        assert _sub(c, "recencia").valor == 1.0
+
+    @pytest.mark.parametrize(
+        ("fecha", "ref"), [(None, "2026-08"), ("2026-01", None), ("bad", "2026-08")]
+    )
+    def test_missing_or_invalid_dates_are_neutral(self, fecha, ref) -> None:
+        c = calcular_puntuacion(self._con_fecha(fecha), fecha_referencia=ref)
+        assert _sub(c, "recencia").valor == VALOR_NEUTRO
+
+    def test_meses_entre(self) -> None:
+        assert meses_entre("2025-11", "2026-02") == 3
+        assert meses_entre("2026-02", "2025-11") == -3
+        assert meses_entre("x", "2026-01") is None
+
+
+class TestContexto:
+    def _con_contexto(self, contexto: int | None):
+        c = _make_candidate()
+        c.familia = c.familia.model_copy(update={"contexto_maximo": contexto})
+        return c
+
+    @pytest.mark.parametrize(("contexto", "esperado"), [
+        (4_096, 0.0), (32_768, 0.375), (131_072, 0.625), (262_144, 0.75), (1_048_576, 1.0),
+    ])
+    def test_log_scale(self, contexto: int, esperado: float) -> None:
+        c = calcular_puntuacion(self._con_contexto(contexto))
+        assert _sub(c, "contexto").valor == pytest.approx(esperado, abs=1e-3)
+
+    def test_out_of_range_is_clamped(self) -> None:
+        assert _sub(calcular_puntuacion(self._con_contexto(1024)), "contexto").valor == 0.0
+        assert _sub(calcular_puntuacion(self._con_contexto(8_000_000)), "contexto").valor == 1.0
+
+    @pytest.mark.parametrize("contexto", [None, 0])
+    def test_unknown_is_neutral(self, contexto) -> None:
+        c = calcular_puntuacion(self._con_contexto(contexto))
+        assert _sub(c, "contexto").valor == VALOR_NEUTRO
 
 
 class TestSinDocumentacion:

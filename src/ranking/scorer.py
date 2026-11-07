@@ -4,12 +4,28 @@ Computes a weighted sum of normalised sub-scores.  Every score comes from
 structured data only — no semantic evidence, no LLM calls.  Weights are
 explicit and documented.  Same input always produces the same ranking.
 
-Inputs read today (and nothing else): ``tareas_soportadas`` and
-``license_declarada`` from the family, plus ``vram_required_gb`` from the
-compatibility result and the user's available VRAM.  A former
-``documentacion`` sub-score was retired: without an approved documentation
-source it only re-counted the declared licence, which ``licencia`` already
-scores; its weight went to the VRAM policy and to ``licencia``.
+Inputs read today (and nothing else): ``tareas_soportadas``,
+``license_declarada``, ``fecha_lanzamiento`` and ``contexto_maximo`` from
+the family, ``vram_required_gb`` from the compatibility result, and the
+user's available VRAM and requested task.  All of them come from the
+synced source (canIRun.ai exposes ``releaseDate`` and ``contextLength``);
+nothing is inferred from model names or benchmarks.
+
+Criteria:
+
+* ``ajuste_vram`` / ``capacidad`` — the VRAM policy (below).
+* ``especializacion`` — task-aware: for ``codigo`` and ``razonamiento`` a
+  model dedicated to that task scores 1.0, a generalist 0.3; for ``chat``
+  there is no meaningful specialisation signal (chat-only models are the
+  small generalists), so every candidate gets the neutral value.  It
+  replaces the former ``evidencia_codigo``, which was a constant for every
+  non-code query and wasted a quarter of the weight there.
+* ``recencia`` — months since release relative to the newest model in the
+  catalogue, linear to 0 at 24 months.  Newer generations dominate older
+  ones at equal size, and the source dates every record.
+* ``contexto`` — log scale of the context window from 4k (0.0) to 1M
+  (1.0): 32k ≈ 0.38, 128k ≈ 0.63, 256k ≈ 0.75.
+* ``licencia`` — permissive / other / none.
 
 VRAM policy: *the most capable model that still fits comfortably*.
 ``ajuste_vram`` is a safety margin (full score up to
@@ -24,6 +40,8 @@ regardless of the GPU.
 
 from __future__ import annotations
 
+import math
+
 from src.compatibility.vram import FRACCION_VRAM_UTIL
 from src.models.schemas import (
     CandidatoRankeado,
@@ -35,11 +53,22 @@ from src.tools.licencias import es_licencia_permisiva
 
 # Default weights — documented, never hidden.  They sum to 1.0.
 PESOS: dict[str, float] = {
-    "ajuste_vram": 0.35,
-    "capacidad": 0.25,
-    "evidencia_codigo": 0.25,
-    "licencia": 0.15,
+    "ajuste_vram": 0.30,
+    "capacidad": 0.20,
+    "especializacion": 0.20,
+    "recencia": 0.12,
+    "contexto": 0.08,
+    "licencia": 0.10,
 }
+
+MESES_RECENCIA = 24
+"""Age at which ``recencia`` reaches 0.0."""
+
+CONTEXTO_MINIMO = 4_096
+CONTEXTO_MAXIMO = 1_048_576
+"""Context-window bounds of the ``contexto`` log scale."""
+
+TAREAS_CON_ESPECIALIZACION = frozenset({"codigo", "razonamiento"})
 
 VALOR_NEUTRO = 0.5
 """Sub-score used when the data needed to judge a criterion is missing.
@@ -50,6 +79,9 @@ def calcular_puntuacion(
     candidato: CandidatoRankeado,
     vram_disponible_gb: float | None = None,
     pesos: dict[str, float] | None = None,
+    *,
+    tarea: str | None = None,
+    fecha_referencia: str | None = None,
 ) -> CandidatoRankeado:
     """Compute the total score for a candidate and attach its sub-scores.
 
@@ -58,10 +90,14 @@ def calcular_puntuacion(
             Mutated in place: ``subpuntuaciones`` and ``puntuacion_total``
             are overwritten.
         vram_disponible_gb: VRAM the user has available.  Needed by
-            ``ajuste_vram``; when ``None`` or non-positive that criterion
-            falls back to :data:`VALOR_NEUTRO`.
+            ``ajuste_vram`` and ``capacidad``; when ``None`` or
+            non-positive they fall back to :data:`VALOR_NEUTRO`.
         pesos: Weight per criterion; defaults to :data:`PESOS`.  Must
             contain every key of ``PESOS``.
+        tarea: Requested task, for ``especializacion``.  ``None`` or
+            ``chat`` yields the neutral value.
+        fecha_referencia: ``YYYY-MM`` of the newest model in the catalogue,
+            the zero point of ``recencia``; ``None`` makes it neutral.
 
     Returns:
         The same ``candidato`` object, for chaining.
@@ -73,7 +109,9 @@ def calcular_puntuacion(
     subpuntuaciones = [
         _puntuar_ajuste_vram(vram, vram_disponible_gb, pesos["ajuste_vram"]),
         _puntuar_capacidad(vram, vram_disponible_gb, pesos["capacidad"]),
-        _puntuar_evidencia_codigo(familia, pesos["evidencia_codigo"]),
+        _puntuar_especializacion(familia, tarea, pesos["especializacion"]),
+        _puntuar_recencia(familia, fecha_referencia, pesos["recencia"]),
+        _puntuar_contexto(familia, pesos["contexto"]),
         _puntuar_licencia(familia, pesos["licencia"]),
     ]
 
@@ -153,26 +191,87 @@ def _puntuar_capacidad(
     return SubPuntuacion(criterio="capacidad", valor=valor, peso=peso, justificacion=justificacion)
 
 
-def _puntuar_evidencia_codigo(familia: FamiliaModelo, peso: float) -> SubPuntuacion:
-    """Reward models the source declares as *dedicated* to code.
+def _puntuar_especializacion(
+    familia: FamiliaModelo, tarea: str | None, peso: float
+) -> SubPuntuacion:
+    """Reward models the source declares as *dedicated* to the requested task.
 
-    A model is dedicated when ``tareas_soportadas == ["codigo"]`` — mere
-    presence of ``codigo`` would give 1.0 to every candidate of a
-    ``codigo`` query (all of them declare it after filtering) and make
-    the criterion a constant.
+    Dedicated means ``tareas_soportadas == [tarea]``; mere presence of the
+    task would give 1.0 to every candidate (all of them declare it after
+    filtering) and make the criterion a constant.  Only ``codigo`` and
+    ``razonamiento`` carry a meaningful signal; for ``chat`` (or no task)
+    every candidate gets :data:`VALOR_NEUTRO`.
     """
-    dedicado = familia.tareas_soportadas == ["codigo"]
-    if dedicado:
-        justificacion = "Dedicated coding model"
-    elif "codigo" in familia.tareas_soportadas:
-        justificacion = "General-purpose model with code support"
-    else:
-        justificacion = "No code specialisation declared"
+    if tarea not in TAREAS_CON_ESPECIALIZACION:
+        return SubPuntuacion(
+            criterio="especializacion",
+            valor=VALOR_NEUTRO,
+            peso=peso,
+            justificacion=f"No specialisation signal for task {tarea or 'unknown'!r}",
+        )
+    dedicado = familia.tareas_soportadas == [tarea]
     return SubPuntuacion(
-        criterio="evidencia_codigo",
+        criterio="especializacion",
         valor=1.0 if dedicado else 0.3,
         peso=peso,
-        justificacion=justificacion,
+        justificacion=(
+            f"Dedicated {tarea} model" if dedicado
+            else f"General-purpose model that also supports {tarea}"
+        ),
+    )
+
+
+def meses_entre(desde: str, hasta: str) -> int | None:
+    """Whole months from ``desde`` to ``hasta`` (``YYYY-MM``), or ``None`` if unparsable."""
+    try:
+        a1, m1 = (int(x) for x in desde.split("-")[:2])
+        a2, m2 = (int(x) for x in hasta.split("-")[:2])
+    except (ValueError, AttributeError):
+        return None
+    return (a2 - a1) * 12 + (m2 - m1)
+
+
+def _puntuar_recencia(
+    familia: FamiliaModelo, fecha_referencia: str | None, peso: float
+) -> SubPuntuacion:
+    """Linear decay from 1.0 (released with the newest model) to 0.0 at
+    :data:`MESES_RECENCIA` months older.  Neutral without dates."""
+    meses = (
+        meses_entre(familia.fecha_lanzamiento, fecha_referencia)
+        if familia.fecha_lanzamiento and fecha_referencia
+        else None
+    )
+    if meses is None:
+        valor = VALOR_NEUTRO
+        justificacion = "Release date unknown"
+    else:
+        valor = max(0.0, min(1.0, 1.0 - max(meses, 0) / MESES_RECENCIA))
+        justificacion = (
+            f"Released {familia.fecha_lanzamiento}, {max(meses, 0)} months after the "
+            f"newest model ({fecha_referencia})"
+            if meses > 0 else f"Released {familia.fecha_lanzamiento} (newest generation)"
+        )
+    return SubPuntuacion(
+        criterio="recencia", valor=valor, peso=peso, justificacion=justificacion
+    )
+
+
+def _puntuar_contexto(familia: FamiliaModelo, peso: float) -> SubPuntuacion:
+    """Log scale of the context window between :data:`CONTEXTO_MINIMO` and
+    :data:`CONTEXTO_MAXIMO`.  Neutral when unknown."""
+    contexto = familia.contexto_maximo
+    if not contexto or contexto <= 0:
+        return SubPuntuacion(
+            criterio="contexto", valor=VALOR_NEUTRO, peso=peso,
+            justificacion="Context length unknown",
+        )
+    acotado = min(max(contexto, CONTEXTO_MINIMO), CONTEXTO_MAXIMO)
+    valor = math.log2(acotado / CONTEXTO_MINIMO) / math.log2(CONTEXTO_MAXIMO / CONTEXTO_MINIMO)
+    return SubPuntuacion(
+        criterio="contexto",
+        valor=round(valor, 4),
+        peso=peso,
+        justificacion=f"Context window {contexto:,} tokens",
     )
 
 

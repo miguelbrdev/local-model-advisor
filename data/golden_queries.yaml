@@ -10,25 +10,31 @@
 #
 # Ranking policy pinned since 1.1.0: "the most capable model that still fits
 # comfortably" (ajuste_vram = safety margin, capacidad = use of the usable
-# budget). 1.0.0 encoded the previous smallest-wins bias and was re-reviewed.
+# budget). 1.2.0 adds task-aware specialisation, recency (months behind the
+# newest model, zero at 24) and context window: a dedicated coder from 2024
+# no longer leads by default over a 2026 generalist of the same size, and
+# dedicated reasoning models lead reasoning queries.
 #
 # Run: python -m scripts.evaluate_golden
-version: "1.1.0"
+version: "1.2.0"
 snapshot_id: "snap-176d40242fd0157a"
 descripcion: >
   Suite written against the bootstrap snapshot. Covers the three v1 tasks,
   VRAM budgets from 1 GB to 48 GB, the commercial-licence filter, the
-  empty-result case and the "no longer smallest-first" policy.
+  empty-result case, the "no longer smallest-first" policy and the
+  recency/specialisation signals.
 
 casos:
   - id: codigo-8gb
     descripcion: >
-      Mid-range GPU for coding. The dedicated 7B coder uses ~65 % of 8 GB and
-      must lead; both Qwen coders are in the top 3; 24B+ coders do not fit.
+      Mid-range GPU for coding. The dedicated 7B coder (2024-11, 128k) stays in
+      the top 3, but with recency and context in play a 2026 code-capable 9B
+      (ornith-1.0-9b, 256k) may lead, so the first place is not pinned. The
+      2024 1.5B coder (32k) is legitimately outranked by 2026 8B generalists.
+      24B+ coders do not fit.
     criterios: {tarea: codigo, vram_gb: 8}
     top_n: 3
-    primero: qwen2.5-coder-7b
-    debe_incluir: [qwen2.5-coder-7b, qwen2.5-coder-1.5b]
+    debe_incluir: [qwen2.5-coder-7b]
     debe_excluir: [qwen3-coder-30b, devstral-small-2-24b, qwen3-coder-480b]
     min_candidatos: 5
 
@@ -53,12 +59,12 @@ casos:
 
   - id: chat-6gb
     descripcion: >
-      Entry-level GPU. 3B-4B chat models are the right size and must lead; the
-      0.6B/0.8B models still fit but must no longer be recommended first;
-      12B+ and dedicated coders are out.
+      Entry-level GPU. 3B-4B chat models from 2026 are the right size and must
+      lead (qwen3.5-4b pinned); the 0.6B/0.8B models still fit but must no
+      longer be recommended first; 12B+ and dedicated coders are out.
     criterios: {tarea: chat, vram_gb: 6}
     top_n: 5
-    debe_incluir: [qwen3.5-4b, smollm3-3b]
+    debe_incluir: [qwen3.5-4b]
     debe_quedar_fuera_del_top: [qwen3-0.6b, qwen3.5-0.8b]
     debe_excluir: [gemma3-12b, mistral-nemo-12b, qwen3-14b, qwen2.5-coder-7b]
     min_candidatos: 10
@@ -76,11 +82,15 @@ casos:
 
   - id: razonamiento-16gb
     descripcion: >
-      The 14B reasoning models fit at ~59 % and must lead; the 1.5B distil must
-      not; the 32B distil and the 671B original do not fit; coders are out.
+      Dedicated reasoning models lead a reasoning query: the 14B R1 distil
+      (MIT, ~59 % of the budget) must be first and the 7B distil in the top 5;
+      the 1.5B distil must not rank; the 32B distil and the 671B original do
+      not fit; coders are out. phi-4-14b (2024-12, 16k context, not dedicated)
+      is no longer pinned.
     criterios: {tarea: razonamiento, vram_gb: 16}
     top_n: 5
-    debe_incluir: [deepseek-r1-14b, phi-4-14b]
+    primero: deepseek-r1-14b
+    debe_incluir: [deepseek-r1-14b, deepseek-r1-7b]
     debe_quedar_fuera_del_top: [deepseek-r1-1.5b]
     debe_excluir: [deepseek-r1-32b, deepseek-r1, qwen2.5-coder-7b]
     min_candidatos: 10

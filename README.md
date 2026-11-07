@@ -58,9 +58,10 @@ Implemented:
   parameter-count heuristic (`src/compatibility/heuristica.py`) as the
   production fallback when the service is down or lacks a model; the same
   heuristic drives the offline evaluation
-- Deterministic multi-criteria ranking with four explicit sub-scores (VRAM
-  safety margin, capacity, dedicated-coder evidence, licence), following
-  "the most capable model that still fits comfortably"
+- Deterministic multi-criteria ranking with six explicit sub-scores (VRAM
+  safety margin, capacity, task specialisation, recency, context window,
+  licence), following "the most capable model that still fits comfortably";
+  every signal comes from the synced catalogue, none from model names
 - SQLite-backed server-side conversation state with a 24-hour TTL, storing
   the catalog `snapshot_id` that produced each recommendation
 - Explanatory evidence: README fragments per candidate from a Qdrant index
@@ -75,7 +76,7 @@ Implemented:
   `scripts/evaluate_golden.py`): reviewed cases pin filter and ranking
   behaviour per catalog snapshot and report pass rate, hit rate and
   exclusion rate
-- 525 automated tests and Ruff linting
+- 561 automated tests and Ruff linting
 
 Not implemented yet:
 

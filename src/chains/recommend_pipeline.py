@@ -7,9 +7,15 @@ from __future__ import annotations
 
 from src.catalog.protocol import CatalogoModelos
 from src.compatibility.provider import VRAMCompatibilityProvider, elegir_provider
-from src.models.schemas import CandidatoRankeado, CriteriosBusqueda
+from src.models.schemas import CandidatoRankeado, CriteriosBusqueda, FamiliaModelo
 from src.ranking.scorer import calcular_puntuacion, ordenar_por_puntuacion
 from src.tools.structured_filter import filtrar_candidatos
+
+
+def fecha_mas_reciente(familias: list[FamiliaModelo]) -> str | None:
+    """Newest ``YYYY-MM`` release date in the catalogue (zero point of ``recencia``)."""
+    fechas = [f.fecha_lanzamiento for f in familias if f.fecha_lanzamiento]
+    return max(fechas) if fechas else None
 
 
 def ejecutar_pipeline(
@@ -56,7 +62,13 @@ def ejecutar_pipeline(
     provider = vram_provider or elegir_provider(criterios.tarea or "codigo")
 
     candidatos = filtrar_candidatos(familias, criterios, provider)
+    fecha_referencia = fecha_mas_reciente(familias)
     for candidato in candidatos:
-        calcular_puntuacion(candidato, vram_disponible_gb=criterios.vram_gb)
+        calcular_puntuacion(
+            candidato,
+            vram_disponible_gb=criterios.vram_gb,
+            tarea=criterios.tarea,
+            fecha_referencia=fecha_referencia,
+        )
 
     return ordenar_por_puntuacion(candidatos)[:top_n]

@@ -201,7 +201,7 @@ class TestHappyPath:
         assert all(r.puntuacion_total >= 0 for r in results)
 
     def test_subpuntuaciones_present(self) -> None:
-        """Each result contains 4 explainable sub-scores."""
+        """Each result contains 6 explainable sub-scores."""
         provider_results = {
             "model-a": _compatible("model-a"),
             "model-b": _compatible("model-b"),
@@ -218,9 +218,11 @@ class TestHappyPath:
             )
 
         for candidate in results:
-            assert len(candidate.subpuntuaciones) == 4
+            assert len(candidate.subpuntuaciones) == 6
             names = {s.criterio for s in candidate.subpuntuaciones}
-            assert names == {"ajuste_vram", "capacidad", "evidencia_codigo", "licencia"}
+            assert names == {
+                "ajuste_vram", "capacidad", "especializacion", "recencia", "contexto", "licencia",
+            }
 
     def test_provider_called_for_each_family(self) -> None:
         """VRAM provider is queried once per candidate family."""
@@ -396,7 +398,7 @@ class TestProviderUnavailable:
             )
 
         assert len(results) == 1
-        assert len(results[0].subpuntuaciones) == 4
+        assert len(results[0].subpuntuaciones) == 6
 
 
 # ---------------------------------------------------------------------------
@@ -600,6 +602,24 @@ class TestCatalogueInjection:
         routing.assert_not_called()
         assert provider.call_count == 1
         assert [r.familia.familia_id for r in results] == ["model-a"]
+
+    def test_scorer_receives_task_and_newest_release_date(self) -> None:
+        """``especializacion`` must see the requested task and ``recencia``
+        the newest date of the catalogue, not of the candidate."""
+        viejo = FAMILIA_A.model_copy(update={"fecha_lanzamiento": "2024-08"})
+        nuevo = FAMILIA_C.model_copy(update={"fecha_lanzamiento": "2026-08"})
+        provider = _MockProvider(
+            {"model-a": _compatible("model-a"), "model-c": _compatible("model-c")}
+        )
+
+        with patch("src.chains.recommend_pipeline.elegir_provider", return_value=provider):
+            results = ejecutar_pipeline(criterios=_criterios(), catalogo=_catalogo(viejo, nuevo))
+
+        por_id = {r.familia.familia_id: r for r in results}
+        sub = lambda r, k: next(s for s in r.subpuntuaciones if s.criterio == k)  # noqa: E731
+        assert sub(por_id["model-c"], "recencia").valor == 1.0
+        assert sub(por_id["model-a"], "recencia").valor == 0.0
+        assert sub(por_id["model-a"], "especializacion").valor == 1.0  # dedicated codigo
 
     def test_signature_requires_keyword_only_catalogue(self) -> None:
         """Pin design (a): no ``familias`` escape hatch, ``catalogo``
