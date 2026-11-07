@@ -33,6 +33,11 @@ Implemented:
 
 - FastAPI API with `POST /chat`, `GET /health`, and `GET /families`
 - Structured validation with Pydantic v2
+- Free-text input: `mensaje` may be criteria JSON or natural language
+  ("quiero programar en Python con 12 GB"), interpreted by a local Ollama
+  model through LangChain structured output, re-validated with Pydantic and
+  merged into the conversation's criteria; missing fields trigger a
+  clarification and the follow-up completes them
 - Catalog abstraction (`src/catalog/`): `CatalogoModelos` protocol plus a
   synchronized adapter with a strict fallback chain
   `runtime/catalog/current.json` → `data/catalog_bootstrap.json` → loud
@@ -65,7 +70,7 @@ Implemented:
   `scripts/evaluate_golden.py`): reviewed cases pin filter and ranking
   behaviour per catalog snapshot and report pass rate, hit rate and
   exclusion rate
-- 403 automated tests and Ruff linting
+- 440 automated tests and Ruff linting
 
 Not implemented yet:
 
@@ -73,7 +78,6 @@ Not implemented yet:
   language field, so language requirements are not enforced on them
 - Runtime preference filtering
 - Qdrant hybrid retrieval and reranking for explanatory evidence
-- LangChain-based extraction of free-form user requirements
 - Docker Compose packaging
 
 ## Architecture
@@ -106,6 +110,7 @@ candidate score.
 - SQLite with a 24-hour conversation TTL
 - httpx
 - PyYAML
+- LangChain (`langchain-core`, `langchain-ollama`) with a local Ollama model
 - canirun.ai compatibility API
 - pytest and Ruff
 
@@ -156,6 +161,31 @@ uvicorn src.api.main:app --reload
 python -m pytest
 python -m ruff check .
 ```
+
+## Natural-language input
+
+`POST /chat` accepts either criteria JSON (always available, no LLM involved)
+or free text. Free text is interpreted by a local Ollama model: the model only
+fills the criteria fields it can read from the message, the output is
+validated with Pydantic, and the deterministic pipeline runs exactly as with
+JSON. The model never sees the catalog and never influences the ranking.
+
+```bash
+# one-off setup
+winget install Ollama.Ollama        # or https://ollama.com/download
+ollama pull qwen2.5:3b
+```
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `LMA_EXTRACCION_LLM` | `1` | Set to `0` to accept only criteria JSON |
+| `LMA_OLLAMA_MODEL` | `qwen2.5:3b` | Ollama model tag |
+| `LMA_OLLAMA_BASE_URL` | `http://127.0.0.1:11434` | Local Ollama server |
+
+If Ollama is unreachable or returns invalid output, a free-text message gets
+`503` with a hint to send JSON; JSON input keeps working. The first message
+may be incomplete: `"necesito razonar"` returns a clarification, and
+`"tengo 12 GB"` sent with the same `conversation_id` completes the criteria.
 
 ## Example
 
@@ -259,7 +289,7 @@ the cases and update `snapshot_id` in the suite.
 |---|---|---|
 | `GET` | `/health` | Returns API health status |
 | `GET` | `/families` | Lists every family of the mounted catalog snapshot |
-| `POST` | `/chat` | Returns a clarification or recommendation response; `422` when `mensaje` is not valid criteria JSON |
+| `POST` | `/chat` | Returns a clarification or recommendation response; `422` when free text is disabled and `mensaje` is not criteria JSON; `503` when the local LLM is unavailable |
 
 Once the server is running, interactive OpenAPI documentation is available at
 `/docs`.
@@ -285,7 +315,7 @@ Once the server is running, interactive OpenAPI documentation is available at
 ├── src/
 │   ├── api/             # FastAPI endpoints and app lifespan (mounts the catalog)
 │   ├── catalog/         # Catalog protocol + synchronized adapter with fallback chain
-│   ├── chains/          # Recommendation orchestration
+│   ├── chains/          # Recommendation orchestration and criteria extraction (JSON / Ollama)
 │   ├── compatibility/   # Interchangeable VRAM providers (canirun.ai, offline heuristic)
 │   ├── evaluation/      # Golden-query evaluation and metrics
 │   ├── models/          # Pydantic contracts
@@ -314,7 +344,7 @@ Once the server is running, interactive OpenAPI documentation is available at
 - [x] Add `scripts/sync_catalog.py` for the recurring scheduled task (every 21 days)
 - [ ] Add Qdrant hybrid retrieval for explanatory evidence
 - [ ] Add reranking of retrieved evidence
-- [ ] Add LangChain-based criteria extraction
+- [x] Add LangChain-based criteria extraction
 - [x] Add golden-query evaluation metrics
 - [ ] Add Docker Compose packaging and GPU passthrough
 - [ ] Record a demo GIF

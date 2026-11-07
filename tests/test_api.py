@@ -21,9 +21,19 @@ from uuid import UUID, uuid4
 import pytest
 from fastapi.testclient import TestClient
 
-from src.api.main import LIMITACIONES_ACTUALES, app, describir_antiguedad
+from src.api.main import (
+    LIMITACIONES_ACTUALES,
+    app,
+    construir_extractor,
+    describir_antiguedad,
+)
 from src.catalog import synced
 from src.catalog.protocol import CatalogUnavailableError
+from src.chains.extraccion_criterios import (
+    ExtraccionNoDisponibleError,
+    ExtractorCompuesto,
+    ExtractorOllama,
+)
 from src.models.schemas import (
     CandidatoRankeado,
     CompatibilityResult,
@@ -141,8 +151,34 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClie
         runtime_dir=tmp_path / "runtime" / "catalog",
         bootstrap_path=bootstrap,
     )
+    # Free-text extraction off by default: no test may reach Ollama.  Tests
+    # of the free-text path mount a fake on ``app.state.extractor``.
+    monkeypatch.setenv("LMA_EXTRACCION_LLM", "0")
     with TestClient(app) as test_client:
         yield test_client
+
+
+class _FakeExtractor:
+    """Scripted ``ExtractorCriterios``: returns the next prepared criteria,
+    merged over ``base`` like the real extractors do, or raises."""
+
+    def __init__(self, *salidas: CriteriosBusqueda, error: Exception | None = None) -> None:
+        self._salidas = list(salidas)
+        self._error = error
+        self.mensajes: list[str] = []
+
+    @property
+    def acepta_texto_libre(self) -> bool:
+        return True
+
+    def extraer(self, mensaje: str, base: CriteriosBusqueda | None = None) -> CriteriosBusqueda:
+        self.mensajes.append(mensaje)
+        if self._error is not None:
+            raise self._error
+        siguiente = self._salidas.pop(0)
+        previo = base.model_dump() if base is not None else {}
+        nuevo = {k: v for k, v in siguiente.model_dump().items() if v is not None and v != []}
+        return CriteriosBusqueda.model_validate({**previo, **nuevo})
 
 
 def _mock_pipeline_result() -> list[CandidatoRankeado]:
@@ -446,7 +482,8 @@ class TestChatCamposFaltantes:
 # ---------------------------------------------------------------------------
 
 class TestChatInvalidMessage:
-    """Malformed criteria are a client error (422), never a server fault (500)."""
+    """With free-text input disabled, malformed criteria are a client error
+    (422), never a server fault (500)."""
 
     def test_invalid_json_returns_422(self, client: TestClient) -> None:
         response = client.post("/chat", json={"mensaje": "not valid json {"})
@@ -474,6 +511,125 @@ class TestChatInvalidMessage:
         with patch("src.api.main.conversation_store.guardar") as guardar:
             client.post("/chat", json={"mensaje": "not valid json {"})
         guardar.assert_not_called()
+
+
+# ---------------------------------------------------------------------------
+# POST /chat — free-text input through the mounted extractor
+# ---------------------------------------------------------------------------
+
+
+class TestChatTextoLibre:
+    @patch("src.api.main.ejecutar_pipeline")
+    def test_free_text_is_extracted_and_recommended(
+        self, mock_pipeline: MagicMock, client: TestClient
+    ) -> None:
+        mock_pipeline.return_value = _mock_pipeline_result()
+        fake = _FakeExtractor(CriteriosBusqueda(tarea="codigo", vram_gb=12))
+        app.state.extractor = fake
+
+        data = client.post("/chat", json={"mensaje": "quiero programar con 12 GB"}).json()
+
+        assert data["tipo"] == "recomendacion"
+        assert data["criterios_interpretados"]["tarea"] == "codigo"
+        assert data["criterios_interpretados"]["vram_gb"] == 12
+        assert fake.mensajes == ["quiero programar con 12 GB"]
+        criterios: CriteriosBusqueda = mock_pipeline.call_args[0][0]
+        assert criterios.vram_gb == 12
+
+    def test_clarification_is_persisted_and_follow_up_completes_it(
+        self, client: TestClient
+    ) -> None:
+        """First message lacks VRAM -> clarification; the follow-up on the
+        same conversation merges the missing field and recommends."""
+        fake = _FakeExtractor(
+            CriteriosBusqueda(tarea="razonamiento"),
+            CriteriosBusqueda(vram_gb=12),
+        )
+        app.state.extractor = fake
+
+        with patch("src.api.main.ejecutar_pipeline", return_value=_mock_pipeline_result()):
+            first = client.post("/chat", json={"mensaje": "necesito razonar"}).json()
+            assert first["tipo"] == "clarificacion"
+            assert first["campo_faltante"] == "vram_gb"
+            conv_id = first["conversation_id"]
+
+            run = conversation_store.cargar(UUID(conv_id))
+            assert run is not None and run.criterios.tarea == "razonamiento"
+
+            second = client.post(
+                "/chat", json={"conversation_id": conv_id, "mensaje": "tengo 12 GB"}
+            ).json()
+
+        assert second["tipo"] == "recomendacion"
+        assert second["conversation_id"] == conv_id
+        assert second["criterios_interpretados"] == {
+            "tarea": "razonamiento",
+            "vram_gb": 12.0,
+            "idiomas_requeridos": [],
+            "runtime_preferido": None,
+            "requiere_licencia_comercial": False,
+        }
+        run = conversation_store.cargar(UUID(conv_id))
+        assert [t.rol for t in run.historial] == ["usuario", "sistema", "usuario", "sistema"]
+        assert fake.mensajes == ["necesito razonar", "tengo 12 GB"]
+
+    @patch("src.api.main.ejecutar_pipeline")
+    def test_complete_conversation_ignores_follow_up_text(
+        self, mock_pipeline: MagicMock, client: TestClient
+    ) -> None:
+        mock_pipeline.return_value = _mock_pipeline_result()
+        fake = _FakeExtractor(CriteriosBusqueda(tarea="chat", vram_gb=8))
+        app.state.extractor = fake
+        conv_id = client.post("/chat", json={"mensaje": "un chat con 8 GB"}).json()[
+            "conversation_id"
+        ]
+        data = client.post(
+            "/chat", json={"conversation_id": conv_id, "mensaje": "cuéntame más"}
+        ).json()
+        assert data["tipo"] == "recomendacion"
+        assert fake.mensajes == ["un chat con 8 GB"]  # extractor not consulted again
+
+    def test_llm_unavailable_is_503_and_persists_nothing(self, client: TestClient) -> None:
+        app.state.extractor = _FakeExtractor(
+            error=ExtraccionNoDisponibleError("connection refused")
+        )
+        with patch("src.api.main.conversation_store.guardar") as guardar:
+            response = client.post("/chat", json={"mensaje": "quiero programar con 12 GB"})
+        assert response.status_code == 503
+        assert "Send the criteria as JSON" in response.json()["detail"]
+        guardar.assert_not_called()
+
+    def test_free_text_disabled_returns_422(self, client: TestClient) -> None:
+        """The fixture disables the LLM; free text must then be a 422 with
+        the validation items, not a 503."""
+        response = client.post("/chat", json={"mensaje": "quiero programar con 12 GB"})
+        assert response.status_code == 422
+        assert response.json()["detail"][0]["loc"][:2] == ["body", "mensaje"]
+
+    def test_lifespan_mounts_a_composite_extractor(self, client: TestClient) -> None:
+        assert isinstance(app.state.extractor, ExtractorCompuesto)
+        assert app.state.extractor.acepta_texto_libre is False
+
+
+class TestConstruirExtractor:
+    def test_enabled_by_default_with_ollama(self) -> None:
+        extractor = construir_extractor({})
+        assert extractor.acepta_texto_libre is True
+        llm = extractor._llm
+        assert isinstance(llm, ExtractorOllama)
+        assert llm.modelo == "qwen2.5:3b"
+        assert llm.base_url == "http://127.0.0.1:11434"
+
+    def test_env_overrides_model_and_url(self) -> None:
+        extractor = construir_extractor(
+            {"LMA_OLLAMA_MODEL": "qwen3:4b", "LMA_OLLAMA_BASE_URL": "http://127.0.0.1:11500"}
+        )
+        assert extractor._llm.modelo == "qwen3:4b"
+        assert extractor._llm.base_url == "http://127.0.0.1:11500"
+
+    @pytest.mark.parametrize("valor", ["0", "false", "no", "off", " False "])
+    def test_can_be_disabled(self, valor: str) -> None:
+        assert construir_extractor({"LMA_EXTRACCION_LLM": valor}).acepta_texto_libre is False
 
 
 # ---------------------------------------------------------------------------
