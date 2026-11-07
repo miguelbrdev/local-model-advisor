@@ -24,7 +24,9 @@ SECCIONES_OMITIDAS = (
     "installation", "install", "requirements", "deployment", "deploy", "inference",
     "running", "download", "citation", "cite", "bibtex", "license", "licence",
     "acknowledg", "special thanks", "community model", "contact", "changelog",
-    "table of contents", "sponsor",
+    "table of contents", "sponsor", "vllm", "transformers", "llama.cpp", "ollama",
+    "lm studio", "serving", "serve", "settings", "sampling", "api", "sdk", "prompt format",
+    "chat template", "tokenizer",
 )
 """Section headings (case-insensitive substrings) whose content is operational
 boilerplate — install commands, API calls, citations — rather than an

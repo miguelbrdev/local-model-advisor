@@ -326,7 +326,9 @@ class TestTrocear:
         assert not any(f.startswith(("Quickstart: ", "Citation: ")) for f in fragmentos)
 
     @pytest.mark.parametrize("titulo", ["Quickstart", "How to use", "Usage", "License", "BibTeX",
-                                        "Community Model> Qwen", "Special thanks"])
+                                        "Community Model> Qwen", "Special thanks", "vLLM",
+                                        "Recommended Settings", "Serving Ornith-1.0-9B",
+                                        "Hugging Face Transformers"])
     def test_seccion_omitida(self, titulo: str) -> None:
         assert seccion_omitida(titulo)
 
