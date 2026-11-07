@@ -63,6 +63,9 @@ Implemented:
   "the most capable model that still fits comfortably"
 - SQLite-backed server-side conversation state with a 24-hour TTL, storing
   the catalog `snapshot_id` that produced each recommendation
+- Explanatory evidence: README fragments per candidate from a Qdrant index
+  built with a local Ollama embedding model, attached after ranking and never
+  used for scoring
 - Limitations and the age of the catalog data reported in every
   recommendation, so a short result is never ambiguous
 - `scripts/sync_catalog.py`: the entry point for the 21-day scheduled task,
@@ -72,14 +75,14 @@ Implemented:
   `scripts/evaluate_golden.py`): reviewed cases pin filter and ranking
   behaviour per catalog snapshot and report pass rate, hit rate and
   exclusion rate
-- 505 automated tests and Ruff linting
+- 525 automated tests and Ruff linting
 
 Not implemented yet:
 
 - Language data for synced models: the canIRun.ai source exposes no
   language field, so language requirements are not enforced on them
 - Runtime preference filtering
-- Qdrant hybrid retrieval and reranking for explanatory evidence
+- Hybrid (sparse + dense) retrieval and reranking of evidence
 
 ## Architecture
 
@@ -185,11 +188,33 @@ ollama pull gemma4:e4b
 | `LMA_EXTRACCION_LLM` | `1` | Set to `0` to accept only criteria JSON |
 | `LMA_OLLAMA_MODEL` | `gemma4:e4b` | Ollama model tag |
 | `LMA_OLLAMA_BASE_URL` | `http://127.0.0.1:11434` | Local Ollama server |
+| `LMA_EVIDENCIA` | `1` | Set to `0` to skip explanatory evidence |
+| `LMA_QDRANT_URL` | `http://127.0.0.1:6333` | Qdrant server holding the evidence index |
+| `LMA_EMBEDDING_MODEL` | `embeddinggemma` | Ollama embedding model |
 
 If Ollama is unreachable or returns invalid output, a free-text message gets
 `503` with a hint to send JSON; JSON input keeps working. The first message
 may be incomplete: `"necesito razonar"` returns a clarification, and
 `"tengo 12 GB"` sent with the same `conversation_id` completes the criteria.
+
+## Explanatory evidence
+
+Every recommended candidate can carry `evidencia_explicativa`: up to two
+fragments of the model's own Hugging Face README, chosen by similarity to the
+user's message, with the source URL and a relevance score for display. The
+fragments are attached **after** ranking and never influence a score or the
+order (the tests pin both). The index is built outside the API:
+
+```bash
+python -m scripts.index_docs        # fetch READMEs into runtime/docs, embed, upsert into Qdrant
+```
+
+Source: the Hugging Face repository each catalog record points to, fetched
+without a token. Licence-gated repositories (Meta, Google) answer 401 and are
+recorded as `gated`; quantisation mirrors are followed one hop to the
+original model. When Qdrant or the embedding model is unreachable, or a
+candidate has no indexed documentation, `limitaciones` says so and the
+recommendation is returned anyway.
 
 ## Docker Compose
 
@@ -374,7 +399,7 @@ Once the server is running, interactive OpenAPI documentation is available at
 - [x] Persist `snapshot_id` per conversation
 - [x] Enable chat and reasoning tasks in the pipeline
 - [x] Add `scripts/sync_catalog.py` for the recurring scheduled task (every 21 days)
-- [ ] Add Qdrant hybrid retrieval for explanatory evidence
+- [x] Add Qdrant retrieval for explanatory evidence (dense; hybrid pending)
 - [ ] Add reranking of retrieved evidence
 - [x] Add LangChain-based criteria extraction
 - [x] Add golden-query evaluation metrics

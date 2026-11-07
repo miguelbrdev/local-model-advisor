@@ -133,6 +133,19 @@ class SubPuntuacion(BaseModel):
     justificacion: str
 
 
+class EvidenciaExplicativa(BaseModel):
+    """A documentation fragment that explains a candidate.
+
+    Retrieved from the model's own README *after* ranking.  ``relevancia``
+    is the retrieval similarity for display only; it is never read by the
+    scorer and never alters ``puntuacion_total``.
+    """
+
+    fuente_url: str | None = None
+    fragmento: str
+    relevancia: float = Field(ge=0, le=1)
+
+
 class CandidatoRankeado(BaseModel):
     """A ranked candidate returned by the pipeline."""
 
@@ -142,6 +155,7 @@ class CandidatoRankeado(BaseModel):
     evidencia_benchmark: EvidenciaBenchmark | None = None
     subpuntuaciones: list[SubPuntuacion] = Field(default_factory=list)
     puntuacion_total: float = 0.0
+    evidencia_explicativa: list[EvidenciaExplicativa] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------

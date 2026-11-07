@@ -24,6 +24,7 @@ from fastapi.testclient import TestClient
 from src.api.main import (
     LIMITACIONES_BASE,
     app,
+    construir_buscador_evidencia,
     construir_extractor,
     describir_antiguedad,
 )
@@ -34,6 +35,7 @@ from src.chains.extraccion_criterios import (
     ExtractorCompuesto,
     ExtractorOllama,
 )
+from src.evidence.qdrant_index import Fragmento, IndiceEvidencia, IndiceNoDisponibleError
 from src.models.schemas import (
     CandidatoRankeado,
     CompatibilityResult,
@@ -151,11 +153,32 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClie
         runtime_dir=tmp_path / "runtime" / "catalog",
         bootstrap_path=bootstrap,
     )
-    # Free-text extraction off by default: no test may reach Ollama.  Tests
-    # of the free-text path mount a fake on ``app.state.extractor``.
+    # Free-text extraction and explanatory evidence off by default: no test
+    # may reach Ollama or Qdrant.  Tests of those paths mount fakes on
+    # ``app.state.extractor`` / ``app.state.evidencia``.
     monkeypatch.setenv("LMA_EXTRACCION_LLM", "0")
+    monkeypatch.setenv("LMA_EVIDENCIA", "0")
     with TestClient(app) as test_client:
         yield test_client
+
+
+EVIDENCIA_OFF = "Explanatory evidence is disabled (LMA_EVIDENCIA=0)."
+
+
+class _FakeBuscador:
+    """Scripted ``BuscadorEvidencia``: fragments per family, or a failure."""
+
+    def __init__(self, por_familia: dict[str, list[Fragmento]] | None = None,
+                 error: Exception | None = None) -> None:
+        self._por_familia = por_familia or {}
+        self._error = error
+        self.consultas: list[str] = []
+
+    def buscar(self, consulta: str, familia_id: str, k: int = 2) -> list[Fragmento]:
+        self.consultas.append(consulta)
+        if self._error is not None:
+            raise self._error
+        return self._por_familia.get(familia_id, [])
 
 
 class _FakeExtractor:
@@ -351,7 +374,7 @@ class TestChatNuevaConversacion:
         mock_pipeline.return_value = _mock_pipeline_result()
         payload = {"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
         data = client.post("/chat", json=payload).json()
-        assert data["limitaciones"] == LIMITACIONES_BASE
+        assert data["limitaciones"] == [*LIMITACIONES_BASE, EVIDENCIA_OFF]
 
     @patch("src.api.main.ejecutar_pipeline")
     def test_limitations_count_locally_estimated_candidates(
@@ -366,8 +389,9 @@ class TestChatNuevaConversacion:
         payload = {"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
         limitaciones = client.post("/chat", json=payload).json()["limitaciones"]
         extra = limitaciones[len(LIMITACIONES_BASE):]
-        assert len(extra) == 1
-        assert extra[0].startswith("VRAM compatibility of 1 of 2 candidates was estimated locally")
+        assert extra[0] == EVIDENCIA_OFF
+        assert len(extra) == 2
+        assert extra[1].startswith("VRAM compatibility of 1 of 2 candidates was estimated locally")
 
     @patch("src.api.main.ejecutar_pipeline")
     def test_limitations_name_the_unapplied_criteria(
@@ -385,9 +409,10 @@ class TestChatNuevaConversacion:
         limitaciones = client.post("/chat", json=payload).json()["limitaciones"]
         assert limitaciones[: len(LIMITACIONES_BASE)] == LIMITACIONES_BASE
         extra = limitaciones[len(LIMITACIONES_BASE):]
-        assert len(extra) == 2
-        assert "['es', 'en']" in extra[0]
-        assert "'ollama'" in extra[1]
+        assert extra[0] == EVIDENCIA_OFF
+        assert len(extra) == 3
+        assert "['es', 'en']" in extra[1]
+        assert "'ollama'" in extra[2]
 
     @patch("src.api.main.ejecutar_pipeline")
     def test_reports_age_of_the_mounted_snapshot(
@@ -645,6 +670,88 @@ class TestChatTextoLibre:
     def test_lifespan_mounts_a_composite_extractor(self, client: TestClient) -> None:
         assert isinstance(app.state.extractor, ExtractorCompuesto)
         assert app.state.extractor.acepta_texto_libre is False
+
+
+class TestChatEvidencia:
+    """Explanatory evidence is attached after ranking and reported honestly."""
+
+    @patch("src.api.main.ejecutar_pipeline")
+    def test_fragments_attached_without_changing_ranking(
+        self, mock_pipeline: MagicMock, client: TestClient
+    ) -> None:
+        mock_pipeline.return_value = _mock_pipeline_result()
+        fake = _FakeBuscador({
+            "mock-model": [Fragmento("mock-model", "Great at Python.", 0.83, "https://hf.co/m", 0)]
+        })
+        app.state.evidencia = fake
+        payload = {"mensaje": "quiero programar en Python con 12 GB"}
+        app.state.extractor = _FakeExtractor(CriteriosBusqueda(tarea="codigo", vram_gb=12))
+
+        data = client.post("/chat", json=payload).json()
+
+        candidato = data["candidatos"][0]
+        assert candidato["puntuacion_total"] == 0.8  # untouched
+        assert candidato["evidencia_explicativa"] == [
+            {"fuente_url": "https://hf.co/m", "fragmento": "Great at Python.", "relevancia": 0.83}
+        ]
+        assert fake.consultas == ["quiero programar en Python con 12 GB"]
+        assert not any(
+            "Explanatory evidence" in lim or "documentation fragments" in lim
+            for lim in data["limitaciones"]
+        )
+
+    @patch("src.api.main.ejecutar_pipeline")
+    def test_candidates_without_fragments_are_counted(
+        self, mock_pipeline: MagicMock, client: TestClient
+    ) -> None:
+        mock_pipeline.return_value = _mock_pipeline_result()
+        app.state.evidencia = _FakeBuscador({})
+        payload = {"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
+        data = client.post("/chat", json=payload).json()
+        assert data["candidatos"][0]["evidencia_explicativa"] == []
+        assert any(
+            lim.startswith("1 of 1 candidates have no documentation fragments")
+            for lim in data["limitaciones"]
+        )
+
+    @patch("src.api.main.ejecutar_pipeline")
+    def test_index_failure_is_a_limitation_not_an_error(
+        self, mock_pipeline: MagicMock, client: TestClient
+    ) -> None:
+        mock_pipeline.return_value = _mock_pipeline_result()
+        app.state.evidencia = _FakeBuscador(error=IndiceNoDisponibleError("qdrant down"))
+        payload = {"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
+        response = client.post("/chat", json=payload)
+        assert response.status_code == 200
+        data = response.json()
+        assert data["candidatos"][0]["evidencia_explicativa"] == []
+        assert any(
+            lim.startswith("Explanatory evidence unavailable: qdrant down")
+            for lim in data["limitaciones"]
+        )
+
+    @patch("src.api.main.ejecutar_pipeline")
+    def test_json_message_queries_with_a_task_description(
+        self, mock_pipeline: MagicMock, client: TestClient
+    ) -> None:
+        mock_pipeline.return_value = _mock_pipeline_result()
+        fake = _FakeBuscador({})
+        app.state.evidencia = fake
+        client.post("/chat", json={"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})})
+        assert fake.consultas == ["modelo para codigo"]
+
+    def test_lifespan_mounts_no_index_when_disabled(self, client: TestClient) -> None:
+        assert app.state.evidencia is None
+
+
+class TestConstruirBuscadorEvidencia:
+    def test_enabled_by_default_builds_index_without_io(self) -> None:
+        buscador = construir_buscador_evidencia({"LMA_QDRANT_URL": "http://127.0.0.1:9"})
+        assert isinstance(buscador, IndiceEvidencia)
+
+    @pytest.mark.parametrize("valor", ["0", "false", "no", "off"])
+    def test_can_be_disabled(self, valor: str) -> None:
+        assert construir_buscador_evidencia({"LMA_EVIDENCIA": valor}) is None
 
 
 class TestConstruirExtractor:

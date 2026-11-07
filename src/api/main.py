@@ -11,6 +11,10 @@ Configuration (environment variables, read once at startup):
   only criteria JSON is then accepted (default: enabled).
 - ``LMA_OLLAMA_MODEL``: Ollama model tag (default ``gemma4:e4b``).
 - ``LMA_OLLAMA_BASE_URL``: Ollama server (default ``http://127.0.0.1:11434``).
+- ``LMA_EVIDENCIA``: ``"0"``/``"false"`` disables explanatory evidence
+  (default: enabled).
+- ``LMA_QDRANT_URL``: Qdrant server (default ``http://127.0.0.1:6333``).
+- ``LMA_EMBEDDING_MODEL``: Ollama embedding model (default ``embeddinggemma``).
 """
 
 from __future__ import annotations
@@ -35,6 +39,14 @@ from src.chains.extraccion_criterios import (
     MensajeNoEstructuradoError,
 )
 from src.chains.recommend_pipeline import ejecutar_pipeline
+from src.evidence.embeddings import DEFAULT_EMBEDDING_MODEL, crear_embedder_ollama
+from src.evidence.enriquecer import (
+    BuscadorEvidencia,
+    ResultadoEnriquecimiento,
+    consulta_para,
+    enriquecer_candidatos,
+)
+from src.evidence.qdrant_index import DEFAULT_QDRANT_URL, IndiceEvidencia
 from src.models.schemas import (
     CandidatoRankeado,
     ClarificacionNecesaria,
@@ -51,13 +63,14 @@ TOP_N_RECOMENDACIONES = 3
 
 LIMITACIONES_BASE = [
     "Benchmark evidence not yet available (OpenEvals pending).",
-    "Explanatory evidence (Qdrant) not included in this slice.",
 ]
 """Limitations that apply to every recommendation today."""
 
 
 def limitaciones_para(
-    criterios: CriteriosBusqueda, candidatos: list[CandidatoRankeado] | None = None
+    criterios: CriteriosBusqueda,
+    candidatos: list[CandidatoRankeado] | None = None,
+    evidencia: ResultadoEnriquecimiento | None = None,
 ) -> list[str]:
     """Limitations to report for *this* request.
 
@@ -69,9 +82,24 @@ def limitaciones_para(
     models and ``runtime_preferido`` is not used at all.  When some
     candidates carry a locally estimated VRAM verdict (canirun.ai down or
     without an entry), a line says how many, so measured and estimated
-    results are never confused.
+    results are never confused.  ``evidencia`` describes the explanatory
+    evidence lookup: ``None`` means it is disabled, an error means the
+    index was unreachable, and candidates without fragments (gated or
+    unindexed documentation) are counted.
     """
     limitaciones = list(LIMITACIONES_BASE)
+    if evidencia is None:
+        limitaciones.append("Explanatory evidence is disabled (LMA_EVIDENCIA=0).")
+    elif evidencia.error is not None:
+        limitaciones.append(
+            f"Explanatory evidence unavailable: {evidencia.error}. Candidates are shown "
+            "without documentation fragments."
+        )
+    elif evidencia.sin_evidencia:
+        limitaciones.append(
+            f"{evidencia.sin_evidencia} of {evidencia.con_evidencia + evidencia.sin_evidencia} "
+            "candidates have no documentation fragments (README gated, missing or not indexed)."
+        )
     estimados = sum(
         1 for c in candidatos or [] if c.compatibilidad_vram.fuente == "heuristica_propia"
     )
@@ -120,6 +148,34 @@ def construir_extractor(env: dict[str, str] | None = None) -> ExtractorCompuesto
     return ExtractorCompuesto(ExtractorJson(), llm)
 
 
+def construir_buscador_evidencia(env: dict[str, str] | None = None) -> BuscadorEvidencia | None:
+    """Build the explanatory-evidence index client from the environment.
+
+    Returns ``None`` when ``LMA_EVIDENCIA`` disables it.  Construction
+    performs no I/O: Qdrant and the embedding model are contacted only when
+    a recommendation is produced, and failures then become a limitation
+    line, never an error response.
+    """
+    fuente = os.environ if env is None else env
+    habilitado = fuente.get("LMA_EVIDENCIA", "1").strip().lower() not in {
+        "0", "false", "no", "off"
+    }
+    if not habilitado:
+        return None
+    from qdrant_client import QdrantClient
+
+    cliente = QdrantClient(
+        url=fuente.get("LMA_QDRANT_URL", DEFAULT_QDRANT_URL),
+        timeout=5,
+        check_compatibility=False,  # no version probe at startup: construction stays I/O-free
+    )
+    embedder = crear_embedder_ollama(
+        fuente.get("LMA_EMBEDDING_MODEL", DEFAULT_EMBEDDING_MODEL),
+        fuente.get("LMA_OLLAMA_BASE_URL", DEFAULT_OLLAMA_BASE_URL),
+    )
+    return IndiceEvidencia(cliente, embedder)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Mount one catalogue and one extractor per process at startup.
@@ -156,6 +212,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     catalogo.cargar()  # resolve + memoize now, or raise and abort boot
     app.state.catalogo = catalogo
     app.state.extractor = construir_extractor()
+    app.state.evidencia = construir_buscador_evidencia()
     yield
 
 
@@ -217,11 +274,18 @@ def chat(peticion: PeticionChat) -> RespuestaChat:
         )
     else:
         candidatos = ejecutar_pipeline(criterios, catalogo=catalogo, top_n=TOP_N_RECOMENDACIONES)
+        buscador: BuscadorEvidencia | None = app.state.evidencia
+        evidencia = None
+        if buscador is not None:
+            # After ranking, on purpose: evidence explains, it never scores.
+            evidencia = enriquecer_candidatos(
+                candidatos, consulta_para(criterios, peticion.mensaje), buscador
+            )
         respuesta = RespuestaRecomendacion(
             conversation_id=conversation_id,
             criterios_interpretados=criterios,
             candidatos=candidatos,
-            limitaciones=limitaciones_para(criterios, candidatos),
+            limitaciones=limitaciones_para(criterios, candidatos, evidencia),
             datos_actualizados_hace=describir_antiguedad(catalogo.fecha_sincronizacion),
         )
 
