@@ -54,9 +54,10 @@ Implemented:
   license normalizer shared by filter and scorer. The catalog source has no
   language or runtime data, so when a request states `idiomas_requeridos` or
   `runtime_preferido` the response says explicitly that they were not applied
-- Real VRAM compatibility lookup through canirun.ai, plus an offline
-  parameter-count heuristic (`src/compatibility/heuristica.py`) used by the
-  evaluation and injectable into the pipeline
+- Real VRAM compatibility lookup through canirun.ai, with the offline
+  parameter-count heuristic (`src/compatibility/heuristica.py`) as the
+  production fallback when the service is down or lacks a model; the same
+  heuristic drives the offline evaluation
 - Deterministic multi-criteria ranking with four explicit sub-scores (VRAM
   safety margin, capacity, dedicated-coder evidence, licence), following
   "the most capable model that still fits comfortably"
@@ -71,7 +72,7 @@ Implemented:
   `scripts/evaluate_golden.py`): reviewed cases pin filter and ranking
   behaviour per catalog snapshot and report pass rate, hit rate and
   exclusion rate
-- 440 automated tests and Ruff linting
+- 452 automated tests and Ruff linting
 
 Not implemented yet:
 
@@ -326,7 +327,7 @@ Once the server is running, interactive OpenAPI documentation is available at
 - **Explainability**: every recommendation includes its weighted sub-scores.
 - **Evidence separation**: retrieved README content provides context, not ranking points.
 - **Safe state**: candidates and scores live on the server; the client only holds the conversation ID.
-- **Graceful degradation**: an unavailable external compatibility provider does not crash the pipeline.
+- **Graceful degradation**: when canirun.ai is unreachable or has no entry for a model, VRAM compatibility is estimated locally from the parameter count, labelled `heuristica_propia` per candidate and counted in `limitaciones`; an outage stops further calls for the rest of that request.
 
 ## Project structure
 

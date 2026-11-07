@@ -354,6 +354,22 @@ class TestChatNuevaConversacion:
         assert data["limitaciones"] == LIMITACIONES_BASE
 
     @patch("src.api.main.ejecutar_pipeline")
+    def test_limitations_count_locally_estimated_candidates(
+        self, mock_pipeline: MagicMock, client: TestClient
+    ) -> None:
+        medido = _mock_pipeline_result()[0]
+        estimado = medido.model_copy(deep=True)
+        estimado.compatibilidad_vram = estimado.compatibilidad_vram.model_copy(
+            update={"fuente": "heuristica_propia"}
+        )
+        mock_pipeline.return_value = [medido, estimado]
+        payload = {"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
+        limitaciones = client.post("/chat", json=payload).json()["limitaciones"]
+        extra = limitaciones[len(LIMITACIONES_BASE):]
+        assert len(extra) == 1
+        assert extra[0].startswith("VRAM compatibility of 1 of 2 candidates was estimated locally")
+
+    @patch("src.api.main.ejecutar_pipeline")
     def test_limitations_name_the_unapplied_criteria(
         self, mock_pipeline: MagicMock, client: TestClient
     ) -> None:

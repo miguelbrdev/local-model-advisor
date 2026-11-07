@@ -36,6 +36,7 @@ from src.chains.extraccion_criterios import (
 )
 from src.chains.recommend_pipeline import ejecutar_pipeline
 from src.models.schemas import (
+    CandidatoRankeado,
     ClarificacionNecesaria,
     ConversationRun,
     CriteriosBusqueda,
@@ -55,7 +56,9 @@ LIMITACIONES_BASE = [
 """Limitations that apply to every recommendation today."""
 
 
-def limitaciones_para(criterios: CriteriosBusqueda) -> list[str]:
+def limitaciones_para(
+    criterios: CriteriosBusqueda, candidatos: list[CandidatoRankeado] | None = None
+) -> list[str]:
     """Limitations to report for *this* request.
 
     Always the base list, plus one line for each criterion the user did
@@ -63,9 +66,21 @@ def limitaciones_para(criterios: CriteriosBusqueda) -> list[str]:
     exactly which of the user's wishes were not applied instead of a
     generic disclaimer.  The catalogue source exposes no language or
     runtime data, so ``idiomas_requeridos`` cannot be enforced on synced
-    models and ``runtime_preferido`` is not used at all.
+    models and ``runtime_preferido`` is not used at all.  When some
+    candidates carry a locally estimated VRAM verdict (canirun.ai down or
+    without an entry), a line says how many, so measured and estimated
+    results are never confused.
     """
     limitaciones = list(LIMITACIONES_BASE)
+    estimados = sum(
+        1 for c in candidatos or [] if c.compatibilidad_vram.fuente == "heuristica_propia"
+    )
+    if estimados:
+        limitaciones.append(
+            f"VRAM compatibility of {estimados} of {len(candidatos or [])} candidates was "
+            "estimated locally from parameter counts (canirun.ai unavailable or without an "
+            "entry); see compatibilidad_vram.fuente per candidate."
+        )
     if criterios.idiomas_requeridos:
         limitaciones.append(
             f"Languages {criterios.idiomas_requeridos} could not be verified: the catalogue "
@@ -206,7 +221,7 @@ def chat(peticion: PeticionChat) -> RespuestaChat:
             conversation_id=conversation_id,
             criterios_interpretados=criterios,
             candidatos=candidatos,
-            limitaciones=limitaciones_para(criterios),
+            limitaciones=limitaciones_para(criterios, candidatos),
             datos_actualizados_hace=describir_antiguedad(catalogo.fecha_sincronizacion),
         )
 
