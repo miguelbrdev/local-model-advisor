@@ -88,7 +88,7 @@ class TestDeterminismo:
 # ---------------------------------------------------------------------------
 
 class TestSubpuntuaciones:
-    def test_five_dimensions_in_order(self) -> None:
+    def test_dimensions_in_weight_order(self) -> None:
         c = calcular_puntuacion(_make_candidate())
         assert [s.criterio for s in c.subpuntuaciones] == list(PESOS)
 
@@ -206,18 +206,17 @@ class TestEvidenciaCodigo:
         assert _sub(c, "evidencia_codigo").valor == 0.3
 
 
-class TestDocumentacion:
-    def test_with_license_and_many_languages(self) -> None:
-        c = calcular_puntuacion(_make_candidate(license_="MIT", idiomas=["en", "es", "fr", "de"]))
-        assert _sub(c, "documentacion").valor == 1.0  # 0.5 + 0.3 + 0.2
+class TestSinDocumentacion:
+    def test_documentacion_criterion_is_gone(self) -> None:
+        """Retired: it only re-counted the declared licence."""
+        c = calcular_puntuacion(_make_candidate())
+        assert "documentacion" not in {s.criterio for s in c.subpuntuaciones}
+        assert "documentacion" not in PESOS
 
-    def test_without_license(self) -> None:
-        c = calcular_puntuacion(_make_candidate(license_=None, idiomas=["en"]))
-        assert _sub(c, "documentacion").valor == VALOR_NEUTRO
-
-    def test_with_license_few_languages(self) -> None:
-        c = calcular_puntuacion(_make_candidate(license_="MIT", idiomas=["en"]))
-        assert _sub(c, "documentacion").valor == pytest.approx(0.8)  # 0.5 + 0.3
+    def test_languages_do_not_affect_the_score(self) -> None:
+        many = calcular_puntuacion(_make_candidate(idiomas=["en", "es", "fr", "de"]))
+        few = calcular_puntuacion(_make_candidate(idiomas=["en"]))
+        assert many.puntuacion_total == few.puntuacion_total
 
 
 class TestCapacidad:

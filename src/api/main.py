@@ -48,15 +48,35 @@ from src.state import conversation_store
 
 TOP_N_RECOMENDACIONES = 3
 
-LIMITACIONES_ACTUALES = [
+LIMITACIONES_BASE = [
     "Benchmark evidence not yet available (OpenEvals pending).",
     "Explanatory evidence (Qdrant) not included in this slice.",
-    "The catalogue source exposes no language data; language requirements "
-    "are not enforced on synced models.",
-    "runtime_preferido is accepted but not applied yet.",
 ]
-"""Limitations reported with every recommendation.  They describe what the
-pipeline cannot do today so an empty or short result is never ambiguous."""
+"""Limitations that apply to every recommendation today."""
+
+
+def limitaciones_para(criterios: CriteriosBusqueda) -> list[str]:
+    """Limitations to report for *this* request.
+
+    Always the base list, plus one line for each criterion the user did
+    state that the pipeline cannot honour yet — so the response says
+    exactly which of the user's wishes were not applied instead of a
+    generic disclaimer.  The catalogue source exposes no language or
+    runtime data, so ``idiomas_requeridos`` cannot be enforced on synced
+    models and ``runtime_preferido`` is not used at all.
+    """
+    limitaciones = list(LIMITACIONES_BASE)
+    if criterios.idiomas_requeridos:
+        limitaciones.append(
+            f"Languages {criterios.idiomas_requeridos} could not be verified: the catalogue "
+            "source exposes no language data, so every candidate is shown."
+        )
+    if criterios.runtime_preferido:
+        limitaciones.append(
+            f"runtime_preferido {criterios.runtime_preferido!r} was not applied: the catalogue "
+            "source exposes no runtime data."
+        )
+    return limitaciones
 
 
 def construir_extractor(env: dict[str, str] | None = None) -> ExtractorCompuesto:
@@ -186,7 +206,7 @@ def chat(peticion: PeticionChat) -> RespuestaChat:
             conversation_id=conversation_id,
             criterios_interpretados=criterios,
             candidatos=candidatos,
-            limitaciones=list(LIMITACIONES_ACTUALES),
+            limitaciones=limitaciones_para(criterios),
             datos_actualizados_hace=describir_antiguedad(catalogo.fecha_sincronizacion),
         )
 

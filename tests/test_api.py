@@ -22,7 +22,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from src.api.main import (
-    LIMITACIONES_ACTUALES,
+    LIMITACIONES_BASE,
     app,
     construir_extractor,
     describir_antiguedad,
@@ -351,7 +351,27 @@ class TestChatNuevaConversacion:
         mock_pipeline.return_value = _mock_pipeline_result()
         payload = {"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
         data = client.post("/chat", json=payload).json()
-        assert data["limitaciones"] == LIMITACIONES_ACTUALES
+        assert data["limitaciones"] == LIMITACIONES_BASE
+
+    @patch("src.api.main.ejecutar_pipeline")
+    def test_limitations_name_the_unapplied_criteria(
+        self, mock_pipeline: MagicMock, client: TestClient
+    ) -> None:
+        """Languages and runtime the user asked for are reported as not
+        applied, with their values, instead of a generic disclaimer."""
+        mock_pipeline.return_value = _mock_pipeline_result()
+        payload = {
+            "mensaje": json.dumps(
+                {"tarea": "codigo", "vram_gb": 11.0, "idiomas_requeridos": ["es", "en"],
+                 "runtime_preferido": "ollama"}
+            )
+        }
+        limitaciones = client.post("/chat", json=payload).json()["limitaciones"]
+        assert limitaciones[: len(LIMITACIONES_BASE)] == LIMITACIONES_BASE
+        extra = limitaciones[len(LIMITACIONES_BASE):]
+        assert len(extra) == 2
+        assert "['es', 'en']" in extra[0]
+        assert "'ollama'" in extra[1]
 
     @patch("src.api.main.ejecutar_pipeline")
     def test_reports_age_of_the_mounted_snapshot(

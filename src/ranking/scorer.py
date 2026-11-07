@@ -4,11 +4,12 @@ Computes a weighted sum of normalised sub-scores.  Every score comes from
 structured data only — no semantic evidence, no LLM calls.  Weights are
 explicit and documented.  Same input always produces the same ranking.
 
-Inputs read today (and nothing else): ``tareas_soportadas``,
-``license_declarada`` and ``idiomas_detectados`` from the family, plus
-``vram_required_gb`` from the compatibility result and the user's
-available VRAM.  ``documentacion`` remains a placeholder until a real
-documentation source is approved.
+Inputs read today (and nothing else): ``tareas_soportadas`` and
+``license_declarada`` from the family, plus ``vram_required_gb`` from the
+compatibility result and the user's available VRAM.  A former
+``documentacion`` sub-score was retired: without an approved documentation
+source it only re-counted the declared licence, which ``licencia`` already
+scores; its weight went to the VRAM policy and to ``licencia``.
 
 VRAM policy: *the most capable model that still fits comfortably*.
 ``ajuste_vram`` is a safety margin (full score up to
@@ -34,11 +35,10 @@ from src.tools.licencias import es_licencia_permisiva
 
 # Default weights — documented, never hidden.  They sum to 1.0.
 PESOS: dict[str, float] = {
-    "ajuste_vram": 0.30,
-    "capacidad": 0.20,
+    "ajuste_vram": 0.35,
+    "capacidad": 0.25,
     "evidencia_codigo": 0.25,
-    "documentacion": 0.15,
-    "licencia": 0.10,
+    "licencia": 0.15,
 }
 
 VALOR_NEUTRO = 0.5
@@ -74,7 +74,6 @@ def calcular_puntuacion(
         _puntuar_ajuste_vram(vram, vram_disponible_gb, pesos["ajuste_vram"]),
         _puntuar_capacidad(vram, vram_disponible_gb, pesos["capacidad"]),
         _puntuar_evidencia_codigo(familia, pesos["evidencia_codigo"]),
-        _puntuar_documentacion(familia, pesos["documentacion"]),
         _puntuar_licencia(familia, pesos["licencia"]),
     ]
 
@@ -174,31 +173,6 @@ def _puntuar_evidencia_codigo(familia: FamiliaModelo, peso: float) -> SubPuntuac
         valor=1.0 if dedicado else 0.3,
         peso=peso,
         justificacion=justificacion,
-    )
-
-
-def _puntuar_documentacion(familia: FamiliaModelo, peso: float) -> SubPuntuacion:
-    """Placeholder for documentation quality.
-
-    No documentation source is approved yet, so this only rewards the
-    presence of a declared license and a rich language list.  Synced
-    families have no languages, so today it is effectively a license
-    presence check.
-    """
-    idiomas = familia.idiomas_detectados or []
-    valor = VALOR_NEUTRO
-    if familia.license_declarada:
-        valor += 0.3
-    if len(idiomas) > 3:
-        valor += 0.2
-    return SubPuntuacion(
-        criterio="documentacion",
-        valor=min(valor, 1.0),
-        peso=peso,
-        justificacion=(
-            f"License: {familia.license_declarada or 'unknown'}, "
-            f"{len(idiomas)} languages detected"
-        ),
     )
 
 

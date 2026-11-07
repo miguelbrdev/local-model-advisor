@@ -51,14 +51,15 @@ Implemented:
 - All three v1 tasks (`chat`, `codigo`, `razonamiento`), filtered on the
   full `tareas_soportadas` list of each model
 - Filtering by VRAM, language and commercial-license needs, with a single
-  license normalizer shared by filter and scorer (`runtime_preferido` is
-  accepted but not applied yet)
+  license normalizer shared by filter and scorer. The catalog source has no
+  language or runtime data, so when a request states `idiomas_requeridos` or
+  `runtime_preferido` the response says explicitly that they were not applied
 - Real VRAM compatibility lookup through canirun.ai, plus an offline
   parameter-count heuristic (`src/compatibility/heuristica.py`) used by the
   evaluation and injectable into the pipeline
-- Deterministic multi-criteria ranking with explicit sub-scores, following
-  "the most capable model that still fits comfortably": a VRAM safety margin
-  plus a capacity score for using the usable budget
+- Deterministic multi-criteria ranking with four explicit sub-scores (VRAM
+  safety margin, capacity, dedicated-coder evidence, licence), following
+  "the most capable model that still fits comfortably"
 - SQLite-backed server-side conversation state with a 24-hour TTL, storing
   the catalog `snapshot_id` that produced each recommendation
 - Limitations and the age of the catalog data reported in every
