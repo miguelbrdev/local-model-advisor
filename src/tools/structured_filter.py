@@ -9,17 +9,29 @@ of internal tasks a model qualifies for, never ``pipeline_tag`` (which is
 only the first of those tasks).  57 of the 91 bootstrap families declare
 more than one task, so filtering on ``pipeline_tag`` silently dropped
 42 of 51 ``codigo`` models and 50 of 59 ``razonamiento`` models.
+
+VRAM checks run concurrently: the compatibility provider may call
+canirun.ai (about a second per model), and a request can have twenty
+eligible families.  Results are collected in catalogue order so the
+output is identical to a sequential run.
 """
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
+
 from src.compatibility.provider import VRAMCompatibilityProvider
 from src.models.schemas import (
     CandidatoRankeado,
+    CompatibilityResult,
     CriteriosBusqueda,
     FamiliaModelo,
 )
 from src.tools.licencias import es_licencia_permisiva
+
+MAX_WORKERS_VRAM = 8
+"""Concurrent compatibility checks per request.  Bounded so an outage costs
+at most this many simultaneous timeouts and canirun.ai is not flooded."""
 
 
 def filtrar_candidatos(
@@ -31,13 +43,15 @@ def filtrar_candidatos(
 
     The static criteria (task, license, language) are evaluated first so
     the VRAM provider — the only step that may perform I/O — is consulted
-    only for families that could actually be recommended.
+    only for families that could actually be recommended, and those
+    checks run in parallel (see :data:`MAX_WORKERS_VRAM`).
 
     Args:
         familias: Catalogue families to evaluate, in catalogue order.
         criterios: User criteria.  ``runtime_preferido`` is forwarded to
             the provider but no provider reads it today.
-        vram_provider: Compatibility checker; must never raise.
+        vram_provider: Compatibility checker; must never raise and must be
+            safe to call from several threads.
 
     Returns:
         One ``CandidatoRankeado`` per eligible family, in input order,
@@ -45,27 +59,34 @@ def filtrar_candidatos(
         unknown (``compatible is None``) are kept: an unavailable provider
         must not empty the result set.
     """
-    elegibles: list[CandidatoRankeado] = []
-
-    for familia in familias:
-        if not _cumple_criterios_estaticos(familia, criterios):
-            continue
-
-        vram_result = vram_provider.check(
-            familia, criterios.vram_gb or 0.0, criterios.runtime_preferido
+    aptas = [f for f in familias if _cumple_criterios_estaticos(f, criterios)]
+    resultados = _comprobar_vram(aptas, criterios, vram_provider)
+    return [
+        CandidatoRankeado(
+            familia=familia,
+            variante_recomendada=resultado.variante,
+            compatibilidad_vram=resultado,
         )
-        if vram_result.compatible is False:
-            continue
+        for familia, resultado in zip(aptas, resultados, strict=True)
+        if resultado.compatible is not False
+    ]
 
-        elegibles.append(
-            CandidatoRankeado(
-                familia=familia,
-                variante_recomendada=vram_result.variante,
-                compatibilidad_vram=vram_result,
-            )
-        )
 
-    return elegibles
+def _comprobar_vram(
+    familias: list[FamiliaModelo],
+    criterios: CriteriosBusqueda,
+    vram_provider: VRAMCompatibilityProvider,
+) -> list[CompatibilityResult]:
+    """Check every family, concurrently when there is more than one."""
+    vram_gb = criterios.vram_gb or 0.0
+
+    def comprobar(familia: FamiliaModelo) -> CompatibilityResult:
+        return vram_provider.check(familia, vram_gb, criterios.runtime_preferido)
+
+    if len(familias) <= 1:
+        return [comprobar(f) for f in familias]
+    with ThreadPoolExecutor(max_workers=min(MAX_WORKERS_VRAM, len(familias))) as pool:
+        return list(pool.map(comprobar, familias))
 
 
 def soporta_tarea(familia: FamiliaModelo, tarea: str) -> bool:

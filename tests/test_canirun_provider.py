@@ -201,6 +201,60 @@ class TestCanIRunHTTPError:
 
 
 # ---------------------------------------------------------------------------
+# CanIRunProvider — measured results are cached per (canirun_id, vram_gb)
+# ---------------------------------------------------------------------------
+
+class TestCanIRunCache:
+    @patch("src.compatibility.provider.httpx.post")
+    def test_second_call_is_served_from_cache(self, mock_post: MagicMock) -> None:
+        from src.compatibility.cache import CacheCompatibilidad
+
+        mock_response = MagicMock()
+        mock_response.raise_for_status = MagicMock()
+        mock_response.json.return_value = {
+            "compatible": True, "status": "comfortable", "notes": [],
+            "estimated": {"tokensPerSecond": 40.0, "vramRequiredGb": 4.1},
+        }
+        mock_post.return_value = mock_response
+        provider = CanIRunProvider(cache=CacheCompatibilidad(reloj=lambda: 0.0))
+
+        first = provider.check(_familia_con_id(), vram_gb=11.0)
+        second = provider.check(_familia_con_id(), vram_gb=11.0)
+        provider.check(_familia_con_id(), vram_gb=8.0)  # different budget → new call
+
+        assert mock_post.call_count == 2
+        assert first == second
+        assert second.fuente == "canirun_ai"
+
+    @patch("src.compatibility.provider.httpx.post")
+    def test_failures_are_not_cached(self, mock_post: MagicMock) -> None:
+        from src.compatibility.cache import CacheCompatibilidad
+
+        mock_post.side_effect = httpx.TimeoutException("timed out")
+        provider = CanIRunProvider(cache=CacheCompatibilidad(reloj=lambda: 0.0))
+        provider.check(_familia_con_id(), vram_gb=11.0)
+        provider.check(_familia_con_id(), vram_gb=11.0)
+        assert mock_post.call_count == 2
+
+    @patch("src.compatibility.provider.httpx.post")
+    def test_no_cache_by_default(self, mock_post: MagicMock) -> None:
+        mock_response = MagicMock()
+        mock_response.raise_for_status = MagicMock()
+        mock_response.json.return_value = {"compatible": True, "status": "ok", "notes": []}
+        mock_post.return_value = mock_response
+        provider = CanIRunProvider()
+        provider.check(_familia_con_id(), vram_gb=11.0)
+        provider.check(_familia_con_id(), vram_gb=11.0)
+        assert mock_post.call_count == 2
+
+    def test_production_routing_uses_the_shared_cache(self) -> None:
+        from src.compatibility.cache import CACHE_CANIRUN
+
+        provider = elegir_provider("chat")
+        assert provider._primario._cache is CACHE_CANIRUN
+
+
+# ---------------------------------------------------------------------------
 # CanIRunProvider.consultar — raises on failure (check() never does)
 # ---------------------------------------------------------------------------
 

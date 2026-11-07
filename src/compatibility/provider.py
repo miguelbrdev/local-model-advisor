@@ -18,6 +18,7 @@ from typing import Protocol, runtime_checkable
 
 import httpx
 
+from src.compatibility.cache import CACHE_CANIRUN, CacheCompatibilidad
 from src.compatibility.heuristica import HeuristicaParametrosProvider
 from src.models.schemas import CompatibilityResult, FamiliaModelo
 
@@ -64,7 +65,16 @@ class CanIRunProvider:
     to the canirun.ai model identifier.  ``runtime`` is accepted for
     Protocol compatibility but not sent: the compatibility endpoint has no
     runtime parameter in the observed contract.
+
+    Args:
+        cache: Measured results are read from and written to it, keyed by
+            ``(canirun_id, vram_gb)``; ``None`` disables caching (the
+            default for direct construction, so tests see every call).
+            Production routing passes the process-wide ``CACHE_CANIRUN``.
     """
+
+    def __init__(self, cache: CacheCompatibilidad | None = None) -> None:
+        self._cache = cache
 
     def consultar(self, familia: FamiliaModelo, vram_gb: float) -> CompatibilityResult:
         """Query canirun.ai for one family.
@@ -88,6 +98,13 @@ class CanIRunProvider:
                 nota="No canirun_id mapping configured for this family.",
             )
 
+        if self._cache is not None:
+            cacheado = self._cache.obtener(canirun_id, vram_gb)
+            if cacheado is not None:
+                return cacheado.model_copy(
+                    update={"modelo_id": familia.familia_id}
+                )
+
         try:
             response = httpx.post(
                 f"{CANIRUN_API_BASE}/compatibility",
@@ -105,7 +122,7 @@ class CanIRunProvider:
             raise ProveedorExternoError(f"canirun.ai API error: {exc}") from exc
 
         estimado = data.get("estimated", {})
-        return CompatibilityResult(
+        resultado = CompatibilityResult(
             modelo_id=familia.familia_id,
             variante=_variante_por_defecto(familia, ultima=True),
             compatible=data.get("compatible"),
@@ -115,6 +132,9 @@ class CanIRunProvider:
             tokens_per_second=estimado.get("tokensPerSecond"),
             vram_required_gb=estimado.get("vramRequiredGb"),
         )
+        if self._cache is not None:
+            self._cache.guardar(canirun_id, vram_gb, resultado)
+        return resultado
 
     def check(
         self, familia: FamiliaModelo, vram_gb: float, runtime: str | None = None
@@ -158,7 +178,7 @@ class ProveedorConFallback:
         primario: CanIRunProvider | None = None,
         respaldo: VRAMCompatibilityProvider | None = None,
     ) -> None:
-        self._primario = primario or CanIRunProvider()
+        self._primario = primario or CanIRunProvider(cache=CACHE_CANIRUN)
         self._respaldo = respaldo or HeuristicaParametrosProvider()
         self._motivo_caida: str | None = None
 

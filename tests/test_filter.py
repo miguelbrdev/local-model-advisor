@@ -120,6 +120,72 @@ class TestFiltrarPorTarea:
 
 
 # ---------------------------------------------------------------------------
+# filtrar_candidatos — concurrent VRAM checks
+# ---------------------------------------------------------------------------
+
+class TestComprobacionConcurrente:
+    def _familias(self, n: int) -> list[FamiliaModelo]:
+        return [
+            FAMILIA_CODIGO.model_copy(
+                update={"familia_id": f"m{i:02d}", "canirun_id": f"m{i:02d}"}
+            )
+            for i in range(n)
+        ]
+
+    def test_results_keep_catalogue_order(self) -> None:
+        import random
+        import time
+
+        class _SlowRandom:
+            def check(self, familia, vram_gb, runtime=None):
+                time.sleep(random.uniform(0, 0.02))
+                return CompatibilityResult(
+                    modelo_id=familia.familia_id, variante="7B", compatible=True,
+                    fuente="no_disponible", nota="slow",
+                )
+
+        familias = self._familias(12)
+        resultado = filtrar_candidatos(
+            familias, CriteriosBusqueda(tarea="codigo", vram_gb=16.0), _SlowRandom()
+        )
+        assert [r.familia.familia_id for r in resultado] == [f.familia_id for f in familias]
+        assert all(r.compatibilidad_vram.modelo_id == r.familia.familia_id for r in resultado)
+
+    def test_checks_run_in_parallel(self) -> None:
+        import time
+
+        class _Slow:
+            def check(self, familia, vram_gb, runtime=None):
+                time.sleep(0.15)
+                return CompatibilityResult(
+                    modelo_id=familia.familia_id, variante="7B", compatible=True,
+                    fuente="no_disponible",
+                )
+
+        inicio = time.perf_counter()
+        resultado = filtrar_candidatos(
+            self._familias(8), CriteriosBusqueda(tarea="codigo", vram_gb=16.0), _Slow()
+        )
+        transcurrido = time.perf_counter() - inicio
+        assert len(resultado) == 8
+        assert transcurrido < 0.15 * 8 * 0.6  # sequential would take ≥ 1.2 s
+
+    def test_incompatible_results_dropped_after_parallel_check(self) -> None:
+        class _Alterno:
+            def check(self, familia, vram_gb, runtime=None):
+                par = int(familia.familia_id[1:]) % 2 == 0
+                return CompatibilityResult(
+                    modelo_id=familia.familia_id, variante="7B", compatible=par,
+                    fuente="no_disponible",
+                )
+
+        resultado = filtrar_candidatos(
+            self._familias(6), CriteriosBusqueda(tarea="codigo", vram_gb=16.0), _Alterno()
+        )
+        assert [r.familia.familia_id for r in resultado] == ["m00", "m02", "m04"]
+
+
+# ---------------------------------------------------------------------------
 # filtrar_candidatos — VRAM filter
 # ---------------------------------------------------------------------------
 
