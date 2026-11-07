@@ -15,19 +15,29 @@ Configuration (environment variables, read once at startup):
   (default: enabled).
 - ``LMA_QDRANT_URL``: Qdrant server (default ``http://127.0.0.1:6333``).
 - ``LMA_EMBEDDING_MODEL``: Ollama embedding model (default ``embeddinggemma``).
+- ``LMA_CALENTAR_MODELOS``: ``"0"`` skips loading the Ollama models in the
+  background at startup (default: enabled).
+- ``LMA_API_KEY``: when set, ``/chat`` and ``/families`` require the same
+  value in the ``X-API-Key`` header (default: open, for localhost use).
+- ``LMA_RATE_LIMIT_POR_MINUTO``: ``/chat`` requests per client address per
+  minute, ``0`` disables (default 60).
 """
 
 from __future__ import annotations
 
 import logging
 import os
+import threading
+import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
+from typing import Annotated
 from uuid import UUID, uuid4
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, Response, status
 
+from src.api.limites import RATE_LIMIT_POR_DEFECTO, LimitadorTasa, api_key_valida
 from src.catalog.synced import CatalogoSincronizado
 from src.chains.extraccion_criterios import (
     DEFAULT_OLLAMA_BASE_URL,
@@ -63,6 +73,13 @@ from src.state import conversation_store
 logger = logging.getLogger(__name__)
 
 TOP_N_RECOMENDACIONES = 3
+
+DIAS_OBSOLESCENCIA_CATALOGO = 28
+"""A snapshot older than this (21-day sync cadence plus a week of slack) is
+reported as stale in ``/health`` and in every recommendation."""
+
+CONVERSACIONES_ENTRE_LIMPIEZAS = 100
+"""Expired conversations are purged at startup and every this many chats."""
 
 ETIQUETAS_CAMPOS = {"tarea": "la tarea (chat, codigo o razonamiento)", "vram_gb": "la VRAM en GB"}
 
@@ -112,6 +129,12 @@ def limitaciones_para(
     unindexed documentation) are counted.
     """
     limitaciones = list(LIMITACIONES_BASE)
+    dias = dias_desde(getattr(app.state, "catalogo", None))
+    if dias is not None and dias > DIAS_OBSOLESCENCIA_CATALOGO:
+        limitaciones.append(
+            f"Catalogue snapshot is {dias} days old (synchronisation expected every 21 days); "
+            "newer models may be missing."
+        )
     if evidencia is None:
         limitaciones.append("Explanatory evidence is disabled (LMA_EVIDENCIA=0).")
     elif evidencia.error is not None:
@@ -237,13 +260,61 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.catalogo = catalogo
     app.state.extractor = construir_extractor()
     app.state.evidencia = construir_buscador_evidencia()
+    app.state.limitador = LimitadorTasa(
+        _entero_env("LMA_RATE_LIMIT_POR_MINUTO", RATE_LIMIT_POR_DEFECTO)
+    )
+    app.state.api_key = os.environ.get("LMA_API_KEY") or None
+    app.state.chats_desde_limpieza = 0
+    app.state.modelos_listos = None
+    _limpiar_conversaciones("at startup")
+    calentar = os.environ.get("LMA_CALENTAR_MODELOS", "1").strip().lower()
+    if calentar not in {"0", "false", "no", "off"}:
+        threading.Thread(target=_calentar_en_segundo_plano, name="lma-warmup", daemon=True).start()
+    yield
+
+
+def _calentar_en_segundo_plano() -> None:
+    app.state.modelos_listos = calentar_modelos(app.state.extractor, app.state.evidencia)
+
+
+def _entero_env(nombre: str, por_defecto: int) -> int:
+    try:
+        return int(os.environ.get(nombre, por_defecto))
+    except ValueError:
+        logger.warning("Ignoring non-integer %s; using %d.", nombre, por_defecto)
+        return por_defecto
+
+
+def _limpiar_conversaciones(momento: str) -> None:
     try:
         borradas = conversation_store.limpiar_expiradas()
         if borradas:
-            logger.info("Removed %d expired conversations at startup.", borradas)
+            logger.info("Removed %d expired conversations %s.", borradas, momento)
     except Exception as exc:  # a broken store must not block serving
         logger.warning("Could not clean expired conversations: %s", exc)
-    yield
+
+
+def exigir_api_key(x_api_key: Annotated[str | None, Header()] = None) -> None:
+    """Reject the request when ``LMA_API_KEY`` is set and the header does not match."""
+    if not api_key_valida(getattr(app.state, "api_key", None), x_api_key):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or missing X-API-Key"
+        )
+
+
+def limitar_tasa(request: Request, response: Response) -> None:
+    """Per-client fixed-window limit on ``/chat``; 429 with ``Retry-After`` when exceeded."""
+    limitador: LimitadorTasa | None = getattr(app.state, "limitador", None)
+    if limitador is None:
+        return
+    clave = request.client.host if request.client else "unknown"
+    admitida, espera = limitador.admitir(clave)
+    if not admitida:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Rate limit exceeded for this client; retry later.",
+            headers={"Retry-After": str(int(espera) + 1)},
+        )
 
 
 app = FastAPI(title="Local Model Advisor", version="0.1.0", lifespan=lifespan)
@@ -261,16 +332,21 @@ def health() -> dict:
     catalogo = getattr(app.state, "catalogo", None)
     extractor = getattr(app.state, "extractor", None)
     fecha = catalogo.fecha_sincronizacion if catalogo is not None else None
+    dias = dias_desde(catalogo)
     return {
         "status": "ok",
         "snapshot_id": catalogo.snapshot_id if catalogo is not None else None,
         "catalogo_sincronizado": fecha.isoformat() if fecha is not None else None,
+        "catalogo_dias": dias,
+        "catalogo_obsoleto": dias is not None and dias > DIAS_OBSOLESCENCIA_CATALOGO,
         "texto_libre": bool(extractor is not None and extractor.acepta_texto_libre),
         "evidencia": getattr(app.state, "evidencia", None) is not None,
+        "modelos_listos": getattr(app.state, "modelos_listos", None),
+        "api_key_requerida": bool(getattr(app.state, "api_key", None)),
     }
 
 
-@app.get("/families")
+@app.get("/families", dependencies=[Depends(exigir_api_key)])
 def list_families():
     """List every family of the mounted catalogue snapshot.
 
@@ -282,7 +358,11 @@ def list_families():
     return [f.model_dump() for f in app.state.catalogo.cargar()]
 
 
-@app.post("/chat", response_model=RespuestaChat)
+@app.post(
+    "/chat",
+    response_model=RespuestaChat,
+    dependencies=[Depends(exigir_api_key), Depends(limitar_tasa)],
+)
 def chat(peticion: PeticionChat) -> RespuestaChat:
     """Process a chat message and return a recommendation or a clarification.
 
@@ -305,6 +385,11 @@ def chat(peticion: PeticionChat) -> RespuestaChat:
         history and the catalogue ``snapshot_id`` — in SQLite, also on
         clarifications so the follow-up can complete them.
     """
+    app.state.chats_desde_limpieza += 1
+    if app.state.chats_desde_limpieza >= CONVERSACIONES_ENTRE_LIMPIEZAS:
+        app.state.chats_desde_limpieza = 0
+        _limpiar_conversaciones("periodically")
+
     conversation_id, criterios, historial = _resolver_conversacion(peticion)
     catalogo = app.state.catalogo
 
@@ -348,6 +433,39 @@ def chat(peticion: PeticionChat) -> RespuestaChat:
         )
     )
     return respuesta
+
+
+def dias_desde(catalogo, ahora: datetime | None = None) -> int | None:
+    """Age in days of the mounted catalogue snapshot, or ``None`` if unknown."""
+    fecha = getattr(catalogo, "fecha_sincronizacion", None) if catalogo is not None else None
+    if fecha is None:
+        return None
+    return max(0, ((ahora or datetime.now(UTC)) - fecha).days)
+
+
+def calentar_modelos(extractor, evidencia) -> dict[str, bool | None]:
+    """Load the local models so the first user request is fast.
+
+    Runs the chat model first (the big one), then the embedding model.
+    Each step is independent and never raises; the result says what is
+    ready.  Intended to run in a background thread from ``lifespan``.
+    """
+    resultado: dict[str, bool | None] = {"extractor": None, "evidencia": None}
+    for nombre, componente in (("extractor", extractor), ("evidencia", evidencia)):
+        calentar = getattr(componente, "calentar", None)
+        if not callable(calentar):
+            continue
+        inicio = time.perf_counter()
+        try:
+            resultado[nombre] = bool(calentar())
+        except Exception as exc:  # a warm-up must never take the API down
+            logger.warning("Warm-up of %s raised: %s", nombre, exc)
+            resultado[nombre] = False
+        logger.info(
+            "Warm-up %s: %s in %.1f s", nombre,
+            "ready" if resultado[nombre] else "not ready", time.perf_counter() - inicio,
+        )
+    return resultado
 
 
 def describir_antiguedad(fecha: datetime | None, ahora: datetime | None = None) -> str:

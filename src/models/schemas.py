@@ -184,13 +184,18 @@ class ConversationRun(BaseModel):
 # API request / response types
 # ---------------------------------------------------------------------------
 
+LONGITUD_MAXIMA_MENSAJE = 4000
+"""Upper bound for ``PeticionChat.mensaje``: criteria JSON or a few sentences
+of free text; anything longer is abuse of the local model, not a request."""
+
+
 class PeticionChat(BaseModel):
     """Incoming chat request. ``conversation_id`` is ``None`` only for the
     first message of a new conversation.
     """
 
     conversation_id: UUID | None = None
-    mensaje: str
+    mensaje: str = Field(min_length=1, max_length=LONGITUD_MAXIMA_MENSAJE)
 
 
 class ClarificacionNecesaria(BaseModel):

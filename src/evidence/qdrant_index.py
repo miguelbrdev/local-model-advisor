@@ -142,6 +142,15 @@ class IndiceEvidencia:
             if siguiente is None:
                 return familias
 
+    def calentar(self) -> bool:
+        """Load the embedding model with one tiny query.  Never raises."""
+        try:
+            self._embedder.embed_query("warm-up")
+        except Exception as exc:
+            logger.warning("Warm-up of the embedding model failed: %s", exc)
+            return False
+        return True
+
     # ------------------------------------------------------------------
     # Retrieval (request time)
     # ------------------------------------------------------------------

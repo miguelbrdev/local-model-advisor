@@ -123,6 +123,19 @@ class TestBuscar:
         indice.buscar("the query", "f")
         assert indice._embedder.consultas == ["the query"]
 
+    def test_calentar(self, indice: IndiceEvidencia) -> None:
+        assert indice.calentar() is True
+        assert indice._embedder.consultas == ["warm-up"]
+
+        class _Broken:
+            def embed_documents(self, texts):
+                raise ConnectionError("down")
+
+            def embed_query(self, text):
+                raise ConnectionError("down")
+
+        assert IndiceEvidencia(QdrantClient(":memory:"), _Broken()).calentar() is False
+
     def test_backend_failure_is_explicit(self) -> None:
         indice = IndiceEvidencia(_BrokenClient(), FakeEmbedder())  # type: ignore[arg-type]
         with pytest.raises(IndiceNoDisponibleError, match="ConnectionError"):

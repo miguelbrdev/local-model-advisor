@@ -22,11 +22,14 @@ import pytest
 from fastapi.testclient import TestClient
 
 from src.api.main import (
+    DIAS_OBSOLESCENCIA_CATALOGO,
     LIMITACIONES_BASE,
     app,
+    calentar_modelos,
     construir_buscador_evidencia,
     construir_extractor,
     describir_antiguedad,
+    dias_desde,
 )
 from src.catalog import synced
 from src.catalog.protocol import CatalogUnavailableError
@@ -132,8 +135,12 @@ class _SentinelCatalogue:
 
 @pytest.fixture(autouse=True)
 def _conversaciones_en_tmp(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Keep every conversation written by these tests out of ``runtime/``."""
+    """Keep every conversation written by these tests out of ``runtime/`` and
+    never let a startup warm-up thread reach a real Ollama."""
     monkeypatch.setattr(conversation_store, "_DB_PATH", tmp_path / "conversations.db")
+    monkeypatch.setenv("LMA_CALENTAR_MODELOS", "0")
+    monkeypatch.delenv("LMA_API_KEY", raising=False)
+    monkeypatch.delenv("LMA_RATE_LIMIT_POR_MINUTO", raising=False)
 
 
 @pytest.fixture
@@ -163,6 +170,16 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClie
 
 
 EVIDENCIA_OFF = "Explanatory evidence is disabled (LMA_EVIDENCIA=0)."
+OBSOLETO_PREFIJO = "Catalogue snapshot is "
+
+
+def _extras(limitaciones: list[str]) -> list[str]:
+    """Request-specific limitations: strip the base list and the staleness
+    line (the fixture's 2026-01-01 snapshot is always stale)."""
+    assert limitaciones[: len(LIMITACIONES_BASE)] == LIMITACIONES_BASE
+    resto = limitaciones[len(LIMITACIONES_BASE):]
+    assert resto and resto[0].startswith(OBSOLETO_PREFIJO)
+    return resto[1:]
 
 
 class _FakeBuscador:
@@ -250,6 +267,14 @@ class TestHealth:
         assert data["catalogo_sincronizado"].startswith("2026-01-01")
         assert data["texto_libre"] is False  # fixture disables the LLM
         assert data["evidencia"] is False    # fixture disables the index
+        assert data["catalogo_obsoleto"] is True  # pinned 2026-01-01 snapshot is old
+        assert data["catalogo_dias"] > DIAS_OBSOLESCENCIA_CATALOGO
+        assert data["api_key_requerida"] is False
+        assert data["modelos_listos"] is None  # warm-up disabled by the fixture
+
+    def test_health_needs_no_api_key(self, client: TestClient, monkeypatch) -> None:
+        app.state.api_key = "s3cret"
+        assert client.get("/health").status_code == 200
 
     def test_expired_conversations_are_removed_at_startup(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -404,7 +429,7 @@ class TestChatNuevaConversacion:
         mock_pipeline.return_value = _mock_pipeline_result()
         payload = {"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
         data = client.post("/chat", json=payload).json()
-        assert data["limitaciones"] == [*LIMITACIONES_BASE, EVIDENCIA_OFF]
+        assert _extras(data["limitaciones"]) == [EVIDENCIA_OFF]
 
     @patch("src.api.main.ejecutar_pipeline")
     def test_limitations_count_locally_estimated_candidates(
@@ -418,7 +443,7 @@ class TestChatNuevaConversacion:
         mock_pipeline.return_value = [medido, estimado]
         payload = {"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
         limitaciones = client.post("/chat", json=payload).json()["limitaciones"]
-        extra = limitaciones[len(LIMITACIONES_BASE):]
+        extra = _extras(limitaciones)
         assert extra[0] == EVIDENCIA_OFF
         assert len(extra) == 2
         assert extra[1].startswith("VRAM compatibility of 1 of 2 candidates was estimated locally")
@@ -438,7 +463,7 @@ class TestChatNuevaConversacion:
         }
         limitaciones = client.post("/chat", json=payload).json()["limitaciones"]
         assert limitaciones[: len(LIMITACIONES_BASE)] == LIMITACIONES_BASE
-        extra = limitaciones[len(LIMITACIONES_BASE):]
+        extra = _extras(limitaciones)
         assert extra[0] == EVIDENCIA_OFF
         assert len(extra) == 3
         assert "['es', 'en']" in extra[1]
@@ -580,6 +605,150 @@ class TestChatCamposFaltantes:
 # ---------------------------------------------------------------------------
 # POST /chat — invalid JSON in mensaje
 # ---------------------------------------------------------------------------
+
+class TestGuardias:
+    """API key, rate limit and message bounds."""
+
+    def test_api_key_required_when_configured(self, client: TestClient) -> None:
+        app.state.api_key = "s3cret"
+        payload = {"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
+        assert client.post("/chat", json=payload).status_code == 401
+        assert client.get("/families").status_code == 401
+        assert client.get("/families", headers={"X-API-Key": "nope"}).status_code == 401
+        assert client.get("/families", headers={"X-API-Key": "s3cret"}).status_code == 200
+        with patch("src.api.main.ejecutar_pipeline", return_value=_mock_pipeline_result()):
+            ok = client.post("/chat", json=payload, headers={"X-API-Key": "s3cret"})
+        assert ok.status_code == 200
+
+    def test_api_key_from_environment(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        bootstrap = tmp_path / "data" / "catalog_bootstrap.json"
+        _write_bootstrap(bootstrap, [_fam("test-model")])
+        _point_catalogue_sources(
+            monkeypatch, runtime_dir=tmp_path / "runtime" / "catalog", bootstrap_path=bootstrap
+        )
+        monkeypatch.setenv("LMA_EXTRACCION_LLM", "0")
+        monkeypatch.setenv("LMA_EVIDENCIA", "0")
+        monkeypatch.setenv("LMA_API_KEY", "from-env")
+        with TestClient(app) as c:
+            assert c.get("/health").json()["api_key_requerida"] is True
+            assert c.get("/families").status_code == 401
+            assert c.get("/families", headers={"X-API-Key": "from-env"}).status_code == 200
+
+    @patch("src.api.main.ejecutar_pipeline")
+    def test_rate_limit_returns_429_with_retry_after(
+        self, mock_pipeline: MagicMock, client: TestClient
+    ) -> None:
+        from src.api.limites import LimitadorTasa
+
+        mock_pipeline.return_value = _mock_pipeline_result()
+        app.state.limitador = LimitadorTasa(maximo_por_ventana=2)
+        payload = {"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
+        assert client.post("/chat", json=payload).status_code == 200
+        assert client.post("/chat", json=payload).status_code == 200
+        bloqueada = client.post("/chat", json=payload)
+        assert bloqueada.status_code == 429
+        assert int(bloqueada.headers["Retry-After"]) >= 1
+        assert client.get("/families").status_code == 200  # only /chat is limited
+
+    def test_rate_limit_from_environment_zero_disables(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        bootstrap = tmp_path / "data" / "catalog_bootstrap.json"
+        _write_bootstrap(bootstrap, [_fam("test-model")])
+        _point_catalogue_sources(
+            monkeypatch, runtime_dir=tmp_path / "runtime" / "catalog", bootstrap_path=bootstrap
+        )
+        monkeypatch.setenv("LMA_EXTRACCION_LLM", "0")
+        monkeypatch.setenv("LMA_EVIDENCIA", "0")
+        monkeypatch.setenv("LMA_RATE_LIMIT_POR_MINUTO", "0")
+        with TestClient(app):
+            assert app.state.limitador.activo is False
+
+    def test_message_length_is_bounded(self, client: TestClient) -> None:
+        assert client.post("/chat", json={"mensaje": ""}).status_code == 422
+        assert client.post("/chat", json={"mensaje": "x" * 4001}).status_code == 422
+        with patch("src.api.main.conversation_store.guardar") as guardar:
+            client.post("/chat", json={"mensaje": "x" * 4001})
+        guardar.assert_not_called()
+
+
+class TestCalentamiento:
+    def test_warm_up_calls_both_components_and_never_raises(self) -> None:
+        class _Ok:
+            llamadas = 0
+
+            def calentar(self) -> bool:
+                self.llamadas += 1
+                return True
+
+        class _Boom:
+            def calentar(self) -> bool:
+                raise RuntimeError("ollama down")
+
+        ok, boom = _Ok(), _Boom()
+        assert calentar_modelos(ok, boom) == {"extractor": True, "evidencia": False}
+        assert ok.llamadas == 1
+
+    def test_components_without_calentar_are_skipped(self) -> None:
+        assert calentar_modelos(object(), None) == {"extractor": None, "evidencia": None}
+
+    def test_startup_runs_warm_up_in_background_when_enabled(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        import time as _time
+
+        bootstrap = tmp_path / "data" / "catalog_bootstrap.json"
+        _write_bootstrap(bootstrap, [_fam("test-model")])
+        _point_catalogue_sources(
+            monkeypatch, runtime_dir=tmp_path / "runtime" / "catalog", bootstrap_path=bootstrap
+        )
+        monkeypatch.setenv("LMA_EXTRACCION_LLM", "0")
+        monkeypatch.setenv("LMA_EVIDENCIA", "0")
+        monkeypatch.setenv("LMA_CALENTAR_MODELOS", "1")
+        with TestClient(app) as c:
+            for _ in range(50):  # the thread is tiny; give it a moment
+                if app.state.modelos_listos is not None:
+                    break
+                _time.sleep(0.02)
+            assert app.state.modelos_listos == {"extractor": False, "evidencia": None}
+            assert c.get("/health").json()["modelos_listos"] == {
+                "extractor": False, "evidencia": None,
+            }
+
+    def test_compuesto_delegates_warm_up(self) -> None:
+        from src.chains.extraccion_criterios import ExtractorCompuesto, ExtractorJson
+
+        class _LLM:
+            def calentar(self) -> bool:
+                return True
+
+            def extraer(self, mensaje, base=None):
+                raise AssertionError("not used")
+
+        assert ExtractorCompuesto(ExtractorJson(), _LLM()).calentar() is True
+        assert ExtractorCompuesto(ExtractorJson(), None).calentar() is False
+
+
+class TestObsolescencia:
+    def test_dias_desde(self) -> None:
+        class _Cat:
+            fecha_sincronizacion = datetime(2026, 1, 1, tzinfo=UTC)
+
+        assert dias_desde(_Cat(), datetime(2026, 1, 31, tzinfo=UTC)) == 30
+        assert dias_desde(None) is None
+        assert dias_desde(_Cat(), datetime(2025, 12, 1, tzinfo=UTC)) == 0  # clock skew
+
+    @patch("src.api.main.ejecutar_pipeline")
+    def test_stale_catalogue_is_a_limitation(
+        self, mock_pipeline: MagicMock, client: TestClient
+    ) -> None:
+        mock_pipeline.return_value = _mock_pipeline_result()
+        payload = {"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
+        limitaciones = client.post("/chat", json=payload).json()["limitaciones"]
+        assert any(lim.startswith("Catalogue snapshot is ") for lim in limitaciones)
+
 
 class TestChatInvalidMessage:
     """With free-text input disabled, malformed criteria are a client error

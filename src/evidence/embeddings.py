@@ -27,4 +27,4 @@ def crear_embedder_ollama(modelo: str, base_url: str) -> Any:
     """Build the Ollama embedder lazily, so importing this module costs nothing."""
     from langchain_ollama import OllamaEmbeddings
 
-    return OllamaEmbeddings(model=modelo, base_url=base_url)
+    return OllamaEmbeddings(model=modelo, base_url=base_url, keep_alive=-1)

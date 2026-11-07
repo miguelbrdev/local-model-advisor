@@ -178,6 +178,11 @@ class TestExtractorOllama:
         extractor = ExtractorOllama(modelo="nope:0b", base_url="http://127.0.0.1:1")
         assert extractor._llm is None  # chain not built until first use
 
+    def test_calentar_reports_readiness_without_raising(self) -> None:
+        assert ExtractorOllama(llm=_FakeLLM(salida=CriteriosExtraidos())).calentar() is True
+        caido = ExtractorOllama(llm=_FakeLLM(error=ConnectionError("down")))
+        assert caido.calentar() is False
+
     def test_unreachable_server_yields_no_disponible(self) -> None:
         """Real chain against a closed port: must map to ExtraccionNoDisponibleError."""
         extractor = ExtractorOllama(modelo="nope:0b", base_url="http://127.0.0.1:9")

@@ -76,7 +76,7 @@ Implemented:
   `scripts/evaluate_golden.py`): reviewed cases pin filter and ranking
   behaviour per catalog snapshot and report pass rate, hit rate and
   exclusion rate
-- 587 automated tests and Ruff linting
+- 620 automated tests and Ruff linting
 
 Not implemented yet:
 
@@ -192,6 +192,9 @@ ollama pull gemma4:e4b
 | `LMA_EVIDENCIA` | `1` | Set to `0` to skip explanatory evidence |
 | `LMA_QDRANT_URL` | `http://127.0.0.1:6333` | Qdrant server holding the evidence index |
 | `LMA_EMBEDDING_MODEL` | `embeddinggemma` | Ollama embedding model |
+| `LMA_CALENTAR_MODELOS` | `1` | Load both Ollama models in the background at startup; `0` to skip |
+| `LMA_API_KEY` | unset | When set, `/chat` and `/families` require the same value in `X-API-Key` |
+| `LMA_RATE_LIMIT_POR_MINUTO` | `60` | `/chat` requests per client address per minute; `0` disables |
 
 If Ollama is unreachable or returns invalid output, a free-text message gets
 `503` with a hint to send JSON; JSON input keeps working. The first message
@@ -242,6 +245,22 @@ to localhost only. The GPU overlay needs the NVIDIA driver on the host and, on
 Windows, Docker Desktop with the WSL2 backend; without it Ollama runs on CPU.
 Tests and the golden evaluation still run in the local virtualenv; the image
 is for running the service, not for development.
+
+## Operating it
+
+- **Cold start**: at startup the API loads the chat and embedding models in a
+  background thread and asks Ollama to keep them resident (`keep_alive=-1`),
+  so the first user request does not pay the ~100 s model load.
+  `GET /health` shows `modelos_listos` once the warm-up has finished.
+- **Exposure**: ports are bound to `127.0.0.1` by default. If you expose the
+  API, set `LMA_API_KEY` (clients send `X-API-Key`) and keep the per-client
+  rate limit on `/chat` (`429` with `Retry-After` when exceeded). `mensaje` is
+  limited to 4000 characters.
+- **Catalog age**: `/health` reports `catalogo_dias` and flags
+  `catalogo_obsoleto` after 28 days (21-day sync cadence plus a week); every
+  recommendation then carries a limitation line until the next sync.
+- **State**: expired conversations (24 h TTL) are purged at startup and every
+  100 chats.
 
 ## Example
 

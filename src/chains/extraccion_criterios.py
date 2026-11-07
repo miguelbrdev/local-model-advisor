@@ -39,6 +39,10 @@ output.  ``gemma4:e2b`` is the lighter choice for small GPUs."""
 
 DEFAULT_OLLAMA_BASE_URL = "http://127.0.0.1:11434"
 
+KEEP_ALIVE_OLLAMA = -1
+"""Ask Ollama to keep the model loaded indefinitely: the first request after
+an unload paid ~100 s of model load on an RTX 2080 Ti."""
+
 PROMPT_SISTEMA = """\
 You extract search criteria for choosing a local LLM from the user's message.
 Fill ONLY what the user states explicitly; leave everything else null or empty.
@@ -251,9 +255,24 @@ class ExtractorOllama:
         if self._llm is None:
             from langchain_ollama import ChatOllama
 
-            chat = ChatOllama(model=self.modelo, base_url=self.base_url, temperature=0)
+            chat = ChatOllama(
+                model=self.modelo,
+                base_url=self.base_url,
+                temperature=0,
+                keep_alive=KEEP_ALIVE_OLLAMA,
+            )
             self._llm = chat.with_structured_output(CriteriosExtraidos, method="json_schema")
         return self._llm
+
+    def calentar(self) -> bool:
+        """Load the model now with a trivial extraction so the first user
+        request does not pay the load time.  Never raises."""
+        try:
+            self.extraer("hola")
+        except ExtraccionNoDisponibleError as exc:
+            logger.warning("Warm-up of %s failed: %s", self.modelo, exc)
+            return False
+        return True
 
 
 class ExtractorCompuesto:
@@ -273,6 +292,11 @@ class ExtractorCompuesto:
     @property
     def acepta_texto_libre(self) -> bool:
         return self._llm is not None
+
+    def calentar(self) -> bool:
+        """Warm the language model, if any.  Returns whether it is ready."""
+        calentar = getattr(self._llm, "calentar", None)
+        return bool(calentar()) if callable(calentar) else False
 
     def extraer(
         self, mensaje: str, base: CriteriosBusqueda | None = None
