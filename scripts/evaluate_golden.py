@@ -4,8 +4,9 @@ Offline by construction: the catalogue comes from ``runtime/catalog/`` or
 the committed bootstrap, benchmark scores come from the committed
 ``data/benchmarks_bootstrap.json`` only (never from ``runtime/``, whose
 optional Artificial Analysis data differs per operator), and VRAM
-compatibility is the deterministic parameter-count heuristic, so two runs
-on the same snapshots always agree.
+compatibility is read from the quantisation table in the snapshot (with the
+parameter-count heuristic for families without one), so two runs on the
+same snapshots always agree.
 
 Exit codes: ``0`` every case passed (and, with ``--strict-snapshot``, the
 catalogue is the snapshot the suite was written for), ``1`` at least one
@@ -31,7 +32,7 @@ from pydantic import ValidationError
 from src.benchmarks.provider import BenchmarksLocales
 from src.benchmarks.snapshot import DEFAULT_BENCHMARKS_BOOTSTRAP_PATH
 from src.catalog.synced import DEFAULT_RUNTIME_CATALOG_DIR, CatalogoSincronizado
-from src.compatibility.heuristica import HeuristicaParametrosProvider
+from src.compatibility.provider import proveedor_offline
 from src.evaluation.golden import DEFAULT_SUITE_PATH, InformeGolden, cargar_suite, evaluar_suite
 from src.sync.bootstrap import DEFAULT_BOOTSTRAP_PATH
 
@@ -102,7 +103,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     informe = evaluar_suite(
         suite,
         catalogo=catalogo,
-        vram_provider=HeuristicaParametrosProvider(),
+        vram_provider=proveedor_offline(),
         benchmarks=benchmarks,
     )
 

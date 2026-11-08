@@ -4,12 +4,16 @@
 never raises and always returns a ``CompatibilityResult`` whose ``fuente``
 says where the verdict came from.
 
-Production routing (:func:`elegir_provider`) is ``ProveedorConFallback``:
-canirun.ai first, and the offline parameter-count heuristic when canirun.ai
-is unreachable or has no entry for a family.  Every estimated verdict is
-labelled ``fuente="heuristica_propia"`` so the response can say which
-candidates were measured and which were estimated; nothing is silently
-invented.
+Production routing (:func:`elegir_provider`) is
+``ProveedorSnapshotPrimero``: the quantisation table synced from canIRun.ai
+(``fuente="canirun_snapshot"``, offline and deterministic) first; for a
+family without a table, ``ProveedorConFallback`` asks the live canirun.ai
+endpoint and estimates with the parameter-count heuristic when the service
+is unreachable or has no entry.  Every estimated verdict is labelled
+``fuente="heuristica_propia"`` so the response can say which candidates
+were measured and which were estimated; nothing is silently invented.
+:func:`proveedor_offline` is the same chain without the live endpoint, for
+the golden evaluation.
 """
 
 from __future__ import annotations
@@ -19,6 +23,7 @@ from typing import Protocol, runtime_checkable
 import httpx
 
 from src.compatibility.cache import CACHE_CANIRUN, CacheCompatibilidad
+from src.compatibility.cuantizaciones import CuantizacionesProvider
 from src.compatibility.heuristica import HeuristicaParametrosProvider
 from src.models.schemas import CompatibilityResult, FamiliaModelo
 from src.tools.tls import contexto_tls
@@ -213,6 +218,39 @@ class ProveedorConFallback:
         )
 
 
+class ProveedorSnapshotPrimero:
+    """Synced quantisation table first, another provider for the rest.
+
+    ``primario`` (normally :class:`CuantizacionesProvider`) answers from
+    the snapshot without I/O; when it returns ``no_disponible`` (family
+    without a table) the verdict is delegated to ``respaldo`` — in
+    production the live canirun.ai chain, in the golden evaluation the
+    parameter-count heuristic.  ``respaldo`` keeps its own labels, so the
+    response can still tell measured from estimated verdicts.
+    """
+
+    def __init__(
+        self,
+        primario: VRAMCompatibilityProvider | None = None,
+        respaldo: VRAMCompatibilityProvider | None = None,
+    ) -> None:
+        self._primario = primario or CuantizacionesProvider()
+        self._respaldo = respaldo or ProveedorConFallback()
+
+    def check(
+        self, familia: FamiliaModelo, vram_gb: float, runtime: str | None = None
+    ) -> CompatibilityResult:
+        desde_snapshot = self._primario.check(familia, vram_gb, runtime)
+        if desde_snapshot.fuente != "no_disponible":
+            return desde_snapshot
+        return self._respaldo.check(familia, vram_gb, runtime)
+
+
+def proveedor_offline() -> VRAMCompatibilityProvider:
+    """Deterministic chain for evaluations: snapshot table, then the heuristic."""
+    return ProveedorSnapshotPrimero(CuantizacionesProvider(), HeuristicaParametrosProvider())
+
+
 class TamanoDirectoProvider:
     """Fallback heuristic for small models (embeddings/rerankers).
 
@@ -238,10 +276,10 @@ class TamanoDirectoProvider:
 def elegir_provider(tarea: str) -> VRAMCompatibilityProvider:
     """Route to the right VRAM provider based on task category.
 
-    A fresh ``ProveedorConFallback`` per call, so its outage flag is scoped
+    A fresh chain per call, so the live fallback's outage flag is scoped
     to one pipeline run and a recovered service is used again on the next
     request.
     """
     if tarea in ("chat", "codigo", "razonamiento"):
-        return ProveedorConFallback()
+        return ProveedorSnapshotPrimero(CuantizacionesProvider(), ProveedorConFallback())
     return TamanoDirectoProvider()

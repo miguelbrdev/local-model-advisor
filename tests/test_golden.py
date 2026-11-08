@@ -18,6 +18,7 @@ from src.benchmarks.provider import BenchmarksLocales
 from src.benchmarks.snapshot import DEFAULT_BENCHMARKS_BOOTSTRAP_PATH
 from src.catalog.synced import CatalogoSincronizado
 from src.compatibility.heuristica import HeuristicaParametrosProvider
+from src.compatibility.provider import proveedor_offline
 from src.evaluation.golden import (
     DEFAULT_SUITE_PATH,
     CasoGolden,
@@ -250,7 +251,7 @@ class TestCommittedSuite:
             runtime_path=tmp_path / "absent.json", bootstrap_path=DEFAULT_BENCHMARKS_BOOTSTRAP_PATH
         )
         informe = evaluar_suite(
-            suite, catalogo=catalogo, vram_provider=PROVIDER, benchmarks=benchmarks
+            suite, catalogo=catalogo, vram_provider=proveedor_offline(), benchmarks=benchmarks
         )
 
         fallos = {r.id: r.fallos for r in informe.resultados if not r.aprobado}

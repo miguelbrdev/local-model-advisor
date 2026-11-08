@@ -31,9 +31,9 @@
 #
 # Measured coverage against snap-176d40242fd0157a (91 families): 46 get at
 # least one Epoch AI score; 8 get an Artificial Analysis index. 1.1.0 adds the
-# 16 families of snap-f84e4af19dfbc6b8 (136 source models, 107 included).
+# 16 families of snap-3eb98b50f1e483e0 (136 source models, 107 included).
 version: "1.1.0"
-snapshot_id: "snap-f84e4af19dfbc6b8"
+snapshot_id: "snap-3eb98b50f1e483e0"
 familias:
   # --- up to 2B ---------------------------------------------------------------
   qwen3.5-0.8b:
@@ -278,7 +278,7 @@ familias:
   qwen3-vl-30b-a3b:
     nota: No row in either source.
 
-  # --- added with snap-f84e4af19dfbc6b8 (2026-11-08) ---------------------------
+  # --- added with snap-3eb98b50f1e483e0 (2026-11-08) ---------------------------
   lfm3-1.7b:
     nota: No row in either source.
   nemotron-3.5-bolt-e4b:

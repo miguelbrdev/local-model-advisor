@@ -11,11 +11,13 @@ from unittest.mock import MagicMock, patch
 import httpx
 import pytest
 
+from src.compatibility.cuantizaciones import CuantizacionesProvider
 from src.compatibility.heuristica import HeuristicaParametrosProvider
 from src.compatibility.provider import (
     CanIRunProvider,
     ProveedorConFallback,
     ProveedorExternoError,
+    ProveedorSnapshotPrimero,
     TamanoDirectoProvider,
     elegir_provider,
 )
@@ -251,7 +253,9 @@ class TestCanIRunCache:
         from src.compatibility.cache import CACHE_CANIRUN
 
         provider = elegir_provider("chat")
-        assert provider._primario._cache is CACHE_CANIRUN
+        live = provider._respaldo  # snapshot table first, live canirun.ai chain second
+        assert isinstance(live, ProveedorConFallback)
+        assert live._primario._cache is CACHE_CANIRUN
 
 
 # ---------------------------------------------------------------------------
@@ -419,10 +423,12 @@ class TestTamanoDirecto:
 
 class TestElegirProvider:
     @pytest.mark.parametrize("tarea", ["chat", "codigo", "razonamiento"])
-    def test_v1_tasks_return_canirun_with_fallback(self, tarea: str) -> None:
+    def test_v1_tasks_return_snapshot_then_canirun_with_fallback(self, tarea: str) -> None:
         provider = elegir_provider(tarea)
-        assert isinstance(provider, ProveedorConFallback)
-        assert provider.primario_caido is False
+        assert isinstance(provider, ProveedorSnapshotPrimero)
+        assert isinstance(provider._primario, CuantizacionesProvider)
+        assert isinstance(provider._respaldo, ProveedorConFallback)
+        assert provider._respaldo.primario_caido is False
 
     def test_each_call_gets_a_fresh_outage_flag(self) -> None:
         """The outage flag must be scoped to one pipeline run."""

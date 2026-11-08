@@ -16,6 +16,24 @@ from pydantic import BaseModel, Field
 # Catalogue
 # ---------------------------------------------------------------------------
 
+class Cuantizacion(BaseModel):
+    """One row of the canIRun.ai quantisation table for a model.
+
+    Attributes:
+        nombre: Quantisation label as canIRun.ai names it (``Q4_K_M``, ``F16``).
+        bits: Bits per weight, when stated.
+        vram_gb: VRAM the quantised model needs, as published by canIRun.ai.
+        disco_gb: Download size on disk.
+        calidad: canIRun.ai's quality label (``low`` … ``lossless``).
+    """
+
+    nombre: str
+    bits: int | None = None
+    vram_gb: float | None = None
+    disco_gb: float | None = None
+    calidad: str | None = None
+
+
 class FamiliaModelo(BaseModel):
     """A curated model family with its variants and metadata.
 
@@ -68,6 +86,10 @@ class FamiliaModelo(BaseModel):
     """Name in the LM Studio catalogue, from canIRun."""
     fuentes_enriquecimiento: list[str] = Field(default_factory=list)
     """Enrichment sources that answered with data for this family."""
+    cuantizaciones: list[Cuantizacion] = Field(default_factory=list)
+    """Per-quantisation memory table from the canIRun.ai detail record; the
+    offline compatibility verdict reads ``Q4_K_M`` from it.  Empty when the
+    detail lookup failed or listed nothing."""
 
 
 # ---------------------------------------------------------------------------
@@ -81,7 +103,12 @@ class CompatibilityResult(BaseModel):
     variante: str
     compatible: bool | None = None
     grado: str | None = None  # e.g. "comfortable", "tight"
-    fuente: Literal["canirun_ai", "heuristica_propia", "no_disponible"] = "no_disponible"
+    fuente: Literal[
+        "canirun_snapshot", "canirun_ai", "heuristica_propia", "no_disponible"
+    ] = "no_disponible"
+    """Where the verdict came from: the quantisation table synced from
+    canIRun.ai (offline, deterministic), the live canirun.ai endpoint, the
+    local parameter-count estimate, or nowhere."""
     nota: str = ""
     tokens_per_second: float | None = None
     vram_required_gb: float | None = None

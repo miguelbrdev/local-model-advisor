@@ -1,10 +1,10 @@
 {
   "meta": {
     "schema_version": "1.0",
-    "snapshot_id": "snap-f84e4af19dfbc6b8",
-    "fecha_sincronizacion": "2026-11-08T12:16:17.462895Z",
+    "snapshot_id": "snap-3eb98b50f1e483e0",
+    "fecha_sincronizacion": "2026-11-08T12:31:58.904549Z",
     "source_url": "https://canirun.ai/api/models",
-    "hash_contenido": "f84e4af19dfbc6b8bfc3c8edeb89e4e94774a61f2ca3b0cc654d39ef35103592",
+    "hash_contenido": "3eb98b50f1e483e0af52c07927148f089d43c6f918921be8b556584d5200313c",
     "modelos_origen": 136,
     "modelos_incluidos": 107,
     "motivos_exclusion": [
@@ -195,6 +195,29 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 0.9,
+          "disco_gb": 0.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 1.1,
+          "disco_gb": 0.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 1.3,
+          "disco_gb": 0.8,
+          "calidad": "excellent"
+        }
       ]
     },
     {
@@ -247,6 +270,29 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 0.8,
+          "disco_gb": 0.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 1.0,
+          "disco_gb": 0.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 1.1,
+          "disco_gb": 0.7,
+          "calidad": "excellent"
+        }
       ]
     },
     {
@@ -306,6 +352,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 0.8,
+          "disco_gb": 0.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 0.9,
+          "disco_gb": 0.4,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 1.0,
+          "disco_gb": 0.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 1.1,
+          "disco_gb": 0.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 1.3,
+          "disco_gb": 0.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 1.5,
+          "disco_gb": 1.0,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 2.5,
+          "disco_gb": 2.0,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -353,6 +450,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 0.8,
+          "disco_gb": 0.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 0.9,
+          "disco_gb": 0.4,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 1.0,
+          "disco_gb": 0.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 1.1,
+          "disco_gb": 0.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 1.3,
+          "disco_gb": 0.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 1.5,
+          "disco_gb": 1.0,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 2.5,
+          "disco_gb": 2.0,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -405,6 +553,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 1.0,
+          "disco_gb": 0.5,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 1.2,
+          "disco_gb": 0.6,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 1.3,
+          "disco_gb": 0.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 1.5,
+          "disco_gb": 0.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 1.7,
+          "disco_gb": 1.1,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 2.0,
+          "disco_gb": 1.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 3.6,
+          "disco_gb": 2.9,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -457,6 +656,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 1.0,
+          "disco_gb": 0.5,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 1.2,
+          "disco_gb": 0.6,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 1.3,
+          "disco_gb": 0.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 1.5,
+          "disco_gb": 0.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 1.7,
+          "disco_gb": 1.1,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 2.0,
+          "disco_gb": 1.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 3.6,
+          "disco_gb": 2.9,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -510,6 +760,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 1.0,
+          "disco_gb": 0.5,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 1.3,
+          "disco_gb": 0.7,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 1.4,
+          "disco_gb": 0.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 1.6,
+          "disco_gb": 1.0,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 1.8,
+          "disco_gb": 1.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 2.2,
+          "disco_gb": 1.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 4.0,
+          "disco_gb": 3.3,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -562,6 +863,29 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 1.5,
+          "disco_gb": 1.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 2.0,
+          "disco_gb": 1.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 2.5,
+          "disco_gb": 1.9,
+          "calidad": "excellent"
+        }
       ]
     },
     {
@@ -632,6 +956,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 1.0,
+          "disco_gb": 0.5,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 1.3,
+          "disco_gb": 0.7,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 1.4,
+          "disco_gb": 0.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 1.6,
+          "disco_gb": 1.0,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 1.8,
+          "disco_gb": 1.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 2.2,
+          "disco_gb": 1.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 4.0,
+          "disco_gb": 3.3,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -690,6 +1065,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 1.5,
+          "disco_gb": 0.9,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 1.8,
+          "disco_gb": 1.3,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 2.0,
+          "disco_gb": 1.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 2.4,
+          "disco_gb": 1.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 2.8,
+          "disco_gb": 2.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 3.6,
+          "disco_gb": 2.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 6.6,
+          "disco_gb": 5.9,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -751,6 +1177,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 1.5,
+          "disco_gb": 0.9,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 1.8,
+          "disco_gb": 1.3,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 2.0,
+          "disco_gb": 1.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 2.4,
+          "disco_gb": 1.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 2.8,
+          "disco_gb": 2.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 3.6,
+          "disco_gb": 2.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 6.6,
+          "disco_gb": 5.9,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -801,6 +1278,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 1.5,
+          "disco_gb": 0.9,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 1.8,
+          "disco_gb": 1.3,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 2.0,
+          "disco_gb": 1.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 2.4,
+          "disco_gb": 1.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 2.8,
+          "disco_gb": 2.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 3.6,
+          "disco_gb": 2.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 6.6,
+          "disco_gb": 5.9,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -850,6 +1378,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 1.7,
+          "disco_gb": 1.2,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 2.2,
+          "disco_gb": 1.6,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 2.4,
+          "disco_gb": 1.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 2.9,
+          "disco_gb": 2.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 3.4,
+          "disco_gb": 2.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 4.4,
+          "disco_gb": 3.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 8.3,
+          "disco_gb": 7.4,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -901,6 +1480,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 1.8,
+          "disco_gb": 1.2,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 2.3,
+          "disco_gb": 1.7,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 2.5,
+          "disco_gb": 2.0,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 3.1,
+          "disco_gb": 2.4,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 3.6,
+          "disco_gb": 2.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 4.6,
+          "disco_gb": 3.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 8.7,
+          "disco_gb": 7.8,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -951,6 +1581,29 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 2.5,
+          "disco_gb": 2.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 3.6,
+          "disco_gb": 3.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 4.6,
+          "disco_gb": 4.2,
+          "calidad": "excellent"
+        }
       ]
     },
     {
@@ -998,6 +1651,29 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 3.1,
+          "disco_gb": 3.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 4.3,
+          "disco_gb": 3.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 5.6,
+          "disco_gb": 4.6,
+          "calidad": "excellent"
+        }
       ]
     },
     {
@@ -1046,6 +1722,29 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 4.6,
+          "disco_gb": 5.0,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 6.6,
+          "disco_gb": 5.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 8.7,
+          "disco_gb": 7.5,
+          "calidad": "excellent"
+        }
       ]
     },
     {
@@ -1132,6 +1831,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 3.1,
+          "disco_gb": 2.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 4.1,
+          "disco_gb": 3.4,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 4.6,
+          "disco_gb": 3.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 5.6,
+          "disco_gb": 4.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 6.6,
+          "disco_gb": 5.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 8.7,
+          "disco_gb": 7.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 16.9,
+          "disco_gb": 15.6,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -1186,6 +1936,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 2.7,
+          "disco_gb": 2.1,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 3.6,
+          "disco_gb": 3.0,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 4.1,
+          "disco_gb": 3.4,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 5.0,
+          "disco_gb": 4.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 5.9,
+          "disco_gb": 5.1,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 7.7,
+          "disco_gb": 6.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 14.8,
+          "disco_gb": 13.7,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -1235,6 +2036,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 2.7,
+          "disco_gb": 2.1,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 3.6,
+          "disco_gb": 3.0,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 4.1,
+          "disco_gb": 3.4,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 5.0,
+          "disco_gb": 4.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 5.9,
+          "disco_gb": 5.1,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 7.7,
+          "disco_gb": 6.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 14.8,
+          "disco_gb": 13.7,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -1296,6 +2148,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 3.1,
+          "disco_gb": 2.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 4.1,
+          "disco_gb": 3.4,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 4.6,
+          "disco_gb": 3.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 5.6,
+          "disco_gb": 4.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 6.6,
+          "disco_gb": 5.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 8.7,
+          "disco_gb": 7.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 16.9,
+          "disco_gb": 15.6,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -1349,6 +2252,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 3.1,
+          "disco_gb": 2.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 4.1,
+          "disco_gb": 3.4,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 4.6,
+          "disco_gb": 3.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 5.6,
+          "disco_gb": 4.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 6.6,
+          "disco_gb": 5.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 8.7,
+          "disco_gb": 7.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 16.9,
+          "disco_gb": 15.6,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -1401,6 +2355,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 3.1,
+          "disco_gb": 2.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 4.1,
+          "disco_gb": 3.4,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 4.6,
+          "disco_gb": 3.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 5.6,
+          "disco_gb": 4.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 6.6,
+          "disco_gb": 5.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 8.7,
+          "disco_gb": 7.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 16.9,
+          "disco_gb": 15.6,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -1455,6 +2460,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 3.1,
+          "disco_gb": 2.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 4.1,
+          "disco_gb": 3.4,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 4.6,
+          "disco_gb": 3.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 5.6,
+          "disco_gb": 4.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 6.6,
+          "disco_gb": 5.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 8.7,
+          "disco_gb": 7.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 16.9,
+          "disco_gb": 15.6,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -1496,6 +2552,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_card"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 3.4,
+          "disco_gb": 2.8,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 4.5,
+          "disco_gb": 3.9,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 5.1,
+          "disco_gb": 4.4,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 6.3,
+          "disco_gb": 5.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 7.4,
+          "disco_gb": 6.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 9.7,
+          "disco_gb": 8.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 18.9,
+          "disco_gb": 17.6,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -1544,6 +2651,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 3.4,
+          "disco_gb": 2.8,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 4.5,
+          "disco_gb": 3.9,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 5.1,
+          "disco_gb": 4.4,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 6.3,
+          "disco_gb": 5.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 7.4,
+          "disco_gb": 6.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 9.7,
+          "disco_gb": 8.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 18.9,
+          "disco_gb": 17.6,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -1593,6 +2751,29 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 5.1,
+          "disco_gb": 5.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 7.4,
+          "disco_gb": 6.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 9.7,
+          "disco_gb": 8.9,
+          "calidad": "excellent"
+        }
       ]
     },
     {
@@ -1639,6 +2820,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 3.4,
+          "disco_gb": 2.8,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 4.5,
+          "disco_gb": 3.9,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 5.1,
+          "disco_gb": 4.4,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 6.3,
+          "disco_gb": 5.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 7.4,
+          "disco_gb": 6.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 9.7,
+          "disco_gb": 8.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 18.9,
+          "disco_gb": 17.6,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -1686,6 +2918,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 3.6,
+          "disco_gb": 3.0,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 4.8,
+          "disco_gb": 4.1,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 5.5,
+          "disco_gb": 4.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 6.7,
+          "disco_gb": 5.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 8.0,
+          "disco_gb": 7.1,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 10.4,
+          "disco_gb": 9.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 20.4,
+          "disco_gb": 19.0,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -1737,6 +3020,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 4.3,
+          "disco_gb": 3.7,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 5.9,
+          "disco_gb": 5.1,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 6.6,
+          "disco_gb": 5.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 8.2,
+          "disco_gb": 7.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 9.7,
+          "disco_gb": 8.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 12.8,
+          "disco_gb": 11.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 25.1,
+          "disco_gb": 23.5,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -1801,6 +3135,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 4.3,
+          "disco_gb": 3.7,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 5.9,
+          "disco_gb": 5.1,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 6.6,
+          "disco_gb": 5.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 8.2,
+          "disco_gb": 7.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 9.7,
+          "disco_gb": 8.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 12.8,
+          "disco_gb": 11.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 25.1,
+          "disco_gb": 23.5,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -1856,6 +3241,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 5.0,
+          "disco_gb": 4.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 6.8,
+          "disco_gb": 6.0,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 7.7,
+          "disco_gb": 6.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 9.5,
+          "disco_gb": 8.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 11.3,
+          "disco_gb": 10.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 14.8,
+          "disco_gb": 13.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 29.2,
+          "disco_gb": 27.4,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -1909,6 +3345,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 5.0,
+          "disco_gb": 4.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 6.8,
+          "disco_gb": 6.0,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 7.7,
+          "disco_gb": 6.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 9.5,
+          "disco_gb": 8.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 11.3,
+          "disco_gb": 10.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 14.8,
+          "disco_gb": 13.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 29.2,
+          "disco_gb": 27.4,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -1960,6 +3447,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 5.0,
+          "disco_gb": 4.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 6.8,
+          "disco_gb": 6.0,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 7.7,
+          "disco_gb": 6.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 9.5,
+          "disco_gb": 8.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 11.3,
+          "disco_gb": 10.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 14.8,
+          "disco_gb": 13.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 29.2,
+          "disco_gb": 27.4,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -2019,6 +3557,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 35.4,
+          "disco_gb": 33.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 49.4,
+          "disco_gb": 46.6,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 56.3,
+          "disco_gb": 53.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 70.3,
+          "disco_gb": 66.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 84.2,
+          "disco_gb": 79.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 112.2,
+          "disco_gb": 106.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 223.8,
+          "disco_gb": 213.2,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -2068,6 +3657,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 7.2,
+          "disco_gb": 6.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 9.9,
+          "disco_gb": 9.0,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 11.3,
+          "disco_gb": 10.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 13.9,
+          "disco_gb": 12.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 16.6,
+          "disco_gb": 15.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 22.0,
+          "disco_gb": 20.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 43.5,
+          "disco_gb": 41.1,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -2126,6 +3766,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 8.2,
+          "disco_gb": 7.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 11.3,
+          "disco_gb": 10.3,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 12.8,
+          "disco_gb": 11.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 15.9,
+          "disco_gb": 14.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 18.9,
+          "disco_gb": 17.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 25.1,
+          "disco_gb": 23.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 49.7,
+          "disco_gb": 46.9,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -2195,6 +3886,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 8.2,
+          "disco_gb": 7.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 11.3,
+          "disco_gb": 10.3,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 12.8,
+          "disco_gb": 11.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 15.9,
+          "disco_gb": 14.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 18.9,
+          "disco_gb": 17.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 25.1,
+          "disco_gb": 23.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 49.7,
+          "disco_gb": 46.9,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -2244,6 +3986,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 4.3,
+          "disco_gb": 3.7,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 5.9,
+          "disco_gb": 5.1,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 6.6,
+          "disco_gb": 5.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 8.2,
+          "disco_gb": 7.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 9.7,
+          "disco_gb": 8.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 12.8,
+          "disco_gb": 11.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 25.1,
+          "disco_gb": 23.5,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -2290,6 +4083,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 8.2,
+          "disco_gb": 7.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 11.3,
+          "disco_gb": 10.3,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 12.8,
+          "disco_gb": 11.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 15.9,
+          "disco_gb": 14.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 18.9,
+          "disco_gb": 17.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 25.1,
+          "disco_gb": 23.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 49.7,
+          "disco_gb": 46.9,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -2365,6 +4209,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 8.2,
+          "disco_gb": 7.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 11.3,
+          "disco_gb": 10.3,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 12.8,
+          "disco_gb": 11.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 15.9,
+          "disco_gb": 14.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 18.9,
+          "disco_gb": 17.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 25.1,
+          "disco_gb": 23.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 49.7,
+          "disco_gb": 46.9,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -2412,6 +4307,29 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 14.3,
+          "disco_gb": 15.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 21.2,
+          "disco_gb": 21.1,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 28.2,
+          "disco_gb": 25.0,
+          "calidad": "excellent"
+        }
       ]
     },
     {
@@ -2457,6 +4375,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 8.8,
+          "disco_gb": 7.9,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 12.2,
+          "disco_gb": 11.1,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 13.8,
+          "disco_gb": 12.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 17.1,
+          "disco_gb": 15.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 20.5,
+          "disco_gb": 19.1,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 27.1,
+          "disco_gb": 25.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 53.8,
+          "disco_gb": 50.9,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -2507,6 +4476,29 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 14.7,
+          "disco_gb": 15.4,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 21.9,
+          "disco_gb": 20.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 29.0,
+          "disco_gb": 26.6,
+          "calidad": "excellent"
+        }
       ]
     },
     {
@@ -2556,6 +4548,29 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 17.4,
+          "disco_gb": 17.4,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 25.9,
+          "disco_gb": 23.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 34.3,
+          "disco_gb": 30.4,
+          "calidad": "excellent"
+        }
       ]
     },
     {
@@ -2599,6 +4614,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 11.1,
+          "disco_gb": 10.1,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 15.3,
+          "disco_gb": 14.1,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 17.4,
+          "disco_gb": 16.1,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 21.6,
+          "disco_gb": 20.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 25.9,
+          "disco_gb": 24.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 34.3,
+          "disco_gb": 32.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 68.1,
+          "disco_gb": 64.5,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -2650,6 +4716,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 10.1,
+          "disco_gb": 9.2,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 13.9,
+          "disco_gb": 12.8,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 15.9,
+          "disco_gb": 14.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 19.7,
+          "disco_gb": 18.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 23.6,
+          "disco_gb": 22.0,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 31.2,
+          "disco_gb": 29.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 62.0,
+          "disco_gb": 58.7,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -2695,6 +4812,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 11.7,
+          "disco_gb": 10.7,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 16.2,
+          "disco_gb": 15.0,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 18.4,
+          "disco_gb": 17.1,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 22.9,
+          "disco_gb": 21.4,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 27.4,
+          "disco_gb": 25.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 36.4,
+          "disco_gb": 34.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 72.2,
+          "disco_gb": 68.5,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -2752,6 +4920,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 10.1,
+          "disco_gb": 9.2,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 13.9,
+          "disco_gb": 12.8,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 15.9,
+          "disco_gb": 14.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 19.7,
+          "disco_gb": 18.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 23.6,
+          "disco_gb": 22.0,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 31.2,
+          "disco_gb": 29.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 62.0,
+          "disco_gb": 58.7,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -2808,6 +5027,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 10.1,
+          "disco_gb": 9.2,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 13.9,
+          "disco_gb": 12.8,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 15.9,
+          "disco_gb": 14.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 19.7,
+          "disco_gb": 18.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 23.6,
+          "disco_gb": 22.0,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 31.2,
+          "disco_gb": 29.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 62.0,
+          "disco_gb": 58.7,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -2858,6 +5128,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 24.2,
+          "disco_gb": 22.6,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 33.7,
+          "disco_gb": 31.7,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 38.4,
+          "disco_gb": 36.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 47.9,
+          "disco_gb": 45.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 57.4,
+          "disco_gb": 54.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 76.3,
+          "disco_gb": 72.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 152.1,
+          "disco_gb": 144.7,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -2908,6 +5229,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 10.1,
+          "disco_gb": 9.2,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 13.9,
+          "disco_gb": 12.8,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 15.9,
+          "disco_gb": 14.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 19.7,
+          "disco_gb": 18.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 23.6,
+          "disco_gb": 22.0,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 31.2,
+          "disco_gb": 29.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 62.0,
+          "disco_gb": 58.7,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -2951,6 +5323,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 10.1,
+          "disco_gb": 9.2,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 13.9,
+          "disco_gb": 12.8,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 15.9,
+          "disco_gb": 14.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 19.7,
+          "disco_gb": 18.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 23.6,
+          "disco_gb": 22.0,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 31.2,
+          "disco_gb": 29.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 62.0,
+          "disco_gb": 58.7,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3003,6 +5426,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 10.7,
+          "disco_gb": 9.8,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 14.8,
+          "disco_gb": 13.7,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 16.9,
+          "disco_gb": 15.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 21.0,
+          "disco_gb": 19.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 25.1,
+          "disco_gb": 23.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 33.3,
+          "disco_gb": 31.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 66.1,
+          "disco_gb": 62.6,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3052,6 +5526,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 10.7,
+          "disco_gb": 9.8,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 14.8,
+          "disco_gb": 13.7,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 16.9,
+          "disco_gb": 15.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 21.0,
+          "disco_gb": 19.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 25.1,
+          "disco_gb": 23.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 33.3,
+          "disco_gb": 31.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 66.1,
+          "disco_gb": 62.6,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3098,6 +5623,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 10.7,
+          "disco_gb": 9.8,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 14.8,
+          "disco_gb": 13.7,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 16.9,
+          "disco_gb": 15.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 21.0,
+          "disco_gb": 19.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 25.1,
+          "disco_gb": 23.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 33.3,
+          "disco_gb": 31.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 66.1,
+          "disco_gb": 62.6,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3146,6 +5722,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_card"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 11.7,
+          "disco_gb": 10.7,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 16.2,
+          "disco_gb": 15.0,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 18.4,
+          "disco_gb": 17.1,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 22.9,
+          "disco_gb": 21.4,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 27.4,
+          "disco_gb": 25.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 36.4,
+          "disco_gb": 34.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 72.2,
+          "disco_gb": 68.5,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3193,6 +5820,29 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 18.4,
+          "disco_gb": 19.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 27.4,
+          "disco_gb": 26.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 36.4,
+          "disco_gb": 34.4,
+          "calidad": "excellent"
+        }
       ]
     },
     {
@@ -3239,6 +5889,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 11.7,
+          "disco_gb": 10.7,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 16.2,
+          "disco_gb": 15.0,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 18.4,
+          "disco_gb": 17.1,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 22.9,
+          "disco_gb": 21.4,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 27.4,
+          "disco_gb": 25.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 36.4,
+          "disco_gb": 34.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 72.2,
+          "disco_gb": 68.5,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3286,6 +5987,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 12.0,
+          "disco_gb": 11.0,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 16.6,
+          "disco_gb": 15.4,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 18.9,
+          "disco_gb": 17.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 23.6,
+          "disco_gb": 22.0,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 28.2,
+          "disco_gb": 26.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 37.4,
+          "disco_gb": 35.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 74.3,
+          "disco_gb": 70.4,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3343,6 +6095,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 15.5,
+          "disco_gb": 14.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 21.6,
+          "disco_gb": 20.1,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 24.6,
+          "disco_gb": 23.0,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 30.6,
+          "disco_gb": 28.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 36.6,
+          "disco_gb": 34.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 48.6,
+          "disco_gb": 46.0,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 96.8,
+          "disco_gb": 91.9,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3392,6 +6195,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 26.1,
+          "disco_gb": 24.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 36.4,
+          "disco_gb": 34.2,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 41.5,
+          "disco_gb": 39.1,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 51.7,
+          "disco_gb": 48.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 62.0,
+          "disco_gb": 58.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 82.5,
+          "disco_gb": 78.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 164.4,
+          "disco_gb": 156.5,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3437,6 +6291,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 26.1,
+          "disco_gb": 24.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 36.4,
+          "disco_gb": 34.2,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 41.5,
+          "disco_gb": 39.1,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 51.7,
+          "disco_gb": 48.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 62.0,
+          "disco_gb": 58.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 82.5,
+          "disco_gb": 78.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 164.4,
+          "disco_gb": 156.5,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3497,6 +6402,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 22.9,
+          "disco_gb": 21.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 31.9,
+          "disco_gb": 29.9,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 36.4,
+          "disco_gb": 34.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 45.3,
+          "disco_gb": 42.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 54.3,
+          "disco_gb": 51.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 72.2,
+          "disco_gb": 68.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 143.9,
+          "disco_gb": 136.9,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3545,6 +6501,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 38.0,
+          "disco_gb": 35.8,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 52.9,
+          "disco_gb": 50.1,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 60.4,
+          "disco_gb": 57.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 75.4,
+          "disco_gb": 71.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 90.4,
+          "disco_gb": 85.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 120.4,
+          "disco_gb": 114.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 240.2,
+          "disco_gb": 228.8,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3595,6 +6602,29 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 63.0,
+          "disco_gb": 37.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 94.2,
+          "disco_gb": 37.1,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 125.5,
+          "disco_gb": 37.2,
+          "calidad": "excellent"
+        }
       ]
     },
     {
@@ -3640,6 +6670,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 39.6,
+          "disco_gb": 37.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 55.2,
+          "disco_gb": 52.2,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 63.0,
+          "disco_gb": 59.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 78.6,
+          "disco_gb": 74.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 94.2,
+          "disco_gb": 89.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 125.5,
+          "disco_gb": 119.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 250.5,
+          "disco_gb": 238.6,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3700,6 +6781,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 128.6,
+          "disco_gb": 122.2,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 179.8,
+          "disco_gb": 171.1,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 205.4,
+          "disco_gb": 195.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 256.6,
+          "disco_gb": 244.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 307.8,
+          "disco_gb": 293.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 410.3,
+          "disco_gb": 391.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 820.1,
+          "disco_gb": 782.3,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3749,6 +6881,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 75.7,
+          "disco_gb": 71.8,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 105.8,
+          "disco_gb": 100.5,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 120.9,
+          "disco_gb": 114.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 151.0,
+          "disco_gb": 143.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 181.1,
+          "disco_gb": 172.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 241.2,
+          "disco_gb": 229.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 482.0,
+          "disco_gb": 459.6,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3795,6 +6978,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 75.7,
+          "disco_gb": 71.8,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 105.8,
+          "disco_gb": 100.5,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 120.9,
+          "disco_gb": 114.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 151.0,
+          "disco_gb": 143.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 181.1,
+          "disco_gb": 172.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 241.2,
+          "disco_gb": 229.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 482.0,
+          "disco_gb": 459.6,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3844,6 +7078,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 127.6,
+          "disco_gb": 121.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 178.4,
+          "disco_gb": 169.8,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 203.9,
+          "disco_gb": 194.1,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 254.7,
+          "disco_gb": 242.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 305.5,
+          "disco_gb": 291.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 407.2,
+          "disco_gb": 388.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 813.9,
+          "disco_gb": 776.4,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3891,6 +7176,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 154.2,
+          "disco_gb": 146.7,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 215.6,
+          "disco_gb": 205.4,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 246.4,
+          "disco_gb": 234.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 307.8,
+          "disco_gb": 293.4,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 369.3,
+          "disco_gb": 352.0,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 492.2,
+          "disco_gb": 469.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 984.0,
+          "disco_gb": 938.8,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3938,6 +7274,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 94.9,
+          "disco_gb": 90.1,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 132.7,
+          "disco_gb": 126.2,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 151.6,
+          "disco_gb": 144.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 189.4,
+          "disco_gb": 180.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 227.2,
+          "disco_gb": 216.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 302.7,
+          "disco_gb": 288.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 604.9,
+          "disco_gb": 577.0,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -3985,6 +7372,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 215.3,
+          "disco_gb": 205.1,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 301.2,
+          "disco_gb": 287.1,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 344.2,
+          "disco_gb": 328.1,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 430.1,
+          "disco_gb": 410.1,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 516.1,
+          "disco_gb": 492.1,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 687.9,
+          "disco_gb": 656.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 1375.3,
+          "disco_gb": 1312.3,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4031,6 +7469,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 219.8,
+          "disco_gb": 209.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 307.5,
+          "disco_gb": 293.1,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 351.4,
+          "disco_gb": 334.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 439.1,
+          "disco_gb": 418.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 526.8,
+          "disco_gb": 502.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 702.3,
+          "disco_gb": 669.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 1404.0,
+          "disco_gb": 1339.7,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4080,6 +7569,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 10.1,
+          "disco_gb": 9.2,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 13.9,
+          "disco_gb": 12.8,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 15.9,
+          "disco_gb": 14.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 19.7,
+          "disco_gb": 18.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 23.6,
+          "disco_gb": 22.0,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 31.2,
+          "disco_gb": 29.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 62.0,
+          "disco_gb": 58.7,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4129,6 +7669,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 9.4,
+          "disco_gb": 8.5,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 13.0,
+          "disco_gb": 11.9,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 14.7,
+          "disco_gb": 13.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 18.3,
+          "disco_gb": 17.0,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 21.9,
+          "disco_gb": 20.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 29.0,
+          "disco_gb": 27.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 57.5,
+          "disco_gb": 54.4,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4178,6 +7769,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 12.0,
+          "disco_gb": 11.0,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 16.6,
+          "disco_gb": 15.4,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 18.9,
+          "disco_gb": 17.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 23.6,
+          "disco_gb": 22.0,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 28.2,
+          "disco_gb": 26.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 37.4,
+          "disco_gb": 35.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 74.3,
+          "disco_gb": 70.4,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4230,6 +7872,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 34.4,
+          "disco_gb": 32.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 48.0,
+          "disco_gb": 45.3,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 54.8,
+          "disco_gb": 51.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 68.4,
+          "disco_gb": 64.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 81.9,
+          "disco_gb": 77.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 109.1,
+          "disco_gb": 103.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 217.7,
+          "disco_gb": 207.3,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4283,6 +7976,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 114.8,
+          "disco_gb": 109.1,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 160.5,
+          "disco_gb": 152.7,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 183.4,
+          "disco_gb": 174.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 229.1,
+          "disco_gb": 218.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 274.8,
+          "disco_gb": 261.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 366.2,
+          "disco_gb": 349.1,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 732.0,
+          "disco_gb": 698.2,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4331,6 +8075,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 238.7,
+          "disco_gb": 227.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 334.0,
+          "disco_gb": 318.3,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 381.6,
+          "disco_gb": 363.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 476.9,
+          "disco_gb": 454.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 572.1,
+          "disco_gb": 545.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 762.7,
+          "disco_gb": 727.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 1524.9,
+          "disco_gb": 1455.1,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4379,6 +8174,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 241.9,
+          "disco_gb": 230.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 338.4,
+          "disco_gb": 322.6,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 386.7,
+          "disco_gb": 368.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 483.3,
+          "disco_gb": 460.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 579.8,
+          "disco_gb": 553.0,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 772.9,
+          "disco_gb": 737.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 1545.4,
+          "disco_gb": 1474.7,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4431,6 +8277,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 241.6,
+          "disco_gb": 230.1,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 338.0,
+          "disco_gb": 322.2,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 386.2,
+          "disco_gb": 368.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 482.6,
+          "disco_gb": 460.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 579.1,
+          "disco_gb": 552.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 771.9,
+          "disco_gb": 736.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 1543.3,
+          "disco_gb": 1472.7,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4482,6 +8379,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 241.6,
+          "disco_gb": 230.1,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 338.0,
+          "disco_gb": 322.2,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 386.2,
+          "disco_gb": 368.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 482.6,
+          "disco_gb": 460.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 579.1,
+          "disco_gb": 552.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 771.9,
+          "disco_gb": 736.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 1543.3,
+          "disco_gb": 1472.7,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4534,6 +8482,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 102.9,
+          "disco_gb": 97.8,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 143.9,
+          "disco_gb": 136.9,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 164.4,
+          "disco_gb": 156.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 205.4,
+          "disco_gb": 195.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 246.4,
+          "disco_gb": 234.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 328.3,
+          "disco_gb": 312.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 656.2,
+          "disco_gb": 625.8,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4572,6 +8571,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 512.7,
+          "disco_gb": 488.9,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 717.6,
+          "disco_gb": 684.5,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 820.1,
+          "disco_gb": 782.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 1025.0,
+          "disco_gb": 977.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 1229.8,
+          "disco_gb": 1173.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 1639.6,
+          "disco_gb": 1564.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 3278.8,
+          "disco_gb": 3129.2,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4619,6 +8669,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 91.4,
+          "disco_gb": 86.8,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 127.8,
+          "disco_gb": 121.5,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 146.0,
+          "disco_gb": 138.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 182.3,
+          "disco_gb": 173.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 218.7,
+          "disco_gb": 208.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 291.4,
+          "disco_gb": 277.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 582.4,
+          "disco_gb": 555.4,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4663,6 +8764,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 512.7,
+          "disco_gb": 488.9,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 717.6,
+          "disco_gb": 684.5,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 820.1,
+          "disco_gb": 782.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 1025.0,
+          "disco_gb": 977.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 1229.8,
+          "disco_gb": 1173.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 1639.6,
+          "disco_gb": 1564.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 3278.8,
+          "disco_gb": 3129.2,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4709,6 +8861,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 244.8,
+          "disco_gb": 233.2,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 342.5,
+          "disco_gb": 326.4,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 391.3,
+          "disco_gb": 373.1,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 489.0,
+          "disco_gb": 466.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 586.7,
+          "disco_gb": 559.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 782.2,
+          "disco_gb": 746.1,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 1563.8,
+          "disco_gb": 1492.3,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4754,6 +8957,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 339.2,
+          "disco_gb": 323.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 474.7,
+          "disco_gb": 452.6,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 542.4,
+          "disco_gb": 517.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 677.9,
+          "disco_gb": 646.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 813.4,
+          "disco_gb": 776.0,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 1084.4,
+          "disco_gb": 1034.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 2168.2,
+          "disco_gb": 2069.2,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4800,6 +9054,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 890.5,
+          "disco_gb": 849.5,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 1246.5,
+          "disco_gb": 1189.4,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 1424.5,
+          "disco_gb": 1359.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 1780.5,
+          "disco_gb": 1699.1,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 2136.5,
+          "disco_gb": 2038.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 2848.5,
+          "disco_gb": 2718.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 5696.5,
+          "disco_gb": 5437.1,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4851,6 +9156,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 9.1,
+          "disco_gb": 8.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 12.6,
+          "disco_gb": 11.6,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 14.3,
+          "disco_gb": 13.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 17.8,
+          "disco_gb": 16.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 21.2,
+          "disco_gb": 19.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 28.2,
+          "disco_gb": 26.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 55.8,
+          "disco_gb": 52.8,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4899,6 +9255,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 58.1,
+          "disco_gb": 55.0,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 81.2,
+          "disco_gb": 77.0,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 92.7,
+          "disco_gb": 88.0,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 115.8,
+          "disco_gb": 110.0,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 138.8,
+          "disco_gb": 132.0,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 184.9,
+          "disco_gb": 176.0,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 369.3,
+          "disco_gb": 352.0,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4951,6 +9358,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 10.1,
+          "disco_gb": 9.2,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 13.9,
+          "disco_gb": 12.8,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 15.9,
+          "disco_gb": 14.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 19.7,
+          "disco_gb": 18.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 23.6,
+          "disco_gb": 22.0,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 31.2,
+          "disco_gb": 29.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 62.0,
+          "disco_gb": 58.7,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -4997,6 +9455,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 261.7,
+          "disco_gb": 249.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 366.2,
+          "disco_gb": 349.1,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 418.5,
+          "disco_gb": 399.0,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 523.0,
+          "disco_gb": 498.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 627.5,
+          "disco_gb": 598.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 836.5,
+          "disco_gb": 798.0,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 1672.4,
+          "disco_gb": 1595.9,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -5041,6 +9550,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 768.8,
+          "disco_gb": 733.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 1076.2,
+          "disco_gb": 1026.8,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 1229.8,
+          "disco_gb": 1173.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 1537.2,
+          "disco_gb": 1466.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 1844.5,
+          "disco_gb": 1760.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 2459.2,
+          "disco_gb": 2346.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 4917.9,
+          "disco_gb": 4693.9,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -5087,6 +9647,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 137.5,
+          "disco_gb": 130.8,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 192.3,
+          "disco_gb": 183.1,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 219.7,
+          "disco_gb": 209.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 274.5,
+          "disco_gb": 261.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 329.4,
+          "disco_gb": 313.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 439.0,
+          "disco_gb": 418.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 877.4,
+          "disco_gb": 837.1,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -5132,6 +9743,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 137.5,
+          "disco_gb": 130.8,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 192.3,
+          "disco_gb": 183.1,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 219.7,
+          "disco_gb": 209.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 274.5,
+          "disco_gb": 261.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 329.4,
+          "disco_gb": 313.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 439.0,
+          "disco_gb": 418.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 877.4,
+          "disco_gb": 837.1,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -5220,6 +9882,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 320.6,
+          "disco_gb": 305.6,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 448.7,
+          "disco_gb": 427.8,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 512.7,
+          "disco_gb": 488.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 640.8,
+          "disco_gb": 611.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 768.8,
+          "disco_gb": 733.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 1025.0,
+          "disco_gb": 977.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 2049.4,
+          "disco_gb": 1955.8,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -5270,6 +9983,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 99.4,
+          "disco_gb": 94.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 139.0,
+          "disco_gb": 132.2,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 158.8,
+          "disco_gb": 151.1,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 198.3,
+          "disco_gb": 188.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 237.9,
+          "disco_gb": 226.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 317.1,
+          "disco_gb": 302.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 633.6,
+          "disco_gb": 604.3,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -5319,6 +10083,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 4.3,
+          "disco_gb": 3.7,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 5.9,
+          "disco_gb": 5.1,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 6.6,
+          "disco_gb": 5.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 8.2,
+          "disco_gb": 7.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 9.7,
+          "disco_gb": 8.8,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 12.8,
+          "disco_gb": 11.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 25.1,
+          "disco_gb": 23.5,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -5391,6 +10206,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 38.6,
+          "disco_gb": 36.4,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 53.8,
+          "disco_gb": 50.9,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 61.5,
+          "disco_gb": 58.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 76.7,
+          "disco_gb": 72.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 91.9,
+          "disco_gb": 87.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 122.4,
+          "disco_gb": 116.4,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 244.3,
+          "disco_gb": 232.7,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -5450,6 +10316,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 1.5,
+          "disco_gb": 0.9,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 1.8,
+          "disco_gb": 1.3,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 2.0,
+          "disco_gb": 1.5,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 2.4,
+          "disco_gb": 1.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 2.8,
+          "disco_gb": 2.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 3.6,
+          "disco_gb": 2.9,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 6.6,
+          "disco_gb": 5.9,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -5509,6 +10426,57 @@
         "canirun_detail",
         "huggingface_card",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 5.0,
+          "disco_gb": 4.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 6.8,
+          "disco_gb": 6.0,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 7.7,
+          "disco_gb": 6.8,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 9.5,
+          "disco_gb": 8.6,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 11.3,
+          "disco_gb": 10.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 14.8,
+          "disco_gb": 13.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 29.2,
+          "disco_gb": 27.4,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -5560,6 +10528,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 1.9,
+          "disco_gb": 1.3,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 2.5,
+          "disco_gb": 1.9,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 2.8,
+          "disco_gb": 2.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 3.3,
+          "disco_gb": 2.7,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 3.9,
+          "disco_gb": 3.2,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 5.0,
+          "disco_gb": 4.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 9.5,
+          "disco_gb": 8.6,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -5611,6 +10630,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 3.3,
+          "disco_gb": 2.7,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 4.4,
+          "disco_gb": 3.8,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 5.0,
+          "disco_gb": 4.3,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 6.1,
+          "disco_gb": 5.4,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 7.3,
+          "disco_gb": 6.5,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 9.5,
+          "disco_gb": 8.6,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 18.5,
+          "disco_gb": 17.2,
+          "calidad": "lossless"
+        }
       ]
     },
     {
@@ -5658,6 +10728,57 @@
       "fuentes_enriquecimiento": [
         "canirun_detail",
         "huggingface_tree"
+      ],
+      "cuantizaciones": [
+        {
+          "nombre": "Q2_K",
+          "bits": 2,
+          "vram_gb": 10.4,
+          "disco_gb": 9.5,
+          "calidad": "low"
+        },
+        {
+          "nombre": "Q3_K_M",
+          "bits": 3,
+          "vram_gb": 14.4,
+          "disco_gb": 13.3,
+          "calidad": "moderate"
+        },
+        {
+          "nombre": "Q4_K_M",
+          "bits": 4,
+          "vram_gb": 16.4,
+          "disco_gb": 15.2,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q5_K_M",
+          "bits": 5,
+          "vram_gb": 20.3,
+          "disco_gb": 18.9,
+          "calidad": "good"
+        },
+        {
+          "nombre": "Q6_K",
+          "bits": 6,
+          "vram_gb": 24.3,
+          "disco_gb": 22.7,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "Q8_0",
+          "bits": 8,
+          "vram_gb": 32.3,
+          "disco_gb": 30.3,
+          "calidad": "excellent"
+        },
+        {
+          "nombre": "F16",
+          "bits": 16,
+          "vram_gb": 64.0,
+          "disco_gb": 60.6,
+          "calidad": "lossless"
+        }
       ]
     }
   ]

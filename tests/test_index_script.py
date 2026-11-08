@@ -89,7 +89,7 @@ class TestFetchAndIndex:
         assert sum(resumen.values()) == 107
         out = capsys.readouterr().out
         assert "fetch: gated=" in out and "ok=" in out
-        assert "index: snapshot=snap-f84e4af19dfbc6b8 familias=" in out
+        assert "index: snapshot=snap-3eb98b50f1e483e0 familias=" in out
 
         indexadas = IndiceEvidencia(qdrant, FakeEmbedder()).familias_indexadas()
         assert len(indexadas) == resumen["ok"]

@@ -170,6 +170,10 @@ class TestEnriquecer:
             "llama.cpp", "lmstudio", "mlx", "ollama", "transformers", "vllm"
         ]
         assert qwen.fuentes_enriquecimiento == [FUENTE_CANIRUN, FUENTE_HF_TREE]
+        assert [(c.nombre, c.vram_gb, c.calidad) for c in qwen.cuantizaciones] == [
+            ("Q4_K_M", 4.6, "good")
+        ]
+        assert llama.cuantizaciones[0].bits == 4
 
         assert llama.idiomas_detectados == ["en", "de", "fr"]  # "Code"/"multilingual" dropped
         assert llama.ollama_id == "llama3.1:8b" and llama.lmstudio_id is None

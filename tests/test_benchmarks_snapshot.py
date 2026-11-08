@@ -144,7 +144,7 @@ class TestMapeo:
             for f in json.loads(DEFAULT_BOOTSTRAP_PATH.read_text(encoding="utf-8"))["familias"]
         }
         assert set(mapeo.familias) == ids
-        assert mapeo.snapshot_id == "snap-f84e4af19dfbc6b8"
+        assert mapeo.snapshot_id == "snap-3eb98b50f1e483e0"
 
 
 class TestAplicarMapeo:

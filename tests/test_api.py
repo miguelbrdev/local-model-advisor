@@ -56,7 +56,7 @@ from src.sync.snapshot import CatalogSnapshot, SnapshotMeta, compute_content_has
 # Regression sentinels for the committed bootstrap (mirrors
 # tests/test_catalog_loader.py): if the file is ever re-promoted these
 # tests must fail loudly instead of silently shifting.
-BOOTSTRAP_SNAPSHOT_ID = "snap-f84e4af19dfbc6b8"
+BOOTSTRAP_SNAPSHOT_ID = "snap-3eb98b50f1e483e0"
 BOOTSTRAP_FAMILIA_COUNT = 107
 
 

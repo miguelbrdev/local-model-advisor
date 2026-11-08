@@ -10,8 +10,9 @@ ambiguous empty answer is itself a failure.
 The evaluation is a regression net for the deterministic part of the
 pipeline (filter + scorer).  It therefore requires a deterministic
 compatibility oracle — in practice
-:class:`src.compatibility.heuristica.HeuristicaParametrosProvider` — and
-**does not** exercise the real canirun.ai answers.  A suite is written
+:func:`src.compatibility.provider.proveedor_offline` (the synced
+quantisation table, then the parameter-count heuristic) — and **does
+not** call the live canirun.ai endpoint.  A suite is written
 against one catalogue ``snapshot_id`` and, since 1.3.0, one benchmark
 snapshot (``benchmarks_snapshot_id``, the committed Epoch-only bootstrap);
 running it against other data is allowed but flagged in the report,

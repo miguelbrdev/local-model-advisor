@@ -7,8 +7,9 @@ enriched keeps its fields empty and the snapshot records how many):
 
 * **canIRun detail** ``GET /api/models/{id}`` (contract observed
   2026-11-08): ``ollamaId`` and ``lmStudioId`` name the model in those
-  runtimes' libraries; the record also carries ``quants``, ``tools``,
-  ``thinking`` and ``activeParams``, which this step does not use yet.
+  runtimes' libraries, and ``quants`` gives the VRAM per quantisation that
+  the offline compatibility provider reads; ``tools``, ``thinking`` and
+  ``activeParams`` are parsed but not stored yet.
 * **Hugging Face model card** ``GET /api/models/{org}/{repo}`` (public,
   also for gated repositories): ``cardData.language`` is the only
   structured language declaration available anywhere for these models,
@@ -38,7 +39,7 @@ import httpx
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from src.chains.extraccion_criterios import normalizar_idiomas
-from src.models.schemas import FamiliaModelo
+from src.models.schemas import Cuantizacion, FamiliaModelo
 from src.sync.canirun_schemas import CanIRunModelDetail
 from src.sync.catalog_policy import CatalogPolicy
 
@@ -154,6 +155,7 @@ class _Enriquecedor:
         formatos: set[str] = set()
         idiomas: list[str] | None = None
         ollama_id = lmstudio_id = None
+        cuantizaciones: list[Cuantizacion] = []
 
         # --- canIRun detail -------------------------------------------------
         detalle, estados[FUENTE_CANIRUN] = self._detalle_canirun(familia.canirun_id)
@@ -163,6 +165,14 @@ class _Enriquecedor:
             for campo, runtime in self._policy.runtime_by_canirun_field.items():
                 if getattr(detalle, campo, None):
                     runtimes.add(runtime)
+            cuantizaciones = [
+                Cuantizacion(
+                    nombre=q.name, bits=q.bits, vram_gb=q.vramGB, disco_gb=q.diskGB,
+                    calidad=q.quality,
+                )
+                for q in detalle.quants
+                if q.name and q.vramGB is not None and q.vramGB > 0
+            ]
 
         # --- Hugging Face card ------------------------------------------------
         repo = repo_de_url(familia.license_url)
@@ -196,6 +206,7 @@ class _Enriquecedor:
                 "runtimes_disponibles": sorted(runtimes),
                 "ollama_id": ollama_id,
                 "lmstudio_id": lmstudio_id,
+                "cuantizaciones": cuantizaciones,
                 "fuentes_enriquecimiento": [f for f in FUENTES if estados.get(f) == "ok"],
             }
         )

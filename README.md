@@ -45,7 +45,7 @@ Implemented:
 - Catalog synchronization from canIRun.ai (`src/sync/`): versioned local
   policy, normalization, SHA-256 content hash, atomic snapshot writes to
   `runtime/catalog/` (gitignored), and a `current.json` pointer
-- Committed bootstrap `snap-f84e4af19dfbc6b8` (136 source models, 107
+- Committed bootstrap `snap-3eb98b50f1e483e0` (136 source models, 107
   included, 29 excluded as out of scope), promoted to the versioned
   `data/catalog_bootstrap.json` with its original `snapshot_id`
 - Catalogue enrichment during synchronisation (`src/sync/enrichment.py`):
@@ -60,10 +60,13 @@ Implemented:
 - Filtering by VRAM, language, runtime and commercial-license needs, with a
   single license normalizer shared by filter and scorer and a single runtime
   normalizer shared by the catalogue and the filter
-- Real VRAM compatibility lookup through canirun.ai, with the offline
-  parameter-count heuristic (`src/compatibility/heuristica.py`) as the
-  production fallback when the service is down or lacks a model; the same
-  heuristic drives the offline evaluation
+- VRAM compatibility from the canIRun.ai quantisation table synced into the
+  snapshot (`src/compatibility/cuantizaciones.py`: the `Q4_K_M` row decides,
+  the note names the best quantisation that still fits comfortably), so a
+  request needs no network call and two runs always agree; families without
+  a table fall back to the live canirun.ai endpoint and then to the offline
+  parameter-count heuristic (`src/compatibility/heuristica.py`), each verdict
+  labelled with its source
 - Deterministic multi-criteria ranking with seven explicit sub-scores (VRAM
   safety margin, capacity, measured capability, task specialisation, recency,
   context window, licence), following "the most capable model that still
@@ -91,7 +94,7 @@ Implemented:
   `scripts/evaluate_golden.py`): reviewed cases pin filter and ranking
   behaviour per catalog snapshot and report pass rate, hit rate and
   exclusion rate
-- 723 automated tests and Ruff linting
+- 743 automated tests and Ruff linting
 
 Not implemented yet:
 
@@ -102,8 +105,8 @@ Not implemented yet:
 - Benchmark coverage for every family: 55 of the 107 catalogue families have an
   Epoch AI score today; the rest score the neutral value and the response
   counts them
-- Per-quantisation VRAM from the canIRun.ai detail endpoint (`quants`) instead
-  of the parameter-count heuristic
+- VRAM at a user-chosen quantisation: the verdict is always taken at
+  `Q4_K_M` (the recommended quantisation only appears in the note)
 
 ## Architecture
 
@@ -418,9 +421,10 @@ cron (Linux/macOS), running on the 1st and 22nd of each month:
 catalog snapshot: the criteria a client would send, the families that must be
 in the top N, the families that must be filtered out, optionally the expected
 first result, and a minimum candidate count so an ambiguous empty answer is a
-failure. The suite runs offline with the parameter-count VRAM heuristic, so it
-pins the deterministic part of the pipeline (filter + scorer), not live
-canirun.ai answers.
+failure. The suite runs offline with the quantisation table of the snapshot
+(and the parameter-count heuristic for families without one), so it pins the
+deterministic part of the pipeline (filter + scorer), not live canirun.ai
+answers.
 
 ```bash
 python -m scripts.evaluate_golden                     # text report, exit 1 on any failure
@@ -465,7 +469,7 @@ Once the server is running, interactive OpenAPI documentation is available at
 - **Explainability**: every recommendation includes its weighted sub-scores.
 - **Evidence separation**: retrieved README content provides context, not ranking points.
 - **Safe state**: candidates and scores live on the server; the client only holds the conversation ID.
-- **Graceful degradation**: when canirun.ai is unreachable or has no entry for a model, VRAM compatibility is estimated locally from the parameter count, labelled `heuristica_propia` per candidate and counted in `limitaciones`; an outage stops further calls for the rest of that request.
+- **Graceful degradation**: VRAM verdicts come from the synced quantisation table (`canirun_snapshot`); for a family without one, the live canirun.ai endpoint is asked and, when it is unreachable or has no entry, the parameter count gives a local estimate labelled `heuristica_propia` per candidate and counted in `limitaciones`; an outage stops further live calls for the rest of that request.
 
 ## Project structure
 
@@ -486,7 +490,7 @@ Once the server is running, interactive OpenAPI documentation is available at
 │   ├── benchmarks/      # Approved benchmark sources, reviewed mapping, snapshot, provider
 │   ├── catalog/         # Catalog protocol + synchronized adapter with fallback chain
 │   ├── chains/          # Recommendation orchestration and criteria extraction (JSON / Ollama)
-│   ├── compatibility/   # Interchangeable VRAM providers (canirun.ai, offline heuristic)
+│   ├── compatibility/   # Interchangeable VRAM providers (snapshot quantisation table, canirun.ai, heuristic)
 │   ├── evaluation/      # Golden-query evaluation and metrics
 │   ├── evidence/        # Explanatory evidence: HF README fetch/store, chunking, Qdrant index
 │   ├── models/          # Pydantic contracts
