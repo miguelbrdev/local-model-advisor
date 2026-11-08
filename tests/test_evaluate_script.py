@@ -11,7 +11,7 @@ from scripts import evaluate_golden as script
 from src.sync.bootstrap import DEFAULT_BOOTSTRAP_PATH
 
 
-def _write_suite(path: Path, *, snapshot_id: str = "snap-176d40242fd0157a", cases: str) -> Path:
+def _write_suite(path: Path, *, snapshot_id: str = "snap-f84e4af19dfbc6b8", cases: str) -> Path:
     path.write_text(
         f"version: 'test'\nsnapshot_id: {snapshot_id}\ncasos:\n{cases}", encoding="utf-8"
     )
@@ -19,7 +19,7 @@ def _write_suite(path: Path, *, snapshot_id: str = "snap-176d40242fd0157a", case
 
 
 PASSING = (
-    "  - id: ok\n    criterios: {tarea: codigo, vram_gb: 8}\n"
+    "  - id: ok\n    criterios: {tarea: codigo, vram_gb: 8}\n    top_n: 5\n"
     "    debe_incluir: [qwen2.5-coder-7b]\n    debe_excluir: [qwen3-coder-480b]\n"
 )
 FAILING = (
@@ -93,7 +93,7 @@ class TestJsonOutput:
         informe = json.loads(capsys.readouterr().out)
         assert informe["total"] == 1
         assert informe["resultados"][0]["id"] == "ok"
-        assert informe["snapshot_id_catalogo"] == "snap-176d40242fd0157a"
+        assert informe["snapshot_id_catalogo"] == "snap-f84e4af19dfbc6b8"
 
 
 class TestCommittedSuiteViaScript:

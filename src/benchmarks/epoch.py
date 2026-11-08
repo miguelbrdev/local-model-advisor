@@ -37,6 +37,7 @@ from src.benchmarks.fuentes import (
     normalizar,
 )
 from src.models.schemas import EvidenciaBenchmark
+from src.tools.tls import contexto_tls
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +85,9 @@ class FuenteEpoch:
         self, *, timeout: float = 60.0, transport: httpx.BaseTransport | None = None
     ) -> DatosFuente:
         try:
-            with httpx.Client(transport=transport, timeout=timeout) as client:
+            with httpx.Client(
+                transport=transport, timeout=timeout, verify=contexto_tls()
+            ) as client:
                 response = client.get(self._url)
                 response.raise_for_status()
         except httpx.HTTPError as exc:

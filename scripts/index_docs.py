@@ -49,6 +49,7 @@ from src.evidence.embeddings import DEFAULT_EMBEDDING_MODEL, crear_embedder_olla
 from src.evidence.hf_readme import ReadmeDescargado, descargar_readme
 from src.evidence.qdrant_index import DEFAULT_COLECCION, DEFAULT_QDRANT_URL, IndiceEvidencia
 from src.sync.bootstrap import DEFAULT_BOOTSTRAP_PATH
+from src.tools.tls import contexto_tls
 
 logger = logging.getLogger("scripts.index_docs")
 
@@ -152,7 +153,9 @@ def _fetch(
 ) -> dict[str, int]:
     """Download missing (or all) READMEs into the store; returns counts by state."""
     resumen: Counter[str] = Counter()
-    cliente = http_client or httpx.Client(timeout=timeout, headers={"User-Agent": USER_AGENT})
+    cliente = http_client or httpx.Client(
+        timeout=timeout, headers={"User-Agent": USER_AGENT}, verify=contexto_tls()
+    )
     try:
         for familia in familias:
             if not refetch and almacen.cargar(familia.familia_id) is not None:

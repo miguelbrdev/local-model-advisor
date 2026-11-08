@@ -119,9 +119,11 @@ def limitaciones_para(
     Always the base list, plus one line for each criterion the user did
     state that the pipeline cannot honour yet — so the response says
     exactly which of the user's wishes were not applied instead of a
-    generic disclaimer.  The catalogue source exposes no language or
-    runtime data, so ``idiomas_requeridos`` cannot be enforced on synced
-    models and ``runtime_preferido`` is not used at all.  When some
+    generic disclaimer.  Languages and runtimes are enforced only on
+    families that declare them (Hugging Face card, canIRun runtime ids and
+    published formats), so when the request states ``idiomas_requeridos``
+    or ``runtime_preferido`` a line counts the candidates that could not be
+    checked and were shown anyway.  When some
     candidates carry a locally estimated VRAM verdict (canirun.ai down or
     without an entry), a line says how many, so measured and estimated
     results are never confused.  ``evidencia`` describes the explanatory
@@ -174,15 +176,21 @@ def limitaciones_para(
             "entry); see compatibilidad_vram.fuente per candidate."
         )
     if criterios.idiomas_requeridos:
-        limitaciones.append(
-            f"Languages {criterios.idiomas_requeridos} could not be verified: the catalogue "
-            "source exposes no language data, so every candidate is shown."
-        )
+        sin_idiomas = sum(1 for c in candidatos or [] if not c.familia.idiomas_detectados)
+        if sin_idiomas:
+            limitaciones.append(
+                f"Languages {criterios.idiomas_requeridos} could not be verified for "
+                f"{sin_idiomas} of {len(candidatos or [])} candidates: their Hugging Face "
+                "card declares no languages, so they are shown anyway."
+            )
     if criterios.runtime_preferido:
-        limitaciones.append(
-            f"runtime_preferido {criterios.runtime_preferido!r} was not applied: the catalogue "
-            "source exposes no runtime data."
-        )
+        sin_runtime = sum(1 for c in candidatos or [] if not c.familia.runtimes_disponibles)
+        if sin_runtime:
+            limitaciones.append(
+                f"runtime_preferido {criterios.runtime_preferido!r} could not be verified for "
+                f"{sin_runtime} of {len(candidatos or [])} candidates: no runtime data in the "
+                "sources, so they are shown anyway."
+            )
     return limitaciones
 
 

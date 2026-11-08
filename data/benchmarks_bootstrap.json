@@ -1,9 +1,9 @@
 {
   "meta": {
     "schema_version": "1.0",
-    "snapshot_id": "bench-6443d25354393222",
-    "fecha_sincronizacion": "2026-11-08T11:27:38.212605Z",
-    "hash_contenido": "6443d253543932225dcda67cfea5e9fe9869e0b36c9190f5977050d80b15246b",
+    "snapshot_id": "bench-9c4d458ea3be2425",
+    "fecha_sincronizacion": "2026-11-08T12:16:48.343532Z",
+    "hash_contenido": "9c4d458ea3be2425cac9ad1caa565e651530b39221cd26fa982be2998389b021",
     "fuentes": [
       {
         "nombre": "epoch_ai",
@@ -13,13 +13,13 @@
         "atribucion": "Benchmark scores and Capabilities Index: Epoch AI, \"Capabilities & benchmarking\", https://epoch.ai/benchmarks (CC BY 4.0).",
         "redistribuible": true,
         "registros": 587,
-        "descargado_en": "2026-11-08T11:27:36.494264Z"
+        "descargado_en": "2026-11-08T12:16:46.508486Z"
       }
     ],
-    "mapeo_version": "1.0.0",
-    "mapeo_snapshot_id": "snap-176d40242fd0157a",
-    "familias_mapeadas": 91,
-    "familias_con_datos": 45,
+    "mapeo_version": "1.1.0",
+    "mapeo_snapshot_id": "snap-f84e4af19dfbc6b8",
+    "familias_mapeadas": 107,
+    "familias_con_datos": 49,
     "sin_coincidencia": []
   },
   "puntuaciones": {
@@ -1020,6 +1020,94 @@
         "valor_normalizado": 0.7933,
         "modelo_fuente": "MiniMax-M3",
         "fecha_modelo": "2026-06-01",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "glm-5.3-flash": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.9015,
+        "valor_normalizado": 0.9049,
+        "modelo_fuente": "glm-5.3-flash_max",
+        "fecha_modelo": "2026-08-20",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 153.64,
+        "valor_normalizado": 0.894,
+        "modelo_fuente": "GLM-5.3-Flash",
+        "fecha_modelo": "2026-08-20",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "deepseek-v4.1-flash": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.9318,
+        "valor_normalizado": 0.947,
+        "modelo_fuente": "deepseek-v4.1-flash-1017_max",
+        "fecha_modelo": "2026-10-17",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 159.31,
+        "valor_normalizado": 0.9885,
+        "modelo_fuente": "DeepSeek V4.1 Flash 1017",
+        "fecha_modelo": "2026-10-17",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "muse-spark-open": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.8857,
+        "valor_normalizado": 0.883,
+        "modelo_fuente": "Muse-Spark-Open-816B-A42B_xhigh",
+        "fecha_modelo": "2026-10-15",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 155.42,
+        "valor_normalizado": 0.9237,
+        "modelo_fuente": "Muse Spark Open",
+        "fecha_modelo": "2026-10-15",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "mistral-large-4": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.9015,
+        "valor_normalizado": 0.9049,
+        "modelo_fuente": "mistral-large-4-0-oss_high",
+        "fecha_modelo": "2026-10-29",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 154.66,
+        "valor_normalizado": 0.911,
+        "modelo_fuente": "Mistral Large 4",
+        "fecha_modelo": "2026-10-29",
         "nota": "Epoch Capabilities Index, anchored on 100-160."
       }
     ]

@@ -43,6 +43,19 @@ class CatalogPolicy:
         self.informational_tags: list[str] = raw.get("informational_tags", [])
         self.out_of_scope_tags: list[str] = raw.get("out_of_scope_tags", [])
 
+        enrichment = raw.get("enrichment") or {}
+        self.enrichment_enabled: bool = bool(enrichment.get("enabled", False))
+        self.canirun_detail_endpoint: str | None = enrichment.get("canirun_detail_endpoint")
+        hf_api = (enrichment.get("huggingface_api") or "").rstrip("/")
+        self.huggingface_api: str | None = hf_api or None
+        self.runtime_by_canirun_field: dict[str, str] = dict(
+            enrichment.get("runtime_by_canirun_field") or {}
+        )
+        self.runtime_by_format: dict[str, list[str]] = {
+            str(k).lower(): list(v or [])
+            for k, v in (enrichment.get("runtime_by_format") or {}).items()
+        }
+
         rules = raw.get("validity_rules", {})
         self.require_non_empty_id: bool = rules.get("require_non_empty_id", True)
         self.require_unique_id: bool = rules.get("require_unique_id", True)

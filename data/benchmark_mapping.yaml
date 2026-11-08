@@ -29,10 +29,11 @@
 #   * Mirrors: lmstudio-community GGUF repos are the same weights as the
 #     upstream model, so the upstream row is used.
 #
-# Measured coverage against snap-176d40242fd0157a: 46 of 91 families get at
-# least one Epoch AI score; 8 get an Artificial Analysis index.
-version: "1.0.0"
-snapshot_id: "snap-176d40242fd0157a"
+# Measured coverage against snap-176d40242fd0157a (91 families): 46 get at
+# least one Epoch AI score; 8 get an Artificial Analysis index. 1.1.0 adds the
+# 16 families of snap-f84e4af19dfbc6b8 (136 source models, 107 included).
+version: "1.1.0"
+snapshot_id: "snap-f84e4af19dfbc6b8"
 familias:
   # --- up to 2B ---------------------------------------------------------------
   qwen3.5-0.8b:
@@ -276,3 +277,54 @@ familias:
     nota: AA lists "Qwen3 VL 8B Instruct" with a null index; Epoch has no row.
   qwen3-vl-30b-a3b:
     nota: No row in either source.
+
+  # --- added with snap-f84e4af19dfbc6b8 (2026-11-08) ---------------------------
+  lfm3-1.7b:
+    nota: No row in either source.
+  nemotron-3.5-bolt-e4b:
+    nota: No row in either source.
+  ornith-1.5-9b:
+    nota: No row in either source.
+  lfm2.5-24b-a2b:
+    nota: No row in either source.
+  mellum-2.1-12b-a2.5b:
+    nota: No row in either source.
+  nemotron-3.5-lightning-30b-a3b:
+    artificial_analysis_slug: nemotron-3-5-lightning
+    nota: Epoch has no row.
+  nemotron-3.5-bolt-74b-a9b:
+    nota: No row in either source.
+  ornith-1.5-35b-a3b:
+    nota: No row in either source.
+  ornith-1.5-122b:
+    nota: No row in either source.
+  glm-5.3-flash:
+    epoch_model_version: glm-5.3-flash_max
+    epoch_eci_model: GLM-5.3-Flash
+    artificial_analysis_slug: glm-5-3-flash
+  deepseek-v4.1-flash:
+    epoch_model_version: deepseek-v4.1-flash-1017_max
+    epoch_eci_model: DeepSeek V4.1 Flash 1017
+    artificial_analysis_slug: deepseek-v4-1-flash-1017
+    nota: Catalogue entry is the 1017 revision; the September rows are not used. AA "(Max)".
+  qwen3.8-flash-next:
+    nota: No row in either source.
+  muse-spark-open:
+    epoch_model_version: Muse-Spark-Open-816B-A42B_xhigh
+    epoch_eci_model: Muse Spark Open
+    artificial_analysis_slug: muse-spark-open
+    nota: The open-weights release; "muse-spark"/"Muse Spark 1.x" are the API models.
+  minimax-m3.1-flash:
+    artificial_analysis_slug: minimax-m3-1-flash
+    nota: Epoch has no row.
+  mistral-large-4:
+    epoch_model_version: mistral-large-4-0-oss_high
+    epoch_eci_model: Mistral Large 4
+    artificial_analysis_slug: mistral-large-4
+    nota: >
+      Catalogue entry is the open-weights 1T-A52B release; Epoch names it
+      "mistral-large-4-0-oss" (the "-0" rows without "oss" and "Preview" are the
+      API model). AA "(High)".
+  mimo-v2.6-flash:
+    artificial_analysis_slug: mimo-v2-6-flash
+    nota: Catalogue repo is the RL checkpoint of the same model; Epoch has no row.

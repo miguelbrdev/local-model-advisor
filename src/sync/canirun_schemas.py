@@ -8,7 +8,7 @@ detected as early as possible.
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class CanIRunModelRecord(BaseModel):
@@ -30,6 +30,43 @@ class CanIRunModelRecord(BaseModel):
     useCase: list[str] = Field(default_factory=list)  # noqa: N815
     url: str = ""
     license: str = ""
+
+
+class CanIRunQuant(BaseModel):
+    """One row of ``quants`` in the detail record (not used by the pipeline yet)."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    name: str
+    bits: int | None = None
+    vramGB: float | None = None  # noqa: N815
+    diskGB: float | None = None  # noqa: N815
+    quality: str | None = None
+
+
+class CanIRunModelDetail(CanIRunModelRecord):
+    """``GET /api/models/{id}`` as observed on 2026-11-08.
+
+    Extends the list record with runtime library ids, capability flags
+    and a per-quantisation memory table.  Every extra field is optional
+    and unknown fields are ignored, so the list contract stays strict
+    while the detail one tolerates growth.
+    """
+
+    model_config = ConfigDict(extra="ignore")
+
+    activeParams: float | str | None = None  # noqa: N815 — "3B active" in some records
+    description: str = ""
+    tools: bool | None = None
+    thinking: bool | None = None
+    minRamGB: float | None = None  # noqa: N815
+    recommendedRamGB: float | None = None  # noqa: N815
+    ollamaId: str | None = None  # noqa: N815
+    lmStudioId: str | None = None  # noqa: N815
+    lineage: str | None = None
+    supersededBy: str | None = None  # noqa: N815
+    intelligenceIndex: float | None = None  # noqa: N815
+    quants: list[CanIRunQuant] = Field(default_factory=list)
 
 
 class CanIRunModelsResponse(BaseModel):

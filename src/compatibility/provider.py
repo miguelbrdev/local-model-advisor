@@ -21,6 +21,7 @@ import httpx
 from src.compatibility.cache import CACHE_CANIRUN, CacheCompatibilidad
 from src.compatibility.heuristica import HeuristicaParametrosProvider
 from src.models.schemas import CompatibilityResult, FamiliaModelo
+from src.tools.tls import contexto_tls
 
 
 @runtime_checkable
@@ -115,6 +116,7 @@ class CanIRunProvider:
                 },
                 timeout=CANIRUN_TIMEOUT,
                 follow_redirects=True,
+                verify=contexto_tls(),
             )
             response.raise_for_status()
             data = response.json()

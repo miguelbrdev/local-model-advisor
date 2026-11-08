@@ -1,8 +1,8 @@
 """Deterministic structured filter for model candidates.
 
-Filters the catalogue by task, license, language and VRAM compatibility —
-no semantic search, no LLM calls.  Same input always produces the same
-output.
+Filters the catalogue by task, license, language, runtime and VRAM
+compatibility — no semantic search, no LLM calls.  Same input always
+produces the same output.
 
 The task filter reads ``FamiliaModelo.tareas_soportadas``, the full list
 of internal tasks a model qualifies for, never ``pipeline_tag`` (which is
@@ -28,6 +28,7 @@ from src.models.schemas import (
     FamiliaModelo,
 )
 from src.tools.licencias import es_licencia_permisiva
+from src.tools.runtimes import normalizar_runtime
 
 MAX_WORKERS_VRAM = 8
 """Concurrent compatibility checks per request.  Bounded so an outage costs
@@ -39,17 +40,18 @@ def filtrar_candidatos(
     criterios: CriteriosBusqueda,
     vram_provider: VRAMCompatibilityProvider,
 ) -> list[CandidatoRankeado]:
-    """Filter families by task, license, language and VRAM compatibility.
+    """Filter families by task, license, language, runtime and VRAM compatibility.
 
-    The static criteria (task, license, language) are evaluated first so
+    The static criteria (task, license, language, runtime) are evaluated first so
     the VRAM provider — the only step that may perform I/O — is consulted
     only for families that could actually be recommended, and those
     checks run in parallel (see :data:`MAX_WORKERS_VRAM`).
 
     Args:
         familias: Catalogue families to evaluate, in catalogue order.
-        criterios: User criteria.  ``runtime_preferido`` is forwarded to
-            the provider but no provider reads it today.
+        criterios: User criteria.  ``runtime_preferido`` filters families
+            that declare runtimes and is also forwarded to the provider
+            (no provider reads it today).
         vram_provider: Compatibility checker; must never raise and must be
             safe to call from several threads.
 
@@ -95,7 +97,7 @@ def soporta_tarea(familia: FamiliaModelo, tarea: str) -> bool:
 
 
 def _cumple_criterios_estaticos(familia: FamiliaModelo, criterios: CriteriosBusqueda) -> bool:
-    """Apply the I/O-free criteria: task, commercial license, languages."""
+    """Apply the I/O-free criteria: task, commercial license, languages, runtime."""
     if criterios.tarea and not soporta_tarea(familia, criterios.tarea):
         return False
 
@@ -104,17 +106,31 @@ def _cumple_criterios_estaticos(familia: FamiliaModelo, criterios: CriteriosBusq
     ):
         return False
 
-    return _cumple_idiomas(familia, criterios)
+    return _cumple_idiomas(familia, criterios) and _cumple_runtime(familia, criterios)
 
 
 def _cumple_idiomas(familia: FamiliaModelo, criterios: CriteriosBusqueda) -> bool:
     """Every required language must be among the family's declared ones.
 
-    Only enforced when the family declares languages.  The synced source
-    exposes none (``idiomas_detectados`` is ``None`` for every synced
-    family), so the check passes there by design: unknown languages are a
-    limitation to report, not a reason to exclude.
+    Only enforced when the family declares languages (the Hugging Face
+    card of 30 of the 91 bootstrap families does).  A family without a
+    declaration passes by design: unknown languages are a limitation to
+    report, not a reason to exclude.
     """
     if not criterios.idiomas_requeridos or not familia.idiomas_detectados:
         return True
     return set(criterios.idiomas_requeridos) <= set(familia.idiomas_detectados)
+
+
+def _cumple_runtime(familia: FamiliaModelo, criterios: CriteriosBusqueda) -> bool:
+    """The preferred runtime must be among the family's known runtimes.
+
+    Same policy as languages: only enforced when the family declares
+    runtimes (``runtimes_disponibles`` from the enrichment step); an
+    unknown runtime set never excludes.  The user's value is normalised
+    with the same aliases the catalogue uses.
+    """
+    runtime = normalizar_runtime(criterios.runtime_preferido)
+    if runtime is None or not familia.runtimes_disponibles:
+        return True
+    return runtime in familia.runtimes_disponibles

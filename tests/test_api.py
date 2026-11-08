@@ -56,8 +56,8 @@ from src.sync.snapshot import CatalogSnapshot, SnapshotMeta, compute_content_has
 # Regression sentinels for the committed bootstrap (mirrors
 # tests/test_catalog_loader.py): if the file is ever re-promoted these
 # tests must fail loudly instead of silently shifting.
-BOOTSTRAP_SNAPSHOT_ID = "snap-176d40242fd0157a"
-BOOTSTRAP_FAMILIA_COUNT = 91
+BOOTSTRAP_SNAPSHOT_ID = "snap-f84e4af19dfbc6b8"
+BOOTSTRAP_FAMILIA_COUNT = 107
 
 
 # ---------------------------------------------------------------------------
@@ -369,7 +369,7 @@ class TestFamilies:
     ) -> None:
         """Content must come from the lifespan-mounted catalogue (the
         pinned one-family bootstrap), not from ``load_seed`` nor from
-        the committed 91-family bootstrap.
+        the committed 107-family bootstrap.
         """
         data = client.get("/families").json()
         assert [fam["familia_id"] for fam in data] == ["test-model"]
@@ -495,9 +495,14 @@ class TestChatNuevaConversacion:
     def test_limitations_name_the_unapplied_criteria(
         self, mock_pipeline: MagicMock, client: TestClient
     ) -> None:
-        """Languages and runtime the user asked for are reported as not
-        applied, with their values, instead of a generic disclaimer."""
-        mock_pipeline.return_value = _mock_pipeline_result()
+        """Languages and runtime the user asked for are reported, with their
+        values, when a candidate declares neither (so the filter could not
+        check it) instead of a generic disclaimer."""
+        candidato = _mock_pipeline_result()[0]
+        candidato.familia = candidato.familia.model_copy(
+            update={"idiomas_detectados": None, "runtimes_disponibles": []}
+        )
+        mock_pipeline.return_value = [candidato]
         payload = {
             "mensaje": json.dumps(
                 {"tarea": "codigo", "vram_gb": 11.0, "idiomas_requeridos": ["es", "en"],
@@ -509,8 +514,26 @@ class TestChatNuevaConversacion:
         extra = _extras(limitaciones)
         assert extra[0] == EVIDENCIA_OFF
         assert len(extra) == 3
-        assert "['es', 'en']" in extra[1]
-        assert "'ollama'" in extra[2]
+        assert "['es', 'en']" in extra[1] and "1 of 1 candidates" in extra[1]
+        assert "'ollama'" in extra[2] and "1 of 1 candidates" in extra[2]
+
+    @patch("src.api.main.ejecutar_pipeline")
+    def test_no_limitation_when_candidates_declare_languages_and_runtimes(
+        self, mock_pipeline: MagicMock, client: TestClient
+    ) -> None:
+        candidato = _mock_pipeline_result()[0]
+        candidato.familia = candidato.familia.model_copy(
+            update={"idiomas_detectados": ["es", "en"], "runtimes_disponibles": ["ollama"]}
+        )
+        mock_pipeline.return_value = [candidato]
+        payload = {
+            "mensaje": json.dumps(
+                {"tarea": "codigo", "vram_gb": 11.0, "idiomas_requeridos": ["es", "en"],
+                 "runtime_preferido": "ollama"}
+            )
+        }
+        extra = _extras(client.post("/chat", json=payload).json()["limitaciones"])
+        assert extra == [EVIDENCIA_OFF]
 
     @patch("src.api.main.ejecutar_pipeline")
     def test_reports_age_of_the_mounted_snapshot(

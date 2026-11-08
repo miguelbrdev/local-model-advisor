@@ -17,7 +17,7 @@ from src.sync.catalog_sync import SyncResult, sync_catalog
 from src.sync.snapshot import load_active_snapshot, read_manifest, read_snapshot
 
 _FIXTURES = Path(__file__).resolve().parent / "fixtures"
-_DEFAULT_ENDPOINT = "https://www.canirun.ai/api/models"
+_DEFAULT_ENDPOINT = "https://canirun.ai/api/models"
 
 
 def _fixture_payload() -> dict[str, Any]:
@@ -107,7 +107,7 @@ class TestSyncSuccess:
         assert qwen.tareas_soportadas == ["codigo"]
         assert qwen.license_declarada == "Apache 2.0"
         assert snap.meta.source_url == _DEFAULT_ENDPOINT
-        assert snap.meta.politica_version == "1.0.0"
+        assert snap.meta.politica_version == "1.1.0"
         assert snap.meta.modelos_origen == 6
         assert snap.meta.modelos_incluidos == 4
 
@@ -149,6 +149,7 @@ class TestSyncSuccess:
             tmp_path,
             endpoint="https://example.test/api/models",
             transport=transport,
+            enriquecer=False,
         )
         assert result.ok
         assert seen == ["https://example.test/api/models"]

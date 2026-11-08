@@ -45,15 +45,21 @@ Implemented:
 - Catalog synchronization from canIRun.ai (`src/sync/`): versioned local
   policy, normalization, SHA-256 content hash, atomic snapshot writes to
   `runtime/catalog/` (gitignored), and a `current.json` pointer
-- First real validated snapshot (`snap-176d40242fd0157a`: 104 source models,
-  91 included, 13 excluded — all out of scope), promoted to the versioned
-  bootstrap `data/catalog_bootstrap.json` with its original `snapshot_id`
+- Committed bootstrap `snap-f84e4af19dfbc6b8` (136 source models, 107
+  included, 29 excluded as out of scope), promoted to the versioned
+  `data/catalog_bootstrap.json` with its original `snapshot_id`
+- Catalogue enrichment during synchronisation (`src/sync/enrichment.py`):
+  languages from the Hugging Face model card (`cardData.language`, 40 of 107
+  families declare them) and runtimes from the canIRun.ai detail endpoint
+  (`ollamaId`, `lmStudioId`) plus the formats published on Hugging Face
+  (GGUF, MLX, AWQ, …; 107 of 107 families). `idiomas_requeridos` and
+  `runtime_preferido` filter the families that declare the data and the
+  response counts the ones that could not be checked
 - All three v1 tasks (`chat`, `codigo`, `razonamiento`), filtered on the
   full `tareas_soportadas` list of each model
-- Filtering by VRAM, language and commercial-license needs, with a single
-  license normalizer shared by filter and scorer. The catalog source has no
-  language or runtime data, so when a request states `idiomas_requeridos` or
-  `runtime_preferido` the response says explicitly that they were not applied
+- Filtering by VRAM, language, runtime and commercial-license needs, with a
+  single license normalizer shared by filter and scorer and a single runtime
+  normalizer shared by the catalogue and the filter
 - Real VRAM compatibility lookup through canirun.ai, with the offline
   parameter-count heuristic (`src/compatibility/heuristica.py`) as the
   production fallback when the service is down or lacks a model; the same
@@ -85,17 +91,19 @@ Implemented:
   `scripts/evaluate_golden.py`): reviewed cases pin filter and ranking
   behaviour per catalog snapshot and report pass rate, hit rate and
   exclusion rate
-- 695 automated tests and Ruff linting
+- 723 automated tests and Ruff linting
 
 Not implemented yet:
 
-- Language data for synced models: the canIRun.ai source exposes no
-  language field, so language requirements are not enforced on them
-- Runtime preference filtering
+- Language data for every family: only the 40 families whose Hugging Face
+  card declares languages are filtered by `idiomas_requeridos`; the rest are
+  shown and counted in `limitaciones` (languages are never inferred from text)
 - Hybrid (sparse + dense) retrieval and reranking of evidence
-- Benchmark coverage for every family: 46 of the 91 catalogue families have an
+- Benchmark coverage for every family: 55 of the 107 catalogue families have an
   Epoch AI score today; the rest score the neutral value and the response
   counts them
+- Per-quantisation VRAM from the canIRun.ai detail endpoint (`quants`) instead
+  of the parameter-count heuristic
 
 ## Architecture
 
@@ -215,6 +223,7 @@ ollama pull gemma4:e4b
 | `LMA_API_KEY` | unset | When set, `/chat` and `/families` require the same value in `X-API-Key` |
 | `LMA_RATE_LIMIT_POR_MINUTO` | `60` | `/chat` requests per client address per minute; `0` disables |
 | `ARTIFICIAL_ANALYSIS_API_KEY` | unset | Read only by `scripts/sync_benchmarks.py`; adds the Artificial Analysis Intelligence Index to the local benchmark snapshot |
+| `LMA_TLS_CERTIFI` | unset | Outbound HTTPS verifies against the operating-system trust store; set to `1` to use the `certifi` bundle instead (which rejects canirun.ai's chain since late 2026) |
 
 If Ollama is unreachable or returns invalid output, a free-text message gets
 `503` with a hint to send JSON; JSON input keeps working. The first message
@@ -369,7 +378,11 @@ response returned by the provider; the figures above are illustrative.
 
 The API never downloads the catalog during a request. A separate process
 refreshes `runtime/catalog/` and the API picks the new snapshot up on its
-next start:
+next start. One run fetches the canIRun.ai list, normalises it, then enriches
+every included family from the approved metadata sources (canIRun.ai detail
+record, Hugging Face card and quantised-derivative tree: about three requests
+per family) and writes the snapshot atomically; a family whose lookups fail
+keeps empty fields and the snapshot header counts the outcomes per source:
 
 ```bash
 python -m scripts.sync_catalog            # fetch, validate, persist atomically, prune

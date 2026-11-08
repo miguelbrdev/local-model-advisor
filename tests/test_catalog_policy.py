@@ -20,7 +20,7 @@ def policy() -> CatalogPolicy:
 
 class TestCatalogPolicy:
     def test_loads_default_policy(self, policy: CatalogPolicy) -> None:
-        assert policy.version == "1.0.0"
+        assert policy.version == "1.1.0"
 
     def test_supported_tasks(self, policy: CatalogPolicy) -> None:
         tasks = policy.supported_tasks()

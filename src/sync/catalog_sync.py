@@ -9,10 +9,12 @@ Atomicity contract
 ------------------
 1. The external response is fully validated and normalised in memory.
 2. An empty result (zero included models) aborts before any disk write.
-3. The snapshot file is written via temp + round-trip validation +
+3. Included families are enriched with languages and runtimes from the
+   approved sources (per-family failures tolerated and counted).
+4. The snapshot file is written via temp + round-trip validation +
    ``os.replace``.
-4. ``current.json`` is rotated only after the snapshot file is durable.
-5. Any failure leaves the previous snapshot and manifest untouched.
+5. ``current.json`` is rotated only after the snapshot file is durable.
+6. Any failure leaves the previous snapshot and manifest untouched.
 """
 
 from __future__ import annotations
@@ -27,6 +29,7 @@ from pydantic import ValidationError
 
 from src.sync.canirun_schemas import CanIRunModelsResponse
 from src.sync.catalog_policy import CatalogPolicy
+from src.sync.enrichment import enriquecer_familias
 from src.sync.normalizer import NormalizationResult, normalise_response
 from src.sync.snapshot import (
     CatalogSnapshot,
@@ -37,6 +40,7 @@ from src.sync.snapshot import (
     update_manifest,
     write_snapshot,
 )
+from src.tools.tls import contexto_tls
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +75,7 @@ def sync_catalog(
     endpoint: str | None = None,
     timeout: float = 30.0,
     transport: httpx.BaseTransport | None = None,
+    enriquecer: bool | None = None,
 ) -> SyncResult:
     """Run one full synchronisation cycle.
 
@@ -81,6 +86,11 @@ def sync_catalog(
         timeout: HTTP timeout in seconds.
         transport: Injected HTTP transport.  Tests pass
             ``httpx.MockTransport`` so no real connection is opened.
+        enriquecer: Run the language/runtime enrichment step
+            (:mod:`src.sync.enrichment`) on the included families.
+            ``None`` follows ``policy.enrichment_enabled``.  Per-family
+            failures never exclude a model and never abort the sync; the
+            snapshot header records the outcome counts.
 
     Returns:
         :class:`SyncResult` describing success, idempotent no-op, or failure.
@@ -103,7 +113,9 @@ def sync_catalog(
 
     # --- 1. fetch (memory only) ---
     try:
-        with httpx.Client(transport=transport, timeout=timeout) as client:
+        with httpx.Client(
+            transport=transport, timeout=timeout, verify=contexto_tls(), follow_redirects=True
+        ) as client:
             response = client.get(url)
             response.raise_for_status()
     except httpx.HTTPError as exc:
@@ -133,6 +145,19 @@ def sync_catalog(
             skipped_empty=True,
         )
 
+    # --- 3b. enrichment (languages + runtimes), tolerant per family ---
+    enriquecimiento: dict[str, dict[str, int]] = {}
+    hacer = active_policy.enrichment_enabled if enriquecer is None else enriquecer
+    if hacer:
+        with httpx.Client(
+            transport=transport, timeout=timeout, follow_redirects=True, verify=contexto_tls()
+        ) as client:
+            familias, informe = enriquecer_familias(
+                normalisation.families, active_policy, client=client
+            )
+        normalisation.families = familias
+        enriquecimiento = informe.contadores
+
     # --- 4. deterministic identity + snapshot model ---
     hash_contenido = compute_content_hash(normalisation.families, active_policy.version)
     snapshot_id = f"snap-{hash_contenido[:16]}"
@@ -146,6 +171,7 @@ def sync_catalog(
         modelos_incluidos=normalisation.included_count,
         motivos_exclusion=normalisation.exclusions,
         politica_version=active_policy.version,
+        enriquecimiento=enriquecimiento,
     )
     snapshot = CatalogSnapshot(meta=meta, familias=normalisation.families)
 

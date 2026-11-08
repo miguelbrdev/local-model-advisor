@@ -34,8 +34,8 @@ from src.sync.snapshot import (
 
 # Regression sentinels for the committed bootstrap: if this file is ever
 # re-promoted, these tests must fail loudly instead of silently shifting.
-BOOTSTRAP_SNAPSHOT_ID = "snap-176d40242fd0157a"
-BOOTSTRAP_FAMILIA_COUNT = 91
+BOOTSTRAP_SNAPSHOT_ID = "snap-f84e4af19dfbc6b8"
+BOOTSTRAP_FAMILIA_COUNT = 107
 
 
 # ---------------------------------------------------------------------------

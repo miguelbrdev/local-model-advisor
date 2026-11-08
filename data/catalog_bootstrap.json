@@ -1,12 +1,12 @@
 {
   "meta": {
     "schema_version": "1.0",
-    "snapshot_id": "snap-176d40242fd0157a",
-    "fecha_sincronizacion": "2026-09-22T12:36:18.582118Z",
-    "source_url": "https://www.canirun.ai/api/models",
-    "hash_contenido": "176d40242fd0157a3832086a626e30c7a90db32dc884f507bcb21303432febf4",
-    "modelos_origen": 104,
-    "modelos_incluidos": 91,
+    "snapshot_id": "snap-f84e4af19dfbc6b8",
+    "fecha_sincronizacion": "2026-11-08T12:16:17.462895Z",
+    "source_url": "https://canirun.ai/api/models",
+    "hash_contenido": "f84e4af19dfbc6b8bfc3c8edeb89e4e94774a61f2ca3b0cc654d39ef35103592",
+    "modelos_origen": 136,
+    "modelos_incluidos": 107,
     "motivos_exclusion": [
       {
         "record_id": "minimax-h3",
@@ -59,9 +59,90 @@
       {
         "record_id": "hunyuan-image-3-instruct",
         "reason": "out_of_scope"
+      },
+      {
+        "record_id": "qwen-image-2.1",
+        "reason": "out_of_scope"
+      },
+      {
+        "record_id": "krea-2-turbo",
+        "reason": "out_of_scope"
+      },
+      {
+        "record_id": "ideogram-4",
+        "reason": "out_of_scope"
+      },
+      {
+        "record_id": "ernie-image-turbo",
+        "reason": "out_of_scope"
+      },
+      {
+        "record_id": "longcat-image",
+        "reason": "out_of_scope"
+      },
+      {
+        "record_id": "glm-image",
+        "reason": "out_of_scope"
+      },
+      {
+        "record_id": "clef",
+        "reason": "out_of_scope"
+      },
+      {
+        "record_id": "clef-flash",
+        "reason": "out_of_scope"
+      },
+      {
+        "record_id": "clef-omni",
+        "reason": "out_of_scope"
+      },
+      {
+        "record_id": "pplx-decider-v1.2",
+        "reason": "out_of_scope"
+      },
+      {
+        "record_id": "pplx-decider-flash-v1.2",
+        "reason": "out_of_scope"
+      },
+      {
+        "record_id": "d1-2b",
+        "reason": "out_of_scope"
+      },
+      {
+        "record_id": "d1-omni-2b",
+        "reason": "out_of_scope"
+      },
+      {
+        "record_id": "jev-35b",
+        "reason": "out_of_scope"
+      },
+      {
+        "record_id": "jev-27b-vl",
+        "reason": "out_of_scope"
+      },
+      {
+        "record_id": "laya",
+        "reason": "no_supported_task"
       }
     ],
-    "politica_version": "1.0.0"
+    "politica_version": "1.1.0",
+    "enriquecimiento": {
+      "canirun_detail": {
+        "ok": 107,
+        "sin_datos": 0,
+        "error": 0
+      },
+      "huggingface_card": {
+        "ok": 40,
+        "sin_datos": 67,
+        "error": 0
+      },
+      "huggingface_tree": {
+        "ok": 105,
+        "sin_datos": 2,
+        "error": 0
+      }
+    }
   },
   "familias": [
     {
@@ -71,7 +152,18 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/lmstudio-community/Qwen3.5-0.8B-GGUF",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3.5-0.8b",
       "tareas_soportadas": [
         "chat"
@@ -86,7 +178,24 @@
       "parametros_texto": "0.8B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-02",
-      "contexto_maximo": 32768
+      "contexto_maximo": 32768,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3.5:0.8b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3-0.6b",
@@ -95,7 +204,19 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/lmstudio-community/Qwen3-0.6B-GGUF",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3-0.6b",
       "tareas_soportadas": [
         "chat"
@@ -110,7 +231,23 @@
       "parametros_texto": "0.6B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-04",
-      "contexto_maximo": 32768
+      "contexto_maximo": 32768,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "llama3.2-1b",
@@ -118,8 +255,27 @@
       "pipeline_tag": "chat",
       "license_declarada": "Llama 3.2 Community",
       "license_url": "https://huggingface.co/meta-llama/Llama-3.2-1B",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "de",
+        "fr",
+        "it",
+        "pt",
+        "hi",
+        "es",
+        "th"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl2",
+        "fp8",
+        "gguf",
+        "gptq",
+        "onnx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "llama3.2-1b",
       "tareas_soportadas": [
         "chat"
@@ -134,7 +290,23 @@
       "parametros_texto": "1B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2024-09",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "ollama",
+        "onnxruntime",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "llama3.2:1b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "gemma3-1b",
@@ -143,7 +315,15 @@
       "license_declarada": "Gemma",
       "license_url": "https://huggingface.co/google/gemma-3-1b-it",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "gguf",
+        "mlx",
+        "onnx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "gemma3-1b",
       "tareas_soportadas": [
         "chat"
@@ -158,7 +338,22 @@
       "parametros_texto": "1B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-03",
-      "contexto_maximo": 32768
+      "contexto_maximo": 32768,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "gemma3:1b",
+      "lmstudio_id": "gemma-3",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen2.5-coder-1.5b",
@@ -166,8 +361,21 @@
       "pipeline_tag": "codigo",
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen2.5-coder-1.5b",
       "tareas_soportadas": [
         "codigo"
@@ -180,7 +388,24 @@
       "parametros_texto": "1.5B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2024-11",
-      "contexto_maximo": 32768
+      "contexto_maximo": 32768,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen2.5-coder:1.5b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "deepseek-r1-1.5b",
@@ -189,7 +414,20 @@
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl2",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "deepseek-r1-1.5b",
       "tareas_soportadas": [
         "razonamiento"
@@ -202,7 +440,24 @@
       "parametros_texto": "1.5B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-01",
-      "contexto_maximo": 65536
+      "contexto_maximo": 65536,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "deepseek-r1:1.5b",
+      "lmstudio_id": "deepseek-r1",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3-1.7b",
@@ -211,7 +466,19 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3-1.7B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3-1.7b",
       "tareas_soportadas": [
         "chat"
@@ -226,7 +493,24 @@
       "parametros_texto": "1.7B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-04",
-      "contexto_maximo": 32768
+      "contexto_maximo": 32768,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3:1.7b",
+      "lmstudio_id": "qwen3-2504",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3.5-2b",
@@ -235,7 +519,18 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/lmstudio-community/Qwen3.5-2B-GGUF",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3.5-2b",
       "tareas_soportadas": [
         "chat"
@@ -250,7 +545,94 @@
       "parametros_texto": "2B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-02",
-      "contexto_maximo": 32768
+      "contexto_maximo": 32768,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3.5:2b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
+    },
+    {
+      "familia_id": "lfm3-1.7b",
+      "variantes": [],
+      "pipeline_tag": "chat",
+      "license_declarada": "Liquid AI",
+      "license_url": "https://huggingface.co/LiquidAI/LFM3-1.7B",
+      "idiomas_detectados": [
+        "en",
+        "ar",
+        "zh",
+        "fr",
+        "de",
+        "it",
+        "ja",
+        "ko",
+        "pt",
+        "es",
+        "vi",
+        "th",
+        "id",
+        "hi",
+        "ru",
+        "pl"
+      ],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
+      "canirun_id": "lfm3-1.7b",
+      "tareas_soportadas": [
+        "chat"
+      ],
+      "tags_informativos": [
+        "edge"
+      ],
+      "nombre_mostrado": "LFM3 1.7B",
+      "proveedor": "Liquid AI",
+      "familia_origen": "LFM",
+      "parametros_b": 1.7,
+      "parametros_texto": "1.7B",
+      "arquitectura": "dense",
+      "fecha_lanzamiento": "2026-10",
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "lfm3:1.7b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "llama3.2-3b",
@@ -258,8 +640,27 @@
       "pipeline_tag": "chat",
       "license_declarada": "Llama 3.2 Community",
       "license_url": "https://huggingface.co/meta-llama/Llama-3.2-3B",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "de",
+        "fr",
+        "it",
+        "pt",
+        "hi",
+        "es",
+        "th"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "llama3.2-3b",
       "tareas_soportadas": [
         "chat",
@@ -273,7 +674,23 @@
       "parametros_texto": "3B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2024-09",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "llama3.2:3b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "smollm3-3b",
@@ -281,8 +698,29 @@
       "pipeline_tag": "chat",
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/HuggingFaceTB/SmolLM3-3B",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "fr",
+        "es",
+        "it",
+        "pt",
+        "zh",
+        "ar",
+        "ru"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "smollm3-3b",
       "tareas_soportadas": [
         "chat",
@@ -296,7 +734,24 @@
       "parametros_texto": "3B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-07",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "granite-4.1-3b",
@@ -305,7 +760,15 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/ibm-granite/granite-4.1-3b",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "gguf",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "granite-4.1-3b",
       "tareas_soportadas": [
         "chat",
@@ -322,7 +785,23 @@
       "parametros_texto": "3B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-04",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "ibm/granite4.1:3b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "phi-4-mini-reasoning",
@@ -330,8 +809,18 @@
       "pipeline_tag": "razonamiento",
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/microsoft/Phi-4-mini-reasoning",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "exl3",
+        "gguf",
+        "mlx",
+        "onnx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "phi-4-mini-reasoning",
       "tareas_soportadas": [
         "razonamiento"
@@ -344,7 +833,24 @@
       "parametros_texto": "3.8B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-04",
-      "contexto_maximo": 16384
+      "contexto_maximo": 16384,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "phi4-mini-reasoning",
+      "lmstudio_id": "phi-4-reasoning",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "gemma3-4b",
@@ -353,7 +859,19 @@
       "license_declarada": "Gemma",
       "license_url": "https://huggingface.co/google/gemma-3-4b-it",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "gemma3-4b",
       "tareas_soportadas": [
         "chat"
@@ -366,7 +884,24 @@
       "parametros_texto": "4B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-03",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "gemma3:4b",
+      "lmstudio_id": "gemma-3",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3.5-4b",
@@ -375,7 +910,17 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/lmstudio-community/Qwen3.5-4B-GGUF",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "mlx",
+        "onnx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3.5-4b",
       "tareas_soportadas": [
         "chat"
@@ -390,7 +935,23 @@
       "parametros_texto": "4B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-02",
-      "contexto_maximo": 32768
+      "contexto_maximo": 32768,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3.5:4b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "gemma4-e2b-it",
@@ -399,7 +960,17 @@
       "license_declarada": "Gemma",
       "license_url": "https://huggingface.co/google/gemma-4-E2B-it",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "gemma4-e2b-it",
       "tareas_soportadas": [
         "chat"
@@ -412,7 +983,22 @@
       "parametros_texto": "5B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-04",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "gemma4-e4b-it",
@@ -421,7 +1007,18 @@
       "license_declarada": "Gemma",
       "license_url": "https://huggingface.co/google/gemma-4-E4B-it",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "gemma4-e4b-it",
       "tareas_soportadas": [
         "chat"
@@ -434,7 +1031,108 @@
       "parametros_texto": "8B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-04",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
+    },
+    {
+      "familia_id": "nemotron-3.5-bolt-e4b",
+      "variantes": [],
+      "pipeline_tag": "chat",
+      "license_declarada": "OpenMDW 1.1",
+      "license_url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-E4B-4GB",
+      "idiomas_detectados": [
+        "en",
+        "ar",
+        "bg",
+        "cs",
+        "da",
+        "de",
+        "el",
+        "es",
+        "et",
+        "fi",
+        "fr",
+        "hi",
+        "hr",
+        "hu",
+        "id",
+        "it",
+        "ja",
+        "ko",
+        "lt",
+        "lv",
+        "nl",
+        "no",
+        "pl",
+        "pt",
+        "ro",
+        "ru",
+        "sk",
+        "sl",
+        "sv",
+        "th",
+        "tr",
+        "uk",
+        "vi",
+        "zh"
+      ],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "safetensors",
+        "transformers"
+      ],
+      "canirun_id": "nemotron-3.5-bolt-e4b",
+      "tareas_soportadas": [
+        "chat"
+      ],
+      "tags_informativos": [
+        "edge"
+      ],
+      "nombre_mostrado": "Nemotron 3.5 Bolt E4B",
+      "proveedor": "NVIDIA",
+      "familia_origen": "Nemotron",
+      "parametros_b": 8.0,
+      "parametros_texto": "8B",
+      "arquitectura": "dense",
+      "fecha_lanzamiento": "2026-10",
+      "contexto_maximo": 65536,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "nemotron-3.5-bolt:e4b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen2.5-coder-7b",
@@ -442,8 +1140,22 @@
       "pipeline_tag": "codigo",
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl2",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen2.5-coder-7b",
       "tareas_soportadas": [
         "codigo"
@@ -456,7 +1168,25 @@
       "parametros_texto": "7B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2024-11",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen2.5-coder:7b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "deepseek-r1-7b",
@@ -465,7 +1195,18 @@
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "deepseek-r1-7b",
       "tareas_soportadas": [
         "razonamiento"
@@ -478,7 +1219,23 @@
       "parametros_texto": "7B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-01",
-      "contexto_maximo": 65536
+      "contexto_maximo": 65536,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "deepseek-r1:7b",
+      "lmstudio_id": "deepseek-r1",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "llama3.1-8b",
@@ -486,8 +1243,28 @@
       "pipeline_tag": "chat",
       "license_declarada": "Llama 3.1 Community",
       "license_url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "de",
+        "fr",
+        "it",
+        "pt",
+        "hi",
+        "es",
+        "th"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl2",
+        "fp8",
+        "gguf",
+        "gptq",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "llama3.1-8b",
       "tareas_soportadas": [
         "chat",
@@ -502,7 +1279,24 @@
       "parametros_texto": "8B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2024-07",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "llama3.1:8b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3-8b",
@@ -511,7 +1305,19 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3-8B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3-8b",
       "tareas_soportadas": [
         "chat",
@@ -526,7 +1332,24 @@
       "parametros_texto": "8B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-04",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3:8b",
+      "lmstudio_id": "qwen3-2504",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "granite-4.1-8b",
@@ -535,7 +1358,17 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/ibm-granite/granite-4.1-8b",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "granite-4.1-8b",
       "tareas_soportadas": [
         "chat",
@@ -552,7 +1385,23 @@
       "parametros_texto": "8B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-04",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "ibm/granite4.1:8b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "ministral-8b",
@@ -560,8 +1409,25 @@
       "pipeline_tag": "chat",
       "license_declarada": "MRL",
       "license_url": "https://huggingface.co/mistralai/Ministral-8B-Instruct-2410",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "fr",
+        "de",
+        "es",
+        "it",
+        "pt",
+        "zh",
+        "ja",
+        "ru",
+        "ko"
+      ],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "ministral-8b",
       "tareas_soportadas": [
         "chat"
@@ -574,7 +1440,22 @@
       "parametros_texto": "8B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2024-10",
-      "contexto_maximo": 32768
+      "contexto_maximo": 32768,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "ministral-3:8b",
+      "lmstudio_id": "ministral",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "glm-4-9b",
@@ -582,8 +1463,14 @@
       "pipeline_tag": "chat",
       "license_declarada": "GLM-4",
       "license_url": "https://huggingface.co/THUDM/glm-4-9b-chat",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "zh",
+        "en"
+      ],
+      "formatos_disponibles": [
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "glm-4-9b",
       "tareas_soportadas": [
         "chat",
@@ -599,7 +1486,17 @@
       "parametros_texto": "9B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2024-06",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "ollama",
+        "transformers"
+      ],
+      "ollama_id": "glm4:9b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card"
+      ]
     },
     {
       "familia_id": "nemotron-nano-9b",
@@ -607,8 +1504,21 @@
       "pipeline_tag": "razonamiento",
       "license_declarada": "NVIDIA Open",
       "license_url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-Nano-9B-v2",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "es",
+        "fr",
+        "de",
+        "it",
+        "ja"
+      ],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "nemotron-nano-9b",
       "tareas_soportadas": [
         "razonamiento"
@@ -621,7 +1531,20 @@
       "parametros_texto": "9B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-06",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3.5-9b",
@@ -630,7 +1553,18 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/lmstudio-community/Qwen3.5-9B-GGUF",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3.5-9b",
       "tareas_soportadas": [
         "chat"
@@ -643,7 +1577,23 @@
       "parametros_texto": "9B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-02",
-      "contexto_maximo": 32768
+      "contexto_maximo": 32768,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3.5:9b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "ornith-1.0-9b",
@@ -652,7 +1602,16 @@
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/deepreinforce-ai/Ornith-1.0-9B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "ornith-1.0-9b",
       "tareas_soportadas": [
         "codigo",
@@ -666,7 +1625,68 @@
       "parametros_texto": "9B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-06",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "ornith:9b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
+    },
+    {
+      "familia_id": "ornith-1.5-9b",
+      "variantes": [],
+      "pipeline_tag": "codigo",
+      "license_declarada": "MIT",
+      "license_url": "https://huggingface.co/ornith-ai/Ornith-1.5-9B",
+      "idiomas_detectados": null,
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
+      "canirun_id": "ornith-1.5-9b",
+      "tareas_soportadas": [
+        "codigo",
+        "razonamiento"
+      ],
+      "tags_informativos": [],
+      "nombre_mostrado": "Ornith 1.5 9B",
+      "proveedor": "DeepReinforce",
+      "familia_origen": "Ornith",
+      "parametros_b": 9.7,
+      "parametros_texto": "9.7B",
+      "arquitectura": "dense",
+      "fecha_lanzamiento": "2026-08",
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "gemma3-12b",
@@ -675,7 +1695,18 @@
       "license_declarada": "Gemma",
       "license_url": "https://huggingface.co/google/gemma-3-12b-it",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "gemma3-12b",
       "tareas_soportadas": [
         "chat",
@@ -689,7 +1720,24 @@
       "parametros_texto": "12B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-03",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "gemma3:12b",
+      "lmstudio_id": "gemma-3",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "mistral-nemo-12b",
@@ -697,8 +1745,30 @@
       "pipeline_tag": "chat",
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/mistralai/Mistral-Nemo-Instruct-2407",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "fr",
+        "de",
+        "es",
+        "it",
+        "pt",
+        "ru",
+        "zh",
+        "ja"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl2",
+        "exl3",
+        "fp8",
+        "gguf",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "mistral-nemo-12b",
       "tareas_soportadas": [
         "chat"
@@ -713,7 +1783,25 @@
       "parametros_texto": "12B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2024-07",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "mistral-nemo",
+      "lmstudio_id": "mistral-nemo",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "phi-4-14b",
@@ -721,8 +1809,22 @@
       "pipeline_tag": "razonamiento",
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/microsoft/phi-4",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl2",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "phi-4-14b",
       "tareas_soportadas": [
         "razonamiento",
@@ -736,7 +1838,25 @@
       "parametros_texto": "14B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2024-12",
-      "contexto_maximo": 16384
+      "contexto_maximo": 16384,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "phi4",
+      "lmstudio_id": "phi-4",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3-14b",
@@ -745,7 +1865,19 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3-14B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3-14b",
       "tareas_soportadas": [
         "chat",
@@ -760,7 +1892,24 @@
       "parametros_texto": "14B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-04",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3:14b",
+      "lmstudio_id": "qwen3-2504",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "deepseek-r1-14b",
@@ -769,7 +1918,19 @@
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl2",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "deepseek-r1-14b",
       "tareas_soportadas": [
         "razonamiento"
@@ -782,7 +1943,24 @@
       "parametros_texto": "14B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-01",
-      "contexto_maximo": 65536
+      "contexto_maximo": 65536,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "deepseek-r1:14b",
+      "lmstudio_id": "deepseek-r1",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "llama4-scout-17b",
@@ -790,8 +1968,29 @@
       "pipeline_tag": "chat",
       "license_declarada": "Llama 4 Community",
       "license_url": "https://huggingface.co/meta-llama/Llama-4-Scout-17B-16E-Instruct",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "ar",
+        "de",
+        "en",
+        "es",
+        "fr",
+        "hi",
+        "id",
+        "it",
+        "pt",
+        "th",
+        "tl",
+        "vi"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "llama4-scout-17b",
       "tareas_soportadas": [
         "chat",
@@ -805,7 +2004,22 @@
       "parametros_texto": "109B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-04",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "llama4:scout",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "gpt-oss-20b",
@@ -814,7 +2028,16 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/openai/gpt-oss-20b",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "gpt-oss-20b",
       "tareas_soportadas": [
         "chat",
@@ -829,7 +2052,23 @@
       "parametros_texto": "21B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-08",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "gpt-oss:20b",
+      "lmstudio_id": "gpt-oss",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "lfm2-24b",
@@ -837,8 +2076,25 @@
       "pipeline_tag": "chat",
       "license_declarada": "Liquid AI",
       "license_url": "https://huggingface.co/LiquidAI/LFM2-24B-A2B",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "ar",
+        "zh",
+        "fr",
+        "de",
+        "ja",
+        "ko",
+        "es",
+        "pt"
+      ],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "gguf",
+        "mlx",
+        "onnx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "lfm2-24b",
       "tareas_soportadas": [
         "chat"
@@ -854,7 +2110,141 @@
       "parametros_texto": "24B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-11",
-      "contexto_maximo": 32768
+      "contexto_maximo": 32768,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "lfm2:24b",
+      "lmstudio_id": "lfm2-24b-a2b",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
+    },
+    {
+      "familia_id": "lfm2.5-24b-a2b",
+      "variantes": [],
+      "pipeline_tag": "chat",
+      "license_declarada": "Liquid AI",
+      "license_url": "https://huggingface.co/LiquidAI/LFM2.5-24B-A2B",
+      "idiomas_detectados": [
+        "en",
+        "ar",
+        "zh",
+        "fr",
+        "de",
+        "ja",
+        "ko",
+        "es",
+        "pt",
+        "it",
+        "vi",
+        "th",
+        "id",
+        "hi",
+        "ru",
+        "pl"
+      ],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "safetensors",
+        "transformers"
+      ],
+      "canirun_id": "lfm2.5-24b-a2b",
+      "tareas_soportadas": [
+        "chat",
+        "razonamiento"
+      ],
+      "tags_informativos": [
+        "edge"
+      ],
+      "nombre_mostrado": "LFM2.5 24B-A2B",
+      "proveedor": "Liquid AI",
+      "familia_origen": "LFM",
+      "parametros_b": 24.0,
+      "parametros_texto": "24B",
+      "arquitectura": "moe",
+      "fecha_lanzamiento": "2026-10",
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "lfm2.5:24b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
+    },
+    {
+      "familia_id": "mellum-2.1-12b-a2.5b",
+      "variantes": [],
+      "pipeline_tag": "codigo",
+      "license_declarada": "Apache 2.0",
+      "license_url": "https://huggingface.co/JetBrains/Mellum2.1-12B-A2.5B-Thinking",
+      "idiomas_detectados": [
+        "en"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
+      "canirun_id": "mellum-2.1-12b-a2.5b",
+      "tareas_soportadas": [
+        "codigo",
+        "razonamiento"
+      ],
+      "tags_informativos": [],
+      "nombre_mostrado": "Mellum 2.1 12B-A2.5B",
+      "proveedor": "JetBrains",
+      "familia_origen": "Mellum",
+      "parametros_b": 12.0,
+      "parametros_texto": "12B",
+      "arquitectura": "moe",
+      "fecha_lanzamiento": "2026-09",
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "devstral-small-2-24b",
@@ -863,7 +2253,16 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/mistralai/Devstral-Small-2-24B-Instruct-2512",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "devstral-small-2-24b",
       "tareas_soportadas": [
         "codigo"
@@ -876,7 +2275,22 @@
       "parametros_texto": "24B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-12",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "devstral-small-2",
+      "lmstudio_id": "devstral",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "mistral-small-24b",
@@ -884,8 +2298,44 @@
       "pipeline_tag": "chat",
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "fr",
+        "de",
+        "es",
+        "pt",
+        "it",
+        "ja",
+        "ko",
+        "ru",
+        "zh",
+        "ar",
+        "fa",
+        "id",
+        "ms",
+        "ne",
+        "pl",
+        "ro",
+        "sr",
+        "sv",
+        "tr",
+        "uk",
+        "vi",
+        "hi",
+        "bn"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl2",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "mistral-small-24b",
       "tareas_soportadas": [
         "chat",
@@ -899,7 +2349,23 @@
       "parametros_texto": "24B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-03",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "mistral-small",
+      "lmstudio_id": "mistral-small",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "gemma4-26b-a4b-it",
@@ -908,7 +2374,17 @@
       "license_declarada": "Gemma",
       "license_url": "https://huggingface.co/google/gemma-4-26B-A4B-it",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "gemma4-26b-a4b-it",
       "tareas_soportadas": [
         "chat",
@@ -922,7 +2398,21 @@
       "parametros_texto": "27B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-04",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "diffusiongemma-26b-a4b-it",
@@ -931,7 +2421,16 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/google/diffusiongemma-26B-A4B-it",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "diffusiongemma-26b-a4b-it",
       "tareas_soportadas": [
         "chat",
@@ -945,7 +2444,20 @@
       "parametros_texto": "26B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-06",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3.5-27b",
@@ -954,7 +2466,18 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/lmstudio-community/Qwen3.5-27B-GGUF",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3.5-27b",
       "tareas_soportadas": [
         "chat",
@@ -968,7 +2491,23 @@
       "parametros_texto": "27.8B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-02",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3.5:27b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "gemma4-31b-it",
@@ -977,7 +2516,18 @@
       "license_declarada": "Gemma",
       "license_url": "https://huggingface.co/google/gemma-4-31B-it",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "gemma4-31b-it",
       "tareas_soportadas": [
         "chat",
@@ -991,7 +2541,22 @@
       "parametros_texto": "33B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-04",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "gemma4-31b",
@@ -1000,7 +2565,15 @@
       "license_declarada": "Gemma",
       "license_url": "https://huggingface.co/google/gemma-4-31B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "gemma4-31b",
       "tareas_soportadas": [
         "razonamiento"
@@ -1013,7 +2586,20 @@
       "parametros_texto": "33B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-04",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3-30b-a3b",
@@ -1022,7 +2608,19 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3-30B-A3B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl2",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3-30b-a3b",
       "tareas_soportadas": [
         "chat",
@@ -1036,7 +2634,23 @@
       "parametros_texto": "30B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-04",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3:30b-a3b",
+      "lmstudio_id": "qwen3-2504",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "agents-a1",
@@ -1045,7 +2659,15 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/InternScience/Agents-A1",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "agents-a1",
       "tareas_soportadas": [
         "chat",
@@ -1060,7 +2682,20 @@
       "parametros_texto": "35B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-06",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "nemotron-nano-30b",
@@ -1068,8 +2703,25 @@
       "pipeline_tag": "chat",
       "license_declarada": "NVIDIA Open",
       "license_url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "es",
+        "fr",
+        "de",
+        "ja",
+        "it"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "nemotron-nano-30b",
       "tareas_soportadas": [
         "chat",
@@ -1083,7 +2735,130 @@
       "parametros_texto": "30B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-06",
-      "contexto_maximo": 1048576
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "nemotron-3-nano:30b",
+      "lmstudio_id": "nemotron-3",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
+    },
+    {
+      "familia_id": "nemotron-3.5-lightning-30b-a3b",
+      "variantes": [],
+      "pipeline_tag": "chat",
+      "license_declarada": "OpenMDW 1.1",
+      "license_url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16",
+      "idiomas_detectados": [
+        "en",
+        "es",
+        "fr",
+        "de",
+        "it",
+        "ja"
+      ],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
+      "canirun_id": "nemotron-3.5-lightning-30b-a3b",
+      "tareas_soportadas": [
+        "chat",
+        "razonamiento",
+        "codigo"
+      ],
+      "tags_informativos": [],
+      "nombre_mostrado": "Nemotron 3.5 Lightning 30B-A3B",
+      "proveedor": "NVIDIA",
+      "familia_origen": "Nemotron",
+      "parametros_b": 30.0,
+      "parametros_texto": "30B",
+      "arquitectura": "moe",
+      "fecha_lanzamiento": "2026-08",
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "nemotron-3.5-lightning:30b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
+    },
+    {
+      "familia_id": "nemotron-3.5-bolt-74b-a9b",
+      "variantes": [],
+      "pipeline_tag": "chat",
+      "license_declarada": "OpenMDW 1.1",
+      "license_url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-24GB",
+      "idiomas_detectados": [
+        "en",
+        "es",
+        "fr",
+        "de",
+        "it",
+        "ja"
+      ],
+      "formatos_disponibles": [
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
+      "canirun_id": "nemotron-3.5-bolt-74b-a9b",
+      "tareas_soportadas": [
+        "chat",
+        "razonamiento",
+        "codigo"
+      ],
+      "tags_informativos": [],
+      "nombre_mostrado": "Nemotron 3.5 Bolt 74B-A9B",
+      "proveedor": "NVIDIA",
+      "familia_origen": "Nemotron",
+      "parametros_b": 74.0,
+      "parametros_texto": "74B",
+      "arquitectura": "moe",
+      "fecha_lanzamiento": "2026-10",
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers"
+      ],
+      "ollama_id": "nemotron-3.5-bolt",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "granite-4.1-30b",
@@ -1092,7 +2867,15 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/ibm-granite/granite-4.1-30b",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "gguf",
+        "mlx",
+        "onnx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "granite-4.1-30b",
       "tareas_soportadas": [
         "chat",
@@ -1110,7 +2893,22 @@
       "parametros_texto": "30B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-04",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "ibm/granite4.1:30b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "north-mini-code-1.0",
@@ -1119,7 +2917,13 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/CohereLabs/North-Mini-Code-1.0",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "north-mini-code-1.0",
       "tareas_soportadas": [
         "codigo",
@@ -1133,7 +2937,21 @@
       "parametros_texto": "30B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-06",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "north-mini-code-1.0",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3-32b",
@@ -1142,7 +2960,19 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3-32B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl2",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3-32b",
       "tareas_soportadas": [
         "chat",
@@ -1157,7 +2987,23 @@
       "parametros_texto": "32B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-04",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3:32b",
+      "lmstudio_id": "qwen3-2504",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "deepseek-r1-32b",
@@ -1166,7 +3012,18 @@
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl2",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "deepseek-r1-32b",
       "tareas_soportadas": [
         "razonamiento"
@@ -1179,7 +3036,23 @@
       "parametros_texto": "32B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-01",
-      "contexto_maximo": 65536
+      "contexto_maximo": 65536,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "deepseek-r1:32b",
+      "lmstudio_id": "deepseek-r1",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "olmo2-32b",
@@ -1187,8 +3060,17 @@
       "pipeline_tag": "chat",
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/allenai/OLMo-2-0325-32B-Instruct",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "olmo2-32b",
       "tareas_soportadas": [
         "chat",
@@ -1202,7 +3084,21 @@
       "parametros_texto": "32B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-03",
-      "contexto_maximo": 4096
+      "contexto_maximo": 4096,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "command-r-35b",
@@ -1210,8 +3106,22 @@
       "pipeline_tag": "chat",
       "license_declarada": "CC BY-NC 4.0",
       "license_url": "https://huggingface.co/CohereForAI/c4ai-command-r-v01",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "fr",
+        "de",
+        "es",
+        "it",
+        "pt",
+        "ja",
+        "ko",
+        "zh",
+        "ar"
+      ],
+      "formatos_disponibles": [
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "command-r-35b",
       "tareas_soportadas": [
         "chat"
@@ -1226,7 +3136,17 @@
       "parametros_texto": "35B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2024-03",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "ollama",
+        "transformers"
+      ],
+      "ollama_id": "command-r:35b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card"
+      ]
     },
     {
       "familia_id": "qwen3.5-35b-a3b",
@@ -1235,7 +3155,17 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/lmstudio-community/Qwen3.5-35B-A3B-GGUF",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3.5-35b-a3b",
       "tareas_soportadas": [
         "chat"
@@ -1248,7 +3178,22 @@
       "parametros_texto": "35B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-02",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3.5:35b-a3b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "ornith-1.0-35b",
@@ -1257,7 +3202,16 @@
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/deepreinforce-ai/Ornith-1.0-35B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "ornith-1.0-35b",
       "tareas_soportadas": [
         "codigo",
@@ -1271,7 +3225,68 @@
       "parametros_texto": "35B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-06",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "ornith:35b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
+    },
+    {
+      "familia_id": "ornith-1.5-35b-a3b",
+      "variantes": [],
+      "pipeline_tag": "codigo",
+      "license_declarada": "MIT",
+      "license_url": "https://huggingface.co/ornith-ai/Ornith-1.5-35B-A3B",
+      "idiomas_detectados": null,
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
+      "canirun_id": "ornith-1.5-35b-a3b",
+      "tareas_soportadas": [
+        "codigo",
+        "razonamiento"
+      ],
+      "tags_informativos": [],
+      "nombre_mostrado": "Ornith 1.5 35B-A3B",
+      "proveedor": "DeepReinforce",
+      "familia_origen": "Ornith",
+      "parametros_b": 36.0,
+      "parametros_texto": "36B",
+      "arquitectura": "moe",
+      "fecha_lanzamiento": "2026-08",
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "mixtral-8x7b",
@@ -1279,8 +3294,25 @@
       "pipeline_tag": "chat",
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "fr",
+        "it",
+        "de",
+        "es",
+        "en"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "mixtral-8x7b",
       "tareas_soportadas": [
         "chat",
@@ -1294,7 +3326,24 @@
       "parametros_texto": "47B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2023-12",
-      "contexto_maximo": 32768
+      "contexto_maximo": 32768,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "mixtral:8x7b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3-next-80b-a3b",
@@ -1303,7 +3352,17 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3-next-80b-a3b",
       "tareas_soportadas": [
         "chat",
@@ -1318,7 +3377,22 @@
       "parametros_texto": "80B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-12",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3-next:80b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3-coder-next-80b-a3b",
@@ -1327,7 +3401,16 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3-Coder-Next",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3-coder-next-80b-a3b",
       "tareas_soportadas": [
         "codigo"
@@ -1340,7 +3423,21 @@
       "parametros_texto": "80B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-02",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3-coder-next",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "llama3.3-70b",
@@ -1348,8 +3445,28 @@
       "pipeline_tag": "chat",
       "license_declarada": "Llama 3.3 Community",
       "license_url": "https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "fr",
+        "it",
+        "pt",
+        "hi",
+        "es",
+        "th",
+        "de"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl2",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "llama3.3-70b",
       "tareas_soportadas": [
         "chat",
@@ -1364,7 +3481,23 @@
       "parametros_texto": "70B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2024-12",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "llama3.3:70b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "gpt-oss-120b",
@@ -1373,7 +3506,16 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/openai/gpt-oss-120b",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "gpt-oss-120b",
       "tareas_soportadas": [
         "chat",
@@ -1388,7 +3530,22 @@
       "parametros_texto": "117B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-08",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "gpt-oss:120b",
+      "lmstudio_id": "gpt-oss",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3.5-122b-a10b",
@@ -1397,7 +3554,18 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/lmstudio-community/Qwen3.5-122B-A10B-GGUF",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3.5-122b-a10b",
       "tareas_soportadas": [
         "chat",
@@ -1411,7 +3579,68 @@
       "parametros_texto": "122B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-02",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3.5:122b-a10b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
+    },
+    {
+      "familia_id": "ornith-1.5-122b",
+      "variantes": [],
+      "pipeline_tag": "codigo",
+      "license_declarada": "MIT",
+      "license_url": "https://huggingface.co/ornith-ai/Ornith-1.5-122B",
+      "idiomas_detectados": null,
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
+      "canirun_id": "ornith-1.5-122b",
+      "tareas_soportadas": [
+        "codigo",
+        "razonamiento"
+      ],
+      "tags_informativos": [],
+      "nombre_mostrado": "Ornith 1.5 122B",
+      "proveedor": "DeepReinforce",
+      "familia_origen": "Ornith",
+      "parametros_b": 122.0,
+      "parametros_texto": "122B",
+      "arquitectura": "moe",
+      "fecha_lanzamiento": "2026-10",
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "llama4-maverick-17b-128e",
@@ -1419,8 +3648,29 @@
       "pipeline_tag": "chat",
       "license_declarada": "Llama 4 Community",
       "license_url": "https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "ar",
+        "de",
+        "en",
+        "es",
+        "fr",
+        "hi",
+        "id",
+        "it",
+        "pt",
+        "th",
+        "tl",
+        "vi"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "llama4-maverick-17b-128e",
       "tareas_soportadas": [
         "chat",
@@ -1435,7 +3685,22 @@
       "parametros_texto": "400B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-04",
-      "contexto_maximo": 1048576
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "llama4:maverick",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3-235b-a22b",
@@ -1444,7 +3709,17 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3-235B-A22B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3-235b-a22b",
       "tareas_soportadas": [
         "chat",
@@ -1459,7 +3734,22 @@
       "parametros_texto": "235B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-04",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3:235b-a22b",
+      "lmstudio_id": "qwen3-2504",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3-vl-235b-a22b",
@@ -1468,7 +3758,15 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3-VL-235B-A22B-Instruct",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3-vl-235b-a22b",
       "tareas_soportadas": [
         "chat",
@@ -1483,7 +3781,21 @@
       "parametros_texto": "235B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-11",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3-vl:235b-a22b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3.5-397b-a17b",
@@ -1492,7 +3804,17 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3.5-397B-A17B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3.5-397b-a17b",
       "tareas_soportadas": [
         "chat",
@@ -1507,7 +3829,22 @@
       "parametros_texto": "397B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-02",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3.5:397b-cloud",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3-coder-480b",
@@ -1516,7 +3853,17 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3-Coder-480B-A35B-Instruct",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3-coder-480b",
       "tareas_soportadas": [
         "codigo"
@@ -1529,7 +3876,22 @@
       "parametros_texto": "480B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-07",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3-coder:480b",
+      "lmstudio_id": "qwen3-coder",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "hy3",
@@ -1538,7 +3900,16 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/tencent/Hy3",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "hy3",
       "tareas_soportadas": [
         "chat",
@@ -1553,7 +3924,21 @@
       "parametros_texto": "295B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-07",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "deepseek-r1",
@@ -1562,7 +3947,17 @@
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/deepseek-ai/DeepSeek-R1",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "deepseek-r1",
       "tareas_soportadas": [
         "razonamiento"
@@ -1575,7 +3970,22 @@
       "parametros_texto": "671B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-01",
-      "contexto_maximo": 65536
+      "contexto_maximo": 65536,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "deepseek-r1:671b",
+      "lmstudio_id": "deepseek-r1",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "deepseek-v3.2",
@@ -1584,7 +3994,15 @@
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "deepseek-v3.2",
       "tareas_soportadas": [
         "chat",
@@ -1599,7 +4017,21 @@
       "parametros_texto": "685B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-12",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "deepseek-v3.2",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3-coder-30b",
@@ -1608,7 +4040,18 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl2",
+        "exl3",
+        "gguf",
+        "gptq",
+        "mlx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3-coder-30b",
       "tareas_soportadas": [
         "codigo"
@@ -1621,7 +4064,23 @@
       "parametros_texto": "30B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-07",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3-coder:30b",
+      "lmstudio_id": "qwen3-coder",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3.6-27b",
@@ -1630,7 +4089,17 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3.6-27B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3.6-27b",
       "tareas_soportadas": [
         "chat",
@@ -1645,7 +4114,22 @@
       "parametros_texto": "27.8B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-04",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3.6:27b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3.6-35b-a3b",
@@ -1654,7 +4138,17 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3.6-35b-a3b",
       "tareas_soportadas": [
         "chat",
@@ -1669,7 +4163,22 @@
       "parametros_texto": "36B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-04",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3.6:35b-a3b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "glm-4.5-air",
@@ -1677,8 +4186,21 @@
       "pipeline_tag": "chat",
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/zai-org/GLM-4.5-Air",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "zh"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "glm-4.5-air",
       "tareas_soportadas": [
         "chat",
@@ -1693,7 +4215,22 @@
       "parametros_texto": "106B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-07",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "glm-4.6",
@@ -1701,8 +4238,21 @@
       "pipeline_tag": "chat",
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/zai-org/GLM-4.6",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "zh"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "glm-4.6",
       "tareas_soportadas": [
         "chat",
@@ -1717,7 +4267,23 @@
       "parametros_texto": "357B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-09",
-      "contexto_maximo": 200000
+      "contexto_maximo": 200000,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "glm-4.6",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "glm-5",
@@ -1725,8 +4291,18 @@
       "pipeline_tag": "chat",
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/zai-org/GLM-5",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "zh"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "fp8",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "glm-5",
       "tareas_soportadas": [
         "chat",
@@ -1741,7 +4317,21 @@
       "parametros_texto": "744B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-02",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "glm-5.1",
@@ -1749,8 +4339,18 @@
       "pipeline_tag": "chat",
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/zai-org/GLM-5.1",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "zh"
+      ],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "glm-5.1",
       "tareas_soportadas": [
         "chat",
@@ -1765,7 +4365,21 @@
       "parametros_texto": "754B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-04",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "glm-5.2",
@@ -1773,8 +4387,20 @@
       "pipeline_tag": "chat",
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/zai-org/GLM-5.2",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "zh"
+      ],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "glm-5.2",
       "tareas_soportadas": [
         "chat",
@@ -1789,7 +4415,23 @@
       "parametros_texto": "753B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-06",
-      "contexto_maximo": 1048576
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "glm-5.2",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "glm-5.3",
@@ -1797,8 +4439,20 @@
       "pipeline_tag": "chat",
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/zai-org/GLM-5.3",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "zh"
+      ],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "glm-5.3",
       "tareas_soportadas": [
         "chat",
@@ -1813,7 +4467,74 @@
       "parametros_texto": "753B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-08",
-      "contexto_maximo": 1048576
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
+    },
+    {
+      "familia_id": "glm-5.3-flash",
+      "variantes": [],
+      "pipeline_tag": "chat",
+      "license_declarada": "MIT",
+      "license_url": "https://huggingface.co/zai-org/GLM-5.3-Flash",
+      "idiomas_detectados": [
+        "en",
+        "zh"
+      ],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
+      "canirun_id": "glm-5.3-flash",
+      "tareas_soportadas": [
+        "chat",
+        "razonamiento",
+        "codigo"
+      ],
+      "tags_informativos": [],
+      "nombre_mostrado": "GLM-5.3 Flash",
+      "proveedor": "Z.ai",
+      "familia_origen": "GLM",
+      "parametros_b": 320.0,
+      "parametros_texto": "320B",
+      "arquitectura": "moe",
+      "fecha_lanzamiento": "2026-08",
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "longcat-2.0",
@@ -1822,7 +4543,11 @@
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/meituan-longcat/LongCat-2.0",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "longcat-2.0",
       "tareas_soportadas": [
         "chat",
@@ -1837,7 +4562,17 @@
       "parametros_texto": "1.6T",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-07",
-      "contexto_maximo": 1048576
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "mlx",
+        "transformers"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "deepseek-v4-flash",
@@ -1846,7 +4581,16 @@
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "deepseek-v4-flash",
       "tareas_soportadas": [
         "chat",
@@ -1857,11 +4601,25 @@
       "nombre_mostrado": "DeepSeek V4 Flash",
       "proveedor": "DeepSeek",
       "familia_origen": "DeepSeek",
-      "parametros_b": 158.0,
-      "parametros_texto": "158B",
+      "parametros_b": 284.0,
+      "parametros_texto": "284B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-04",
-      "contexto_maximo": 1048576
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "deepseek-v4-pro",
@@ -1870,7 +4628,14 @@
       "license_declarada": "MIT",
       "license_url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "deepseek-v4-pro",
       "tareas_soportadas": [
         "chat",
@@ -1885,7 +4650,66 @@
       "parametros_texto": "1.6T",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-04",
-      "contexto_maximo": 1048576
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
+    },
+    {
+      "familia_id": "deepseek-v4.1-flash",
+      "variantes": [],
+      "pipeline_tag": "chat",
+      "license_declarada": "MIT",
+      "license_url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017",
+      "idiomas_detectados": null,
+      "formatos_disponibles": [
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
+      "canirun_id": "deepseek-v4.1-flash",
+      "tareas_soportadas": [
+        "chat",
+        "razonamiento",
+        "codigo"
+      ],
+      "tags_informativos": [],
+      "nombre_mostrado": "DeepSeek V4.1 Flash",
+      "proveedor": "DeepSeek",
+      "familia_origen": "DeepSeek",
+      "parametros_b": 763.0,
+      "parametros_texto": "763B",
+      "arquitectura": "moe",
+      "fecha_lanzamiento": "2026-10",
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "kimi-k2.6",
@@ -1894,7 +4718,14 @@
       "license_declarada": "Kimi",
       "license_url": "https://huggingface.co/moonshotai/Kimi-K2.6",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "kimi-k2.6",
       "tareas_soportadas": [
         "chat",
@@ -1909,7 +4740,21 @@
       "parametros_texto": "1.06T",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-04",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "kimi-k2.6",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "kimi-k3",
@@ -1918,7 +4763,15 @@
       "license_declarada": "Kimi",
       "license_url": "https://huggingface.co/moonshotai/Kimi-K3",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "kimi-k3",
       "tareas_soportadas": [
         "chat",
@@ -1933,7 +4786,21 @@
       "parametros_texto": "2.8T",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-07",
-      "contexto_maximo": 1048576
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3.8-27b",
@@ -1942,7 +4809,18 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3.8-27B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3.8-27b",
       "tareas_soportadas": [
         "chat",
@@ -1957,7 +4835,71 @@
       "parametros_texto": "27B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-08",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3.8:27b",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
+    },
+    {
+      "familia_id": "qwen3.8-flash-next",
+      "variantes": [],
+      "pipeline_tag": "chat",
+      "license_declarada": "Qwen Community 1.0",
+      "license_url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next",
+      "idiomas_detectados": null,
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
+      "canirun_id": "qwen3.8-flash-next",
+      "tareas_soportadas": [
+        "chat",
+        "razonamiento",
+        "codigo"
+      ],
+      "tags_informativos": [],
+      "nombre_mostrado": "Qwen 3.8 Flash Next",
+      "proveedor": "Alibaba",
+      "familia_origen": "Qwen",
+      "parametros_b": 180.0,
+      "parametros_texto": "180B",
+      "arquitectura": "moe",
+      "fecha_lanzamiento": "2026-08",
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3.8-flash-next:125b-a6b-q4_K_M",
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "muse-glimmer-30b",
@@ -1966,7 +4908,18 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/meta-models/Muse-Glimmer-30B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "muse-glimmer-30b",
       "tareas_soportadas": [
         "chat",
@@ -1981,7 +4934,70 @@
       "parametros_texto": "30B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-08",
-      "contexto_maximo": 131072
+      "contexto_maximo": 131072,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "muse-glimmer",
+      "lmstudio_id": "muse-glimmer",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
+    },
+    {
+      "familia_id": "muse-spark-open",
+      "variantes": [],
+      "pipeline_tag": "chat",
+      "license_declarada": "Muse",
+      "license_url": "https://huggingface.co/meta-models/Muse-Spark-Open-816B-A42B",
+      "idiomas_detectados": [
+        "en"
+      ],
+      "formatos_disponibles": [
+        "exl3",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
+      "canirun_id": "muse-spark-open",
+      "tareas_soportadas": [
+        "chat",
+        "razonamiento",
+        "codigo"
+      ],
+      "tags_informativos": [],
+      "nombre_mostrado": "Muse Spark Open 816B-A42B",
+      "proveedor": "Meta",
+      "familia_origen": "Muse",
+      "parametros_b": 816.0,
+      "parametros_texto": "816B",
+      "arquitectura": "moe",
+      "fecha_lanzamiento": "2026-10",
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3.8-2.4t-a95b",
@@ -1990,7 +5006,14 @@
       "license_declarada": "Qwen",
       "license_url": "https://huggingface.co/Qwen/Qwen3.8-2.4T-A95B",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3.8-2.4t-a95b",
       "tareas_soportadas": [
         "chat",
@@ -2005,7 +5028,20 @@
       "parametros_texto": "2.4T",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-08",
-      "contexto_maximo": 1048576
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "minimax-m3",
@@ -2014,7 +5050,16 @@
       "license_declarada": "MiniMax Community",
       "license_url": "https://huggingface.co/MiniMaxAI/MiniMax-M3",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "minimax-m3",
       "tareas_soportadas": [
         "chat",
@@ -2029,7 +5074,203 @@
       "parametros_texto": "428B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-06",
-      "contexto_maximo": 1048576
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
+    },
+    {
+      "familia_id": "minimax-m3.1-flash",
+      "variantes": [],
+      "pipeline_tag": "chat",
+      "license_declarada": "MiniMax Community",
+      "license_url": "https://huggingface.co/MiniMaxAI/MiniMax-M3.1-Flash",
+      "idiomas_detectados": null,
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
+      "canirun_id": "minimax-m3.1-flash",
+      "tareas_soportadas": [
+        "chat",
+        "razonamiento",
+        "codigo"
+      ],
+      "tags_informativos": [],
+      "nombre_mostrado": "MiniMax M3.1 Flash",
+      "proveedor": "MiniMax",
+      "familia_origen": "MiniMax",
+      "parametros_b": 428.0,
+      "parametros_texto": "428B",
+      "arquitectura": "moe",
+      "fecha_lanzamiento": "2026-10",
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
+    },
+    {
+      "familia_id": "mistral-large-4",
+      "variantes": [],
+      "pipeline_tag": "chat",
+      "license_declarada": "Mistral Ecosystem",
+      "license_url": "https://huggingface.co/mistralai/Mistral-Large-4-1T-A52B",
+      "idiomas_detectados": [
+        "en",
+        "fr",
+        "de",
+        "es",
+        "pt",
+        "it",
+        "ja",
+        "ko",
+        "ru",
+        "zh",
+        "ar",
+        "fa",
+        "id",
+        "ms",
+        "ne",
+        "pl",
+        "ro",
+        "sr",
+        "sv",
+        "tr",
+        "uk",
+        "vi",
+        "hi",
+        "bn",
+        "bg",
+        "hr",
+        "cs",
+        "da",
+        "nl",
+        "et",
+        "fi",
+        "el",
+        "hu",
+        "ga",
+        "lv",
+        "lt",
+        "mt",
+        "sk",
+        "sl"
+      ],
+      "formatos_disponibles": [
+        "exl3",
+        "fp8",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
+      "canirun_id": "mistral-large-4",
+      "tareas_soportadas": [
+        "chat",
+        "razonamiento",
+        "codigo"
+      ],
+      "tags_informativos": [
+        "multilingual"
+      ],
+      "nombre_mostrado": "Mistral Large 4",
+      "proveedor": "Mistral AI",
+      "familia_origen": "Mistral",
+      "parametros_b": 1000.0,
+      "parametros_texto": "1T",
+      "arquitectura": "moe",
+      "fecha_lanzamiento": "2026-09",
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
+    },
+    {
+      "familia_id": "mimo-v2.6-flash",
+      "variantes": [],
+      "pipeline_tag": "chat",
+      "license_declarada": "MIT",
+      "license_url": "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Flash-RL",
+      "idiomas_detectados": [
+        "en",
+        "zh"
+      ],
+      "formatos_disponibles": [
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
+      "canirun_id": "mimo-v2.6-flash",
+      "tareas_soportadas": [
+        "chat",
+        "razonamiento",
+        "codigo"
+      ],
+      "tags_informativos": [],
+      "nombre_mostrado": "MiMo V2.6 Flash",
+      "proveedor": "Xiaomi",
+      "familia_origen": "MiMo",
+      "parametros_b": 309.0,
+      "parametros_texto": "309B",
+      "arquitectura": "moe",
+      "fecha_lanzamiento": "2026-09",
+      "contexto_maximo": 1048576,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "gemma4-12b-it",
@@ -2038,7 +5279,18 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/google/gemma-4-12B-it",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "gemma4-12b-it",
       "tareas_soportadas": [
         "chat",
@@ -2052,7 +5304,22 @@
       "parametros_texto": "12B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2026-04",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "onnxruntime",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "mistral-small-4-119b",
@@ -2060,8 +5327,41 @@
       "pipeline_tag": "chat",
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/mistralai/Mistral-Small-4-119B-2603",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "fr",
+        "de",
+        "es",
+        "pt",
+        "it",
+        "ja",
+        "ko",
+        "ru",
+        "zh",
+        "ar",
+        "fa",
+        "id",
+        "ms",
+        "ne",
+        "pl",
+        "ro",
+        "sr",
+        "sv",
+        "tr",
+        "uk",
+        "vi",
+        "hi",
+        "bn"
+      ],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "mistral-small-4-119b",
       "tareas_soportadas": [
         "chat",
@@ -2076,7 +5376,22 @@
       "parametros_texto": "119B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2026-03",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "ministral-3-3b",
@@ -2084,8 +5399,28 @@
       "pipeline_tag": "chat",
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "fr",
+        "es",
+        "de",
+        "it",
+        "pt",
+        "nl",
+        "zh",
+        "ja",
+        "ko",
+        "ar"
+      ],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "fp8",
+        "gguf",
+        "mlx",
+        "onnx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "ministral-3-3b",
       "tareas_soportadas": [
         "chat"
@@ -2100,7 +5435,22 @@
       "parametros_texto": "3B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-12",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "onnxruntime",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "ministral-3-14b",
@@ -2108,8 +5458,28 @@
       "pipeline_tag": "chat",
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/mistralai/Ministral-3-14B-Instruct-2512",
-      "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "idiomas_detectados": [
+        "en",
+        "fr",
+        "es",
+        "de",
+        "it",
+        "pt",
+        "nl",
+        "zh",
+        "ja",
+        "ko",
+        "ar"
+      ],
+      "formatos_disponibles": [
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "ministral-3-14b",
       "tareas_soportadas": [
         "chat",
@@ -2124,7 +5494,22 @@
       "parametros_texto": "14B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-12",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": null,
+      "lmstudio_id": null,
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_card",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3-vl-4b",
@@ -2133,7 +5518,19 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3-vl-4b",
       "tareas_soportadas": [
         "chat"
@@ -2146,7 +5543,24 @@
       "parametros_texto": "4.4B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-10",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3-vl:4b",
+      "lmstudio_id": "qwen3-vl",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3-vl-8b",
@@ -2155,7 +5569,19 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "onnx",
+        "openvino",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3-vl-8b",
       "tareas_soportadas": [
         "chat"
@@ -2168,7 +5594,24 @@
       "parametros_texto": "8.8B",
       "arquitectura": "dense",
       "fecha_lanzamiento": "2025-10",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "onnxruntime",
+        "openvino",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3-vl:8b",
+      "lmstudio_id": "qwen3-vl",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     },
     {
       "familia_id": "qwen3-vl-30b-a3b",
@@ -2177,7 +5620,17 @@
       "license_declarada": "Apache 2.0",
       "license_url": "https://huggingface.co/Qwen/Qwen3-VL-30B-A3B-Instruct",
       "idiomas_detectados": null,
-      "formatos_disponibles": [],
+      "formatos_disponibles": [
+        "awq",
+        "compressed-tensors",
+        "exl3",
+        "fp8",
+        "gguf",
+        "gptq",
+        "mlx",
+        "safetensors",
+        "transformers"
+      ],
       "canirun_id": "qwen3-vl-30b-a3b",
       "tareas_soportadas": [
         "chat"
@@ -2190,7 +5643,22 @@
       "parametros_texto": "31B",
       "arquitectura": "moe",
       "fecha_lanzamiento": "2025-09",
-      "contexto_maximo": 262144
+      "contexto_maximo": 262144,
+      "runtimes_disponibles": [
+        "exllama",
+        "llama.cpp",
+        "lmstudio",
+        "mlx",
+        "ollama",
+        "transformers",
+        "vllm"
+      ],
+      "ollama_id": "qwen3-vl:30b-a3b",
+      "lmstudio_id": "qwen3-vl",
+      "fuentes_enriquecimiento": [
+        "canirun_detail",
+        "huggingface_tree"
+      ]
     }
   ]
 }

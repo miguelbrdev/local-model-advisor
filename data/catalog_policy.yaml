@@ -1,11 +1,11 @@
-version: "1.0.0"
+version: "1.1.0"
 description: >
   Local policy that defines which canIRun.ai categories map to internal
   tasks, which tags are informational, and minimum validity rules for
   importing external model records.
 
 source:
-  endpoint: "https://www.canirun.ai/api/models"
+  endpoint: "https://canirun.ai/api/models"
   sync_interval_days: 21
 
 # Mapping from external useCase tags to internal task identifiers.
@@ -34,6 +34,36 @@ out_of_scope_tags:
   - video
   - embeddings
   - rerankers
+
+# Enrichment of included families with languages and runtimes, run inside
+# the synchronisation after normalisation (never during a request).
+# Sources approved on 2026-11-08: the canIRun.ai detail endpoint and the
+# public Hugging Face model API (card metadata + quantised-derivative tree).
+# Per-family failures never exclude a model; the snapshot records counts.
+enrichment:
+  enabled: true
+  canirun_detail_endpoint: "https://canirun.ai/api/models/{id}"
+  huggingface_api: "https://huggingface.co/api/models"
+  # canIRun detail fields that name the model in a runtime's own library.
+  runtime_by_canirun_field:
+    ollamaId: ollama
+    lmStudioId: lmstudio
+  # Format tag (Hugging Face) -> runtimes that load it. GGUF implies
+  # llama.cpp and LM Studio (which loads any GGUF); Ollama only through
+  # its own library (ollamaId), since importing a GGUF is a manual step.
+  runtime_by_format:
+    gguf: [llama.cpp, lmstudio]
+    mlx: [mlx]
+    safetensors: []
+    transformers: [transformers]
+    awq: [vllm]
+    gptq: [vllm]
+    fp8: [vllm]
+    compressed-tensors: [vllm]
+    exl2: [exllama]
+    exl3: [exllama]
+    onnx: [onnxruntime]
+    openvino: [openvino]
 
 # Minimum validity rules for a record to be importable.
 validity_rules:

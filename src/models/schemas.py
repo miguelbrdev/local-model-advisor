@@ -30,7 +30,11 @@ class FamiliaModelo(BaseModel):
     license_declarada: str | None = None
     license_url: str | None = None
     idiomas_detectados: list[str] | None = None
+    """ISO 639-1 codes declared in the Hugging Face model card (``cardData.language``);
+    ``None`` when the card declares nothing — never inferred from text."""
     formatos_disponibles: list[str] = Field(default_factory=list)
+    """Weight formats published for the model on Hugging Face (``gguf``, ``mlx``,
+    ``awq``, …), from the repository itself and its quantised derivatives."""
     canirun_id: str | None = None  # mapping to canirun.ai model id
     # --- extended fields (populated by sync normaliser) ---
     tareas_soportadas: list[str] = Field(default_factory=list)
@@ -53,6 +57,17 @@ class FamiliaModelo(BaseModel):
     """Release date in ``YYYY-MM`` format."""
     contexto_maximo: int | None = None
     """Maximum context length in tokens."""
+    # --- enrichment fields (sync enrichment step; see src/sync/enrichment.py) ---
+    runtimes_disponibles: list[str] = Field(default_factory=list)
+    """Canonical runtimes that can load the model (``ollama``, ``lmstudio``,
+    ``llama.cpp``, ``vllm``, ``mlx``, …), derived from canIRun runtime ids and
+    the formats published on Hugging Face.  Empty means unknown, never "none"."""
+    ollama_id: str | None = None
+    """Name in the Ollama library (``qwen3:8b``), from canIRun."""
+    lmstudio_id: str | None = None
+    """Name in the LM Studio catalogue, from canIRun."""
+    fuentes_enriquecimiento: list[str] = Field(default_factory=list)
+    """Enrichment sources that answered with data for this family."""
 
 
 # ---------------------------------------------------------------------------

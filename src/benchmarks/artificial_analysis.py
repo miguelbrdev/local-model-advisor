@@ -35,6 +35,7 @@ from src.benchmarks.fuentes import (
     normalizar,
 )
 from src.models.schemas import EvidenciaBenchmark
+from src.tools.tls import contexto_tls
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +108,10 @@ class FuenteArtificialAnalysis:
         version: int | None = None
         try:
             with httpx.Client(
-                transport=transport, timeout=timeout, headers={"x-api-key": self._api_key}
+                transport=transport,
+                timeout=timeout,
+                headers={"x-api-key": self._api_key},
+                verify=contexto_tls(),
             ) as client:
                 for pagina in range(1, MAX_PAGINAS + 1):
                     respuesta = client.get(self._url, params={"page": pagina})

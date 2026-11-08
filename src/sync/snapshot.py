@@ -80,6 +80,7 @@ class SnapshotMeta(BaseModel):
         modelos_incluidos: Families included in this snapshot.
         motivos_exclusion: One entry per excluded external record.
         politica_version: Catalog policy version used for normalisation.
+        enriquecimiento: Per-source outcome counts of the enrichment step.
 
     Invariants (enforced by the model validator):
         * ``modelos_origen == modelos_incluidos + len(motivos_exclusion)``
@@ -98,6 +99,10 @@ class SnapshotMeta(BaseModel):
     modelos_incluidos: int = Field(ge=0)
     motivos_exclusion: list[ExclusionReason] = Field(default_factory=list)
     politica_version: str
+    enriquecimiento: dict[str, dict[str, int]] = Field(default_factory=dict)
+    """Outcome counts of the enrichment step per source
+    (``{"huggingface_card": {"ok": 30, "sin_datos": 61, "error": 0}, ...}``);
+    empty when the step was disabled."""
 
     @model_validator(mode="after")
     def _check_invariants(self) -> SnapshotMeta:

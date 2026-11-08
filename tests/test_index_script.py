@@ -86,10 +86,10 @@ class TestFetchAndIndex:
         resumen = almacen.resumen()
         assert resumen["ok"] >= 20          # the Qwen families
         assert resumen["gated"] >= 50       # everything else answered 401
-        assert sum(resumen.values()) == 91
+        assert sum(resumen.values()) == 107
         out = capsys.readouterr().out
         assert "fetch: gated=" in out and "ok=" in out
-        assert "index: snapshot=snap-176d40242fd0157a familias=" in out
+        assert "index: snapshot=snap-f84e4af19dfbc6b8 familias=" in out
 
         indexadas = IndiceEvidencia(qdrant, FakeEmbedder()).familias_indexadas()
         assert len(indexadas) == resumen["ok"]
@@ -108,9 +108,9 @@ class TestFetchAndIndex:
             _run(tmp_path, "--skip-index", client=client)
             primera = len(llamadas)
             _run(tmp_path, "--skip-index", client=client)
-        assert primera == 91
-        assert len(llamadas) == 91  # nothing re-downloaded
-        assert "cached=91" in capsys.readouterr().out
+        assert primera == 107
+        assert len(llamadas) == 107  # nothing re-downloaded
+        assert "cached=107" in capsys.readouterr().out
 
     def test_refetch_downloads_again(self, tmp_path: Path) -> None:
         llamadas: list[str] = []
@@ -122,7 +122,7 @@ class TestFetchAndIndex:
         with httpx.Client(transport=httpx.MockTransport(handler)) as client:
             _run(tmp_path, "--skip-index", client=client)
             _run(tmp_path, "--skip-index", "--refetch", client=client)
-        assert len(llamadas) == 182
+        assert len(llamadas) == 214  # 2 x 107 families
 
     def test_skip_fetch_indexes_stored_docs_only(self, tmp_path: Path) -> None:
         with _client(("/Qwen/",)) as client:
@@ -139,7 +139,7 @@ class TestFetchAndIndex:
         with httpx.Client(transport=httpx.MockTransport(boom)) as client:
             code = _run(tmp_path, "--skip-index", client=client)
         assert code == script.EXIT_OK
-        assert AlmacenDocumentos(tmp_path / "docs").resumen() == {"error": 91}
+        assert AlmacenDocumentos(tmp_path / "docs").resumen() == {"error": 107}
 
 
 class TestFailures:
