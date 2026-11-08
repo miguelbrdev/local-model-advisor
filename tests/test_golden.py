@@ -14,6 +14,8 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from src.benchmarks.provider import BenchmarksLocales
+from src.benchmarks.snapshot import DEFAULT_BENCHMARKS_BOOTSTRAP_PATH
 from src.catalog.synced import CatalogoSincronizado
 from src.compatibility.heuristica import HeuristicaParametrosProvider
 from src.evaluation.golden import (
@@ -244,13 +246,22 @@ class TestCommittedSuite:
         catalogo = CatalogoSincronizado(
             runtime_dir=tmp_path / "absent", bootstrap_path=DEFAULT_BOOTSTRAP_PATH
         )
-        informe = evaluar_suite(suite, catalogo=catalogo, vram_provider=PROVIDER)
+        benchmarks = BenchmarksLocales(
+            runtime_path=tmp_path / "absent.json", bootstrap_path=DEFAULT_BENCHMARKS_BOOTSTRAP_PATH
+        )
+        informe = evaluar_suite(
+            suite, catalogo=catalogo, vram_provider=PROVIDER, benchmarks=benchmarks
+        )
 
         fallos = {r.id: r.fallos for r in informe.resultados if not r.aprobado}
         assert fallos == {}, fallos
         assert informe.snapshot_coincide, (
             "the committed suite must be written for the committed bootstrap; "
             "re-review the cases when the bootstrap is re-promoted"
+        )
+        assert informe.benchmarks_coinciden, (
+            "the committed suite must be written for the committed benchmark bootstrap; "
+            "re-review the cases when benchmarks are re-promoted"
         )
         assert informe.hit_rate == 1.0
         assert informe.tasa_exclusion == 1.0

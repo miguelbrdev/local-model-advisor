@@ -1,0 +1,278 @@
+# Reviewed mapping: catalogue family (canirun_id) -> exact model names in the
+# approved benchmark sources.  This file is the ONLY bridge between the
+# catalogue and the benchmark data: the sync never guesses a name, and a
+# family that is not listed here (or whose pinned name is absent from the
+# downloaded data) simply gets no score, which the scorer treats as neutral.
+#
+# Fields per family (all optional):
+#   epoch_model_version      "Model version" in Epoch AI's per-benchmark CSVs
+#                            (gpqa_diamond, math_level_5, swe_bench_verified).
+#                            Suffix _none = run without reasoning; _low/_medium/
+#                            _high/_max/_minimal = reasoning effort of the run.
+#                            The pinned name is the default or highest-effort run
+#                            of the exact open checkpoint in the catalogue.
+#   epoch_eci_model          "Model" in epoch_capabilities_index/eci_scores.csv
+#                            (Epoch Capabilities Index, general capability).
+#   artificial_analysis_slug "slug" in the Artificial Analysis Data API; only
+#                            models whose free-tier Intelligence Index is not
+#                            null are worth pinning.
+#   nota                     reviewer remark (why a name was chosen or left out).
+#
+# Rules followed when reviewing (2026-11-08, data of the same day):
+#   * Same checkpoint only: no base/instruct swaps, no other size, no newer
+#     revision (e.g. our deepseek-v4-flash is the April release, so the July
+#     "0731" rows are NOT used; Granite 4.1 is not Granite 4.2).
+#   * API-only aliases ("deepseek-chat", "qwen3.5-plus") are never used.
+#   * Reasoning effort: the default run of the model (thinking enabled where the
+#     model supports it) or, when only effort-suffixed rows exist, the highest
+#     effort, which is what a local user gets with reasoning on.
+#   * Mirrors: lmstudio-community GGUF repos are the same weights as the
+#     upstream model, so the upstream row is used.
+#
+# Measured coverage against snap-176d40242fd0157a: 46 of 91 families get at
+# least one Epoch AI score; 8 get an Artificial Analysis index.
+version: "1.0.0"
+snapshot_id: "snap-176d40242fd0157a"
+familias:
+  # --- up to 2B ---------------------------------------------------------------
+  qwen3.5-0.8b:
+    nota: Artificial Analysis lists it but its free-tier index is null; Epoch has no row.
+  qwen3-0.6b:
+    nota: No row in either source.
+  llama3.2-1b:
+    epoch_model_version: Llama-3.2-1B-Instruct
+  gemma3-1b:
+    epoch_model_version: gemma-3-1b-it
+  qwen2.5-coder-1.5b:
+    epoch_eci_model: Qwen2.5-Coder (1.5B)
+  deepseek-r1-1.5b:
+    epoch_model_version: DeepSeek-R1-Distill-Qwen-1.5B
+  qwen3-1.7b:
+    epoch_model_version: qwen3-1.7b
+    nota: Thinking run; qwen3-1.7b_none is the no-thinking run.
+  qwen3.5-2b:
+    nota: No row in either source (AA index null).
+
+  # --- 3B to 9B ---------------------------------------------------------------
+  llama3.2-3b:
+    nota: No row in either source.
+  smollm3-3b:
+    nota: No row in either source.
+  granite-4.1-3b:
+    nota: Sources only have Granite 4.0 / 4.2 rows; not the same checkpoint.
+  phi-4-mini-reasoning:
+    nota: No row in either source.
+  gemma3-4b:
+    epoch_model_version: gemma-3-4b-it
+  qwen3.5-4b:
+    nota: AA index null; Epoch has no row.
+  gemma4-e2b-it:
+    nota: No row in either source.
+  gemma4-e4b-it:
+    nota: No row in either source.
+  qwen2.5-coder-7b:
+    epoch_eci_model: Qwen2.5-Coder (7B)
+  deepseek-r1-7b:
+    nota: Epoch has the 1.5B/14B/32B distils but not the 7B.
+  llama3.1-8b:
+    epoch_model_version: Llama-3.1-8B-Instruct
+    epoch_eci_model: Llama 3.1-8B
+  qwen3-8b:
+    epoch_model_version: qwen3-8b
+    epoch_eci_model: Qwen3-8B
+  granite-4.1-8b:
+    nota: Sources only have Granite 4.0 / 4.2 rows.
+  ministral-8b:
+    epoch_model_version: ministral-8b-2410
+  glm-4-9b:
+    nota: No row in either source.
+  nemotron-nano-9b:
+    nota: AA lists "NVIDIA Nemotron Nano 9B V2" with a null index; Epoch has no row.
+  qwen3.5-9b:
+    epoch_model_version: qwen3.5-9B
+    epoch_eci_model: Qwen3.5-9B
+  ornith-1.0-9b:
+    nota: No row in either source.
+
+  # --- 12B to 20B -------------------------------------------------------------
+  gemma3-12b:
+    epoch_model_version: gemma-3-12b-it
+  mistral-nemo-12b:
+    epoch_model_version: open-mistral-nemo-2407
+    epoch_eci_model: Mistral NeMo
+  phi-4-14b:
+    epoch_model_version: phi-4
+    epoch_eci_model: Phi-4
+  qwen3-14b:
+    epoch_model_version: qwen3-14b
+    epoch_eci_model: Qwen3-14B
+  deepseek-r1-14b:
+    epoch_model_version: DeepSeek-R1-Distill-Qwen-14B
+  llama4-scout-17b:
+    epoch_model_version: Llama-4-Scout-17B-16E-Instruct
+    epoch_eci_model: Llama 4 Scout
+  gpt-oss-20b:
+    epoch_model_version: gpt-oss-20b_high
+    epoch_eci_model: gpt-oss-20b
+    nota: AA lists gpt-oss-20b (High/Low) but the free-tier index is null.
+
+  # --- 24B to 35B -------------------------------------------------------------
+  lfm2-24b:
+    nota: No row in either source.
+  devstral-small-2-24b:
+    nota: AA lists "Devstral 2" with a null index; Epoch has no row.
+  mistral-small-24b:
+    epoch_model_version: mistral-small-3.1-2503
+    nota: Catalogue entry is Mistral Small 3.1 24B (2503).
+  gemma4-26b-a4b-it:
+    epoch_model_version: gemma-4-26b-a4b-it_minimal
+    epoch_eci_model: Gemma 4 26B A4B
+    nota: Only the _minimal effort run exists in Epoch.
+  diffusiongemma-26b-a4b-it:
+    nota: No row in either source.
+  qwen3.5-27b:
+    nota: AA lists "Qwen3.5 27B (Reasoning)" with a null index; Epoch has no row.
+  gemma4-31b-it:
+    epoch_model_version: gemma-4-31b-it_minimal
+    epoch_eci_model: Gemma 4 31B IT
+    artificial_analysis_slug: gemma-4-31b
+    nota: AA "Gemma 4 31B (Reasoning)"; Epoch only has the _minimal effort run.
+  gemma4-31b:
+    nota: Base (pre-trained) checkpoint; the sources only measure the instruct model.
+  qwen3-30b-a3b:
+    epoch_model_version: Qwen3-30B-A3B
+    epoch_eci_model: Qwen3-30B-A3B
+    nota: Thinking run; Qwen3-30B-A3B_none is the no-thinking run.
+  agents-a1:
+    nota: No row in either source.
+  nemotron-nano-30b:
+    nota: AA lists "NVIDIA Nemotron 3 Nano 30B A3B" with a null index; Epoch has no row.
+  granite-4.1-30b:
+    nota: Sources only have Granite 4.0 / 4.2 rows.
+  north-mini-code-1.0:
+    artificial_analysis_slug: north-mini-code
+  qwen3-32b:
+    epoch_model_version: Qwen3-32B
+    epoch_eci_model: Qwen3-32B
+  deepseek-r1-32b:
+    epoch_model_version: DeepSeek-R1-Distill-Qwen-32B
+  olmo2-32b:
+    nota: No row in either source.
+  command-r-35b:
+    nota: No row in either source.
+  qwen3.5-35b-a3b:
+    epoch_model_version: qwen3.5-35b-a3b
+    epoch_eci_model: Qwen3.5-35B-A3B
+  ornith-1.0-35b:
+    nota: No row in either source.
+  mixtral-8x7b:
+    epoch_model_version: Mixtral-8x7B-Instruct-v0.1
+    epoch_eci_model: Mixtral 8x7B
+
+  # --- 70B and above ----------------------------------------------------------
+  qwen3-next-80b-a3b:
+    nota: AA lists "Qwen3 Next 80B A3B Instruct" with a null index; Epoch has no row.
+  qwen3-coder-next-80b-a3b:
+    nota: No row in either source.
+  llama3.3-70b:
+    epoch_model_version: Llama-3.3-70B-Instruct
+    epoch_eci_model: Llama 3.3 70B
+  gpt-oss-120b:
+    epoch_model_version: openai/gpt-oss-120b_high
+    epoch_eci_model: gpt-oss-120b
+  qwen3.5-122b-a10b:
+    nota: AA lists it (Reasoning/Non-reasoning) with null indices; Epoch has no row.
+  llama4-maverick-17b-128e:
+    epoch_model_version: Llama-4-Maverick-17B-128E-Instruct-FP8
+    epoch_eci_model: Llama 4 Maverick
+    nota: Epoch measured Meta's official FP8 release of the same checkpoint.
+  qwen3-235b-a22b:
+    epoch_model_version: qwen3-235b-a22b
+    epoch_eci_model: Qwen3-235B-A22B
+  qwen3-vl-235b-a22b:
+    nota: No row in either source.
+  qwen3.5-397b-a17b:
+    epoch_model_version: qwen3.5-397b-a17b
+    epoch_eci_model: Qwen3.5 397B-A17B
+    nota: AA lists it with a null index.
+  qwen3-coder-480b:
+    nota: AA lists "Qwen3 Coder 480B A35B Instruct" with a null index; Epoch has no row.
+  hy3:
+    nota: No row in either source.
+  deepseek-r1:
+    epoch_model_version: DeepSeek-R1
+    epoch_eci_model: DeepSeek-R1
+    nota: January 2025 release; DeepSeek-R1-0528 is a later revision.
+  deepseek-v3.2:
+    epoch_eci_model: DeepSeek-V3.2
+    nota: Epoch benchmark rows only exist under API aliases (deepseek-chat/-reasoner).
+  qwen3-coder-30b:
+    nota: No row in either source.
+  qwen3.6-27b:
+    epoch_model_version: qwen3.6-27b
+    epoch_eci_model: Qwen3.6 27B
+    nota: AA lists "Qwen3.6 27B (Non-reasoning)" with a null index.
+  qwen3.6-35b-a3b:
+    epoch_model_version: qwen3.6-35b-a3b
+    epoch_eci_model: Qwen 3.6 35B-A3B
+  glm-4.5-air:
+    nota: No row in either source.
+  glm-4.6:
+    nota: No row in either source (Epoch has GLM-4.7, not 4.6).
+  glm-5:
+    epoch_model_version: glm-5
+    epoch_eci_model: GLM-5
+  glm-5.1:
+    epoch_model_version: glm-5.1
+    epoch_eci_model: GLM-5.1
+  glm-5.2:
+    epoch_model_version: glm-5.2_max
+    epoch_eci_model: GLM-5.2
+  glm-5.3:
+    epoch_model_version: glm-5.3_max
+    epoch_eci_model: GLM-5.3
+    artificial_analysis_slug: glm-5-3
+    nota: AA "GLM-5.3 (Max)".
+  longcat-2.0:
+    nota: No row in either source.
+  deepseek-v4-flash:
+    epoch_eci_model: DeepSeek-V4-Flash
+    nota: Epoch benchmark rows are the July "0731" revision, not our April checkpoint.
+  deepseek-v4-pro:
+    epoch_model_version: deepseek-v4-pro_max
+    epoch_eci_model: DeepSeek-V4-Pro
+    nota: AA only has the August "0813" revision; not used.
+  kimi-k2.6:
+    epoch_model_version: kimi-k2.6
+    epoch_eci_model: Kimi K2.6
+  kimi-k3:
+    epoch_model_version: kimi-k3_max
+    epoch_eci_model: Kimi K3
+    nota: AA only exposes the Low-effort run with an index; not used.
+  qwen3.8-27b:
+    epoch_eci_model: Qwen 3.8 27B
+    artificial_analysis_slug: qwen3-8-27b
+    nota: AA "Qwen3.8 27B (Xhigh)"; Epoch has no benchmark rows for the 27B.
+  muse-glimmer-30b:
+    artificial_analysis_slug: muse-glimmer
+  qwen3.8-2.4t-a95b:
+    nota: Only API aliases (qwen3.8-max) in the sources; not used.
+  minimax-m3:
+    epoch_model_version: MiniMax-M3
+    epoch_eci_model: MiniMax-M3
+    artificial_analysis_slug: minimax-m3
+  gemma4-12b-it:
+    nota: AA lists "Gemma 4 12B (Non-reasoning)" with a null index; Epoch has no row.
+  mistral-small-4-119b:
+    artificial_analysis_slug: mistral-small-4
+    nota: AA "Mistral Small 4 (Reasoning)".
+  ministral-3-3b:
+    nota: No row in either source.
+  ministral-3-14b:
+    nota: No row in either source.
+  qwen3-vl-4b:
+    nota: No row in either source.
+  qwen3-vl-8b:
+    nota: AA lists "Qwen3 VL 8B Instruct" with a null index; Epoch has no row.
+  qwen3-vl-30b-a3b:
+    nota: No row in either source.

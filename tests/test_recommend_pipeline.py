@@ -201,7 +201,7 @@ class TestHappyPath:
         assert all(r.puntuacion_total >= 0 for r in results)
 
     def test_subpuntuaciones_present(self) -> None:
-        """Each result contains 6 explainable sub-scores."""
+        """Each result contains 7 explainable sub-scores."""
         provider_results = {
             "model-a": _compatible("model-a"),
             "model-b": _compatible("model-b"),
@@ -218,10 +218,11 @@ class TestHappyPath:
             )
 
         for candidate in results:
-            assert len(candidate.subpuntuaciones) == 6
+            assert len(candidate.subpuntuaciones) == 7
             names = {s.criterio for s in candidate.subpuntuaciones}
             assert names == {
-                "ajuste_vram", "capacidad", "especializacion", "recencia", "contexto", "licencia",
+                "ajuste_vram", "capacidad", "capacidad_medida", "especializacion",
+                "recencia", "contexto", "licencia",
             }
 
     def test_provider_called_for_each_family(self) -> None:
@@ -398,7 +399,7 @@ class TestProviderUnavailable:
             )
 
         assert len(results) == 1
-        assert len(results[0].subpuntuaciones) == 6
+        assert len(results[0].subpuntuaciones) == 7
 
 
 # ---------------------------------------------------------------------------

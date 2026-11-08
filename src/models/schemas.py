@@ -77,17 +77,38 @@ class CompatibilityResult(BaseModel):
 # ---------------------------------------------------------------------------
 
 class EvidenciaBenchmark(BaseModel):
-    """Structured benchmark data for a specific checkpoint.
+    """One measured capability score for a catalogue family.
 
-    Only matched by exact HF model ID — never extrapolated between
-    checkpoints, quantisations, base/instruct variants, or repos.
+    Produced by ``scripts/sync_benchmarks.py`` from an explicitly approved
+    source (Epoch AI's Benchmarking Hub or Artificial Analysis) through
+    the reviewed mapping table ``data/benchmark_mapping.yaml`` — never by
+    fuzzy name matching, never extrapolated between checkpoints or
+    quantisations.  Unlike ``EvidenciaExplicativa`` this *is* ranking
+    evidence: the scorer reads ``valor_normalizado`` for the
+    ``capacidad_medida`` criterion.
+
+    Attributes:
+        fuente: Source the score was taken from.
+        benchmark: Benchmark or index key (``gpqa_diamond``,
+            ``math_level_5``, ``swe_bench_verified``, ``eci``,
+            ``intelligence_index``).
+        metrica: Name of the metric as the source labels it.
+        valor: Raw value as published by the source.
+        valor_normalizado: ``valor`` mapped onto 0–1 with the documented
+            bounds of that benchmark (random baseline / ceiling for
+            accuracies, fixed anchors for indices).
+        modelo_fuente: Exact model name in the source the mapping pinned.
+        fecha_modelo: Release date the source records, if any.
+        nota: Free-text caveat (e.g. reasoning effort of the run).
     """
 
-    fuente: Literal["openevals", "model_index"]
+    fuente: Literal["epoch_ai", "artificial_analysis"]
     benchmark: str
     metrica: str
     valor: float
-    cobertura_percent: float | None = None
+    valor_normalizado: float = Field(ge=0, le=1)
+    modelo_fuente: str
+    fecha_modelo: str | None = None
     nota: str = ""
 
 
@@ -152,7 +173,7 @@ class CandidatoRankeado(BaseModel):
     familia: FamiliaModelo
     variante_recomendada: str
     compatibilidad_vram: CompatibilityResult
-    evidencia_benchmark: EvidenciaBenchmark | None = None
+    evidencia_benchmark: list[EvidenciaBenchmark] = Field(default_factory=list)
     subpuntuaciones: list[SubPuntuacion] = Field(default_factory=list)
     puntuacion_total: float = 0.0
     evidencia_explicativa: list[EvidenciaExplicativa] = Field(default_factory=list)
@@ -211,6 +232,7 @@ class RespuestaRecomendacion(BaseModel):
     criterios_interpretados: CriteriosBusqueda
     candidatos: list[CandidatoRankeado]
     limitaciones: list[str] = Field(default_factory=list)
+    atribuciones: list[str] = Field(default_factory=list)
     datos_actualizados_hace: str = ""
 
 

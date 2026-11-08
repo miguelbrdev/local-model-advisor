@@ -31,6 +31,9 @@ from src.api.main import (
     describir_antiguedad,
     dias_desde,
 )
+from src.benchmarks import provider as benchmarks_provider
+from src.benchmarks.fuentes import FuenteMeta
+from src.benchmarks.snapshot import construir_snapshot, write_snapshot
 from src.catalog import synced
 from src.catalog.protocol import CatalogUnavailableError
 from src.chains.extraccion_criterios import (
@@ -43,6 +46,7 @@ from src.models.schemas import (
     CandidatoRankeado,
     CompatibilityResult,
     CriteriosBusqueda,
+    EvidenciaBenchmark,
     FamiliaModelo,
 )
 from src.state import conversation_store
@@ -92,6 +96,30 @@ def _write_bootstrap(path: Path, familias: list[FamiliaModelo]) -> None:
         json.dumps(snapshot.model_dump(mode="json"), ensure_ascii=False),
         encoding="utf-8",
     )
+
+
+def _point_benchmark_sources(
+    monkeypatch: pytest.MonkeyPatch, *, runtime_path: Path, bootstrap_path: Path
+) -> None:
+    """Redirect the zero-argument ``BenchmarksLocales`` defaults (same seam as
+    the catalogue: ``lifespan`` builds it with no arguments)."""
+    monkeypatch.setattr(benchmarks_provider, "DEFAULT_RUNTIME_BENCHMARKS_PATH", runtime_path)
+    monkeypatch.setattr(benchmarks_provider, "DEFAULT_BENCHMARKS_BOOTSTRAP_PATH", bootstrap_path)
+
+
+def _write_benchmarks(path: Path, puntuaciones: dict) -> str:
+    """Write a one-source benchmark snapshot and return its id."""
+    meta = FuenteMeta(
+        nombre="epoch_ai", version="2026-11-08", url="https://epoch.ai/data/benchmark_data.zip",
+        licencia="CC BY 4.0", atribucion="Source: Epoch AI (CC BY 4.0)", redistribuible=True,
+        registros=1, descargado_en=datetime(2026, 11, 8, tzinfo=UTC),
+    )
+    snapshot = construir_snapshot(
+        puntuaciones, [meta], fecha=datetime(2026, 11, 8, tzinfo=UTC),
+        mapeo_version="t", mapeo_snapshot_id="snap-test", familias_mapeadas=len(puntuaciones),
+    )
+    write_snapshot(snapshot, path)
+    return snapshot.meta.snapshot_id
 
 
 def _point_catalogue_sources(
@@ -160,6 +188,13 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClie
         runtime_dir=tmp_path / "runtime" / "catalog",
         bootstrap_path=bootstrap,
     )
+    # No benchmark snapshot by default: ``capacidad_medida`` is neutral and
+    # the response carries the "no benchmark snapshot" limitation.
+    _point_benchmark_sources(
+        monkeypatch,
+        runtime_path=tmp_path / "runtime" / "benchmarks" / "current.json",
+        bootstrap_path=tmp_path / "data" / "benchmarks_bootstrap.json",
+    )
     # Free-text extraction and explanatory evidence off by default: no test
     # may reach Ollama or Qdrant.  Tests of those paths mount fakes on
     # ``app.state.extractor`` / ``app.state.evidencia``.
@@ -171,15 +206,21 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClie
 
 EVIDENCIA_OFF = "Explanatory evidence is disabled (LMA_EVIDENCIA=0)."
 OBSOLETO_PREFIJO = "Catalogue snapshot is "
+SIN_BENCHMARKS = (
+    "No benchmark snapshot loaded (run python -m scripts.sync_benchmarks); "
+    "capacidad_medida is neutral for every candidate."
+)
 
 
 def _extras(limitaciones: list[str]) -> list[str]:
-    """Request-specific limitations: strip the base list and the staleness
-    line (the fixture's 2026-01-01 snapshot is always stale)."""
+    """Request-specific limitations: strip the base list, the "no benchmark
+    snapshot" line (the fixture mounts none) and the staleness line (the
+    fixture's 2026-01-01 snapshot is always stale)."""
     assert limitaciones[: len(LIMITACIONES_BASE)] == LIMITACIONES_BASE
     resto = limitaciones[len(LIMITACIONES_BASE):]
-    assert resto and resto[0].startswith(OBSOLETO_PREFIJO)
-    return resto[1:]
+    assert resto and resto[0] == SIN_BENCHMARKS
+    assert resto[1].startswith(OBSOLETO_PREFIJO)
+    return resto[2:]
 
 
 class _FakeBuscador:
@@ -271,6 +312,8 @@ class TestHealth:
         assert data["catalogo_dias"] > DIAS_OBSOLESCENCIA_CATALOGO
         assert data["api_key_requerida"] is False
         assert data["modelos_listos"] is None  # warm-up disabled by the fixture
+        assert data["benchmarks_snapshot_id"] is None  # fixture mounts no snapshot
+        assert data["benchmarks_fuentes"] == []
 
     def test_health_needs_no_api_key(self, client: TestClient, monkeypatch) -> None:
         app.state.api_key = "s3cret"
@@ -1080,3 +1123,81 @@ class TestCatalogueWiring:
         message = str(excinfo.value)
         assert str(runtime) in message
         assert str(bootstrap) in message
+
+
+class TestBenchmarks:
+    """Benchmark snapshot mounted at startup: health, attributions, limitations."""
+
+    @pytest.fixture
+    def client_con_benchmarks(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> Iterator[tuple[TestClient, str]]:
+        bootstrap = tmp_path / "data" / "catalog_bootstrap.json"
+        _write_bootstrap(bootstrap, [_fam("test-model")])
+        _point_catalogue_sources(
+            monkeypatch, runtime_dir=tmp_path / "runtime" / "catalog", bootstrap_path=bootstrap
+        )
+        benchmarks = tmp_path / "data" / "benchmarks_bootstrap.json"
+        snapshot_id = _write_benchmarks(benchmarks, {"other-id": [_evidencia()]})
+        _point_benchmark_sources(
+            monkeypatch,
+            runtime_path=tmp_path / "runtime" / "absent.json",
+            bootstrap_path=benchmarks,
+        )
+        monkeypatch.setenv("LMA_EXTRACCION_LLM", "0")
+        monkeypatch.setenv("LMA_EVIDENCIA", "0")
+        with TestClient(app) as test_client:
+            yield test_client, snapshot_id
+
+    def test_health_reports_snapshot_and_sources(self, client_con_benchmarks) -> None:
+        client, snapshot_id = client_con_benchmarks
+        data = client.get("/health").json()
+        assert data["benchmarks_snapshot_id"] == snapshot_id
+        assert data["benchmarks_fuentes"] == ["epoch_ai"]
+
+    def test_chat_without_snapshot_has_no_attributions(self, client: TestClient) -> None:
+        with patch("src.api.main.ejecutar_pipeline") as mock_pipeline:
+            mock_pipeline.return_value = _mock_pipeline_result()
+            data = client.post(
+                "/chat", json={"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
+            ).json()
+        assert data["atribuciones"] == []
+        assert SIN_BENCHMARKS in data["limitaciones"]
+        assert mock_pipeline.call_args.kwargs["benchmarks"] is app.state.benchmarks
+
+    def test_chat_with_snapshot_attributes_and_counts_unmeasured(
+        self, client_con_benchmarks
+    ) -> None:
+        client, _ = client_con_benchmarks
+        with patch("src.api.main.ejecutar_pipeline") as mock_pipeline:
+            mock_pipeline.return_value = _mock_pipeline_result()  # candidate without scores
+            data = client.post(
+                "/chat", json={"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
+            ).json()
+        assert data["atribuciones"] == ["Source: Epoch AI (CC BY 4.0)"]
+        assert SIN_BENCHMARKS not in data["limitaciones"]
+        assert any(
+            line.startswith("1 of 1 candidates have no benchmark data")
+            for line in data["limitaciones"]
+        )
+
+    def test_chat_with_snapshot_and_measured_candidate_has_no_count_line(
+        self, client_con_benchmarks
+    ) -> None:
+        client, _ = client_con_benchmarks
+        candidato = _mock_pipeline_result()[0]
+        candidato.evidencia_benchmark = [_evidencia()]
+        with patch("src.api.main.ejecutar_pipeline") as mock_pipeline:
+            mock_pipeline.return_value = [candidato]
+            data = client.post(
+                "/chat", json={"mensaje": json.dumps({"tarea": "codigo", "vram_gb": 11.0})}
+            ).json()
+        assert not any("no benchmark data" in line for line in data["limitaciones"])
+        assert data["candidatos"][0]["evidencia_benchmark"][0]["benchmark"] == "eci"
+
+
+def _evidencia() -> EvidenciaBenchmark:
+    return EvidenciaBenchmark(
+        fuente="epoch_ai", benchmark="eci", metrica="eci", valor=132.2,
+        valor_normalizado=0.54, modelo_fuente="Qwen3-8B",
+    )

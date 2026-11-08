@@ -6,10 +6,12 @@ explicit and documented.  Same input always produces the same ranking.
 
 Inputs read today (and nothing else): ``tareas_soportadas``,
 ``license_declarada``, ``fecha_lanzamiento`` and ``contexto_maximo`` from
-the family, ``vram_required_gb`` from the compatibility result, and the
-user's available VRAM and requested task.  All of them come from the
+the family, ``vram_required_gb`` from the compatibility result, the
+candidate's ``evidencia_benchmark`` (scores from the approved benchmark
+snapshot, attached by the pipeline through the reviewed mapping), and the
+user's available VRAM and requested task.  Catalogue fields come from the
 synced source (canIRun.ai exposes ``releaseDate`` and ``contextLength``);
-nothing is inferred from model names or benchmarks.
+nothing is inferred from model names.
 
 Criteria:
 
@@ -26,6 +28,15 @@ Criteria:
 * ``contexto`` — log scale of the context window from 4k (0.0) to 1M
   (1.0): 32k ≈ 0.38, 128k ≈ 0.63, 256k ≈ 0.75.
 * ``licencia`` — permissive / other / none.
+* ``capacidad_medida`` — measured capability from the benchmark snapshot
+  (Epoch AI, optionally Artificial Analysis).  Task-specific benchmarks
+  first (SWE-bench Verified for ``codigo``; GPQA Diamond and MATH level 5
+  for ``razonamiento``), otherwise a general index (Epoch Capabilities
+  Index, then the Artificial Analysis Intelligence Index).  Values are the
+  source's normalised 0–1 scores, averaged when several apply; neutral
+  for families without a reviewed mapping entry or without data.  It
+  complements ``capacidad``, whose VRAM proxy over-reads mixture-of-experts
+  models.
 
 VRAM policy: *the most capable model that still fits comfortably*.
 ``ajuste_vram`` is a safety margin (full score up to
@@ -46,6 +57,7 @@ from src.compatibility.vram import FRACCION_VRAM_UTIL
 from src.models.schemas import (
     CandidatoRankeado,
     CompatibilityResult,
+    EvidenciaBenchmark,
     FamiliaModelo,
     SubPuntuacion,
 )
@@ -53,9 +65,10 @@ from src.tools.licencias import es_licencia_permisiva
 
 # Default weights — documented, never hidden.  They sum to 1.0.
 PESOS: dict[str, float] = {
-    "ajuste_vram": 0.30,
-    "capacidad": 0.20,
-    "especializacion": 0.20,
+    "ajuste_vram": 0.25,
+    "capacidad": 0.15,
+    "capacidad_medida": 0.15,
+    "especializacion": 0.15,
     "recencia": 0.12,
     "contexto": 0.08,
     "licencia": 0.10,
@@ -69,6 +82,24 @@ CONTEXTO_MAXIMO = 1_048_576
 """Context-window bounds of the ``contexto`` log scale."""
 
 TAREAS_CON_ESPECIALIZACION = frozenset({"codigo", "razonamiento"})
+
+BENCHMARKS_POR_TAREA: dict[str, tuple[str, ...]] = {
+    "codigo": ("swe_bench_verified",),
+    "razonamiento": ("gpqa_diamond", "math_level_5"),
+}
+"""Task-specific benchmark keys, in the order they are reported."""
+
+INDICES_GENERALES: tuple[str, ...] = ("eci", "intelligence_index")
+"""General capability indices, in order of preference: the Epoch index
+covers far more local models, and the two are never mixed for one candidate."""
+
+NOMBRES_BENCHMARK = {
+    "swe_bench_verified": "SWE-bench Verified",
+    "gpqa_diamond": "GPQA Diamond",
+    "math_level_5": "MATH level 5",
+    "eci": "Epoch Capabilities Index",
+    "intelligence_index": "Artificial Analysis Intelligence Index",
+}
 
 VALOR_NEUTRO = 0.5
 """Sub-score used when the data needed to judge a criterion is missing.
@@ -86,7 +117,8 @@ def calcular_puntuacion(
     """Compute the total score for a candidate and attach its sub-scores.
 
     Args:
-        candidato: Candidate with its VRAM compatibility already resolved.
+        candidato: Candidate with its VRAM compatibility already resolved
+            and, when available, ``evidencia_benchmark`` attached.
             Mutated in place: ``subpuntuaciones`` and ``puntuacion_total``
             are overwritten.
         vram_disponible_gb: VRAM the user has available.  Needed by
@@ -109,6 +141,9 @@ def calcular_puntuacion(
     subpuntuaciones = [
         _puntuar_ajuste_vram(vram, vram_disponible_gb, pesos["ajuste_vram"]),
         _puntuar_capacidad(vram, vram_disponible_gb, pesos["capacidad"]),
+        _puntuar_capacidad_medida(
+            candidato.evidencia_benchmark, tarea, pesos["capacidad_medida"]
+        ),
         _puntuar_especializacion(familia, tarea, pesos["especializacion"]),
         _puntuar_recencia(familia, fecha_referencia, pesos["recencia"]),
         _puntuar_contexto(familia, pesos["contexto"]),
@@ -288,6 +323,53 @@ def _puntuar_licencia(familia: FamiliaModelo, peso: float) -> SubPuntuacion:
         valor=valor,
         peso=peso,
         justificacion=f"License: {familia.license_declarada or 'unknown'}",
+    )
+
+
+def _puntuar_capacidad_medida(
+    evidencias: list[EvidenciaBenchmark], tarea: str | None, peso: float
+) -> SubPuntuacion:
+    """Measured capability from the benchmark snapshot.
+
+    Uses the task-specific benchmarks in :data:`BENCHMARKS_POR_TAREA` when
+    the candidate has any (mean of their normalised values), else the
+    first general index of :data:`INDICES_GENERALES` it has, else
+    :data:`VALOR_NEUTRO`.  Only ``valor_normalizado`` is read: the
+    normalisation (baseline/ceiling or fixed anchors) is decided and
+    documented at synchronisation time, never here.
+    """
+    claves = BENCHMARKS_POR_TAREA.get(tarea or "", ())
+    especificos = [e for e in evidencias if e.benchmark in claves]
+    if especificos:
+        valor = sum(e.valor_normalizado for e in especificos) / len(especificos)
+        return SubPuntuacion(
+            criterio="capacidad_medida",
+            valor=round(valor, 4),
+            peso=peso,
+            justificacion="; ".join(_describir_evidencia(e) for e in especificos),
+        )
+    for indice in INDICES_GENERALES:
+        general = next((e for e in evidencias if e.benchmark == indice), None)
+        if general is not None:
+            return SubPuntuacion(
+                criterio="capacidad_medida",
+                valor=general.valor_normalizado,
+                peso=peso,
+                justificacion=_describir_evidencia(general),
+            )
+    return SubPuntuacion(
+        criterio="capacidad_medida",
+        valor=VALOR_NEUTRO,
+        peso=peso,
+        justificacion="No benchmark data for this family (neutral)",
+    )
+
+
+def _describir_evidencia(e: EvidenciaBenchmark) -> str:
+    fuente = {"epoch_ai": "Epoch AI", "artificial_analysis": "Artificial Analysis"}[e.fuente]
+    return (
+        f"{NOMBRES_BENCHMARK.get(e.benchmark, e.benchmark)} {e.valor:g} "
+        f"(normalised {e.valor_normalizado:.2f}; {fuente}, {e.modelo_fuente})"
     )
 
 

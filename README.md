@@ -27,7 +27,7 @@ canIRun.ai catalog: the API boots from the local snapshot (or the committed
 bootstrap), filters by task, license, language and VRAM, and ranks with an
 explicit weighted score.
 
-**Pipeline served by the synced catalog; `scripts/sync_catalog.py` ready for the OS scheduler.**
+**Pipeline served by the synced catalog; measured capability from Epoch AI benchmarks; `scripts/sync_catalog.py` and `scripts/sync_benchmarks.py` ready for the OS scheduler.**
 
 Implemented:
 
@@ -58,10 +58,19 @@ Implemented:
   parameter-count heuristic (`src/compatibility/heuristica.py`) as the
   production fallback when the service is down or lacks a model; the same
   heuristic drives the offline evaluation
-- Deterministic multi-criteria ranking with six explicit sub-scores (VRAM
-  safety margin, capacity, task specialisation, recency, context window,
-  licence), following "the most capable model that still fits comfortably";
-  every signal comes from the synced catalogue, none from model names
+- Deterministic multi-criteria ranking with seven explicit sub-scores (VRAM
+  safety margin, capacity, measured capability, task specialisation, recency,
+  context window, licence), following "the most capable model that still
+  fits comfortably"; every signal comes from the synced catalogue or the
+  benchmark snapshot, none from model names
+- Measured capability (`src/benchmarks/`): benchmark scores from Epoch AI's
+  Benchmarking Hub (GPQA Diamond, MATH level 5, SWE-bench Verified and the
+  Epoch Capabilities Index; CC BY 4.0, no account) and, optionally, the
+  Artificial Analysis Intelligence Index (per-operator key), joined to the
+  catalogue only through the reviewed table `data/benchmark_mapping.yaml`.
+  `scripts/sync_benchmarks.py` writes an atomic snapshot; the Epoch-only part
+  is committed as `data/benchmarks_bootstrap.json` so a fresh clone ranks
+  with real scores, and every recommendation carries the source attribution
 - SQLite-backed server-side conversation state with a 24-hour TTL, storing
   the catalog `snapshot_id` that produced each recommendation
 - Explanatory evidence: README fragments per candidate from a Qdrant index
@@ -76,7 +85,7 @@ Implemented:
   `scripts/evaluate_golden.py`): reviewed cases pin filter and ranking
   behaviour per catalog snapshot and report pass rate, hit rate and
   exclusion rate
-- 620 automated tests and Ruff linting
+- 695 automated tests and Ruff linting
 
 Not implemented yet:
 
@@ -84,6 +93,9 @@ Not implemented yet:
   language field, so language requirements are not enforced on them
 - Runtime preference filtering
 - Hybrid (sparse + dense) retrieval and reranking of evidence
+- Benchmark coverage for every family: 46 of the 91 catalogue families have an
+  Epoch AI score today; the rest score the neutral value and the response
+  counts them
 
 ## Architecture
 
@@ -97,15 +109,22 @@ Structured filter
 VRAM compatibility provider
    |
    v
+Benchmark scores (approved snapshot, reviewed mapping)
+   |
+   v
 Deterministic weighted scorer
    |
    v
 Top-N explainable recommendations
+   |
+   v
+Explanatory README fragments (never alter a score)
 ```
 
-The ranking only uses structured and deterministic fields. Retrieved model-card
-text will be added later as explanatory evidence and will never alter a
-candidate score.
+The ranking only uses structured and deterministic fields: the synced
+catalogue, the compatibility verdict and the benchmark snapshot. Retrieved
+model-card text is attached after ranking as explanatory evidence and never
+alters a candidate score.
 
 ## Tech stack
 
@@ -195,6 +214,7 @@ ollama pull gemma4:e4b
 | `LMA_CALENTAR_MODELOS` | `1` | Load both Ollama models in the background at startup; `0` to skip |
 | `LMA_API_KEY` | unset | When set, `/chat` and `/families` require the same value in `X-API-Key` |
 | `LMA_RATE_LIMIT_POR_MINUTO` | `60` | `/chat` requests per client address per minute; `0` disables |
+| `ARTIFICIAL_ANALYSIS_API_KEY` | unset | Read only by `scripts/sync_benchmarks.py`; adds the Artificial Analysis Intelligence Index to the local benchmark snapshot |
 
 If Ollama is unreachable or returns invalid output, a free-text message gets
 `503` with a hint to send JSON; JSON input keeps working. The first message
@@ -220,6 +240,45 @@ original model. When Qdrant or the embedding model is unreachable, or a
 candidate has no indexed documentation, `limitaciones` says so and the
 recommendation is returned anyway.
 
+## Measured capability (benchmarks)
+
+`capacidad_medida` (weight 0.15) is the only sub-score fed by data outside
+the catalogue, and it comes exclusively from two approved sources:
+
+- **Epoch AI Benchmarking Hub** (mandatory, public, CC BY 4.0): the
+  `benchmark_data.zip` archive with one CSV per benchmark plus the Epoch
+  Capabilities Index. `codigo` uses SWE-bench Verified, `razonamiento` the
+  mean of GPQA Diamond and MATH level 5, `chat` the Capabilities Index;
+  a task without its own benchmark falls back to the index. Accuracies are
+  anchored on the benchmark's random baseline and ceiling, the index on fixed
+  anchors (100 → 0, 160 → 1), so a new model in the source never moves the
+  others.
+- **Artificial Analysis** (optional): the Intelligence Index from the free
+  Data API tier. It needs a per-operator key (`ARTIFICIAL_ANALYSIS_API_KEY`,
+  free account), its terms forbid redistribution, and it covers few local
+  models today, so it is used only when no Epoch index exists for a family and
+  its data never leaves `runtime/`.
+
+Scores reach a family only through `data/benchmark_mapping.yaml`, a reviewed
+table with the exact source name per family (reasoning-effort suffixes,
+revisions and API aliases are decided by a human, never by fuzzy matching).
+Families without an entry or without data score the neutral value and the
+response counts them in `limitaciones`; `atribuciones` lists the sources
+behind the data.
+
+```bash
+python -m scripts.sync_benchmarks                       # Epoch AI (+ Artificial Analysis if the key is set)
+python -m scripts.sync_benchmarks --promote-bootstrap   # also refresh data/benchmarks_bootstrap.json (Epoch only)
+python -m scripts.sync_benchmarks --skip-artificial-analysis
+```
+
+Exit codes: `0` snapshot in place, `1` Epoch AI failed (previous snapshot
+kept), `2` mapping invalid or promotion failed. An Artificial Analysis
+failure (no key, quota, 401) is reported and never fatal. Schedule it next to
+the catalogue sync (every 21 days) and review the `unmatched:` lines it
+prints after each run. The API loads `runtime/benchmarks/current.json`, else
+the committed bootstrap, else runs with neutral scores and says so.
+
 ## Docker Compose
 
 `compose.yaml` runs the API and a local Ollama server side by side, pulls the
@@ -232,6 +291,7 @@ docker compose up --build                                        # CPU
 docker compose -f compose.yaml -f compose.gpu.yaml up --build    # NVIDIA GPU
 LMA_OLLAMA_MODEL=gemma4:e2b docker compose up --build            # lighter model
 docker compose run --rm sync                                     # catalog sync cycle
+docker compose run --rm sync-benchmarks                          # benchmark scores (key read from .env)
 docker compose run --rm index                                    # READMEs -> Qdrant evidence index
 docker compose run --rm index python -m scripts.index_docs --skip-fetch   # re-index stored READMEs
 ```
@@ -297,7 +357,8 @@ Example result:
       "puntuacion_total": 0.75
     }
   ],
-  "limitaciones": ["..."]
+  "limitaciones": ["..."],
+  "atribuciones": ["Benchmark scores and Capabilities Index: Epoch AI, ..."]
 }
 ```
 
@@ -352,7 +413,13 @@ canirun.ai answers.
 python -m scripts.evaluate_golden                     # text report, exit 1 on any failure
 python -m scripts.evaluate_golden --json              # full report as JSON
 python -m scripts.evaluate_golden --strict-snapshot   # also fail on snapshot mismatch
+python -m scripts.evaluate_golden --no-benchmarks     # neutral capacidad_medida
 ```
+
+The suite ranks with the committed `data/benchmarks_bootstrap.json` (never
+with `runtime/`, whose optional Artificial Analysis data differs per
+operator) and records the benchmark snapshot it was written for
+(`benchmarks_snapshot_id`).
 
 The committed suite also runs inside `pytest`, so a ranking change that
 breaks an expectation fails CI.
@@ -393,14 +460,17 @@ Once the server is running, interactive OpenAPI documentation is available at
 ├── data/
 │   ├── catalog_policy.yaml    # versioned sync policy (categories, required fields)
 │   ├── catalog_bootstrap.json # versioned bootstrap catalog (preserves snapshot_id)
+│   ├── benchmark_mapping.yaml # reviewed family -> source model name table
+│   ├── benchmarks_bootstrap.json # Epoch-only benchmark snapshot (CC BY 4.0)
 │   └── golden_queries.yaml    # reviewed golden queries for the evaluation
 ├── docs/
 │   └── technical-design.md    # full design (local only — gitignored, not shipped)
-├── scripts/                   # sync_catalog.py (sync + retention), evaluate_golden.py, index_docs.py
+├── scripts/                   # sync_catalog.py, sync_benchmarks.py, evaluate_golden.py, index_docs.py
 ├── Dockerfile                 # API image (sources run from /app, deps from pyproject)
 ├── compose.yaml               # api + ollama + qdrant (+ model pull); sync and index profiles; compose.gpu.yaml overlay
 ├── src/
-│   ├── api/             # FastAPI endpoints and app lifespan (mounts the catalog)
+│   ├── api/             # FastAPI endpoints and app lifespan (mounts catalog + benchmarks)
+│   ├── benchmarks/      # Approved benchmark sources, reviewed mapping, snapshot, provider
 │   ├── catalog/         # Catalog protocol + synchronized adapter with fallback chain
 │   ├── chains/          # Recommendation orchestration and criteria extraction (JSON / Ollama)
 │   ├── compatibility/   # Interchangeable VRAM providers (canirun.ai, offline heuristic)
@@ -411,7 +481,7 @@ Once the server is running, interactive OpenAPI documentation is available at
 │   ├── state/           # SQLite conversation persistence
 │   ├── sync/            # Catalog sync: download, policy, normalization, snapshots, bootstrap, retention
 │   └── tools/           # Structured filtering and license normalization
-├── runtime/             # gitignored: SQLite conversations + catalog snapshots
+├── runtime/             # gitignored: SQLite conversations, catalog + benchmark snapshots
 ├── tests/
 ├── .github/workflows/   # CI: Ruff + pytest on Python 3.11-3.14
 ├── AGENTS.md            # agent instructions and current project state
@@ -435,6 +505,7 @@ Once the server is running, interactive OpenAPI documentation is available at
 - [x] Add LangChain-based criteria extraction
 - [x] Add golden-query evaluation metrics
 - [x] Add Docker Compose packaging and GPU passthrough
+- [x] Add measured capability from approved benchmark sources (Epoch AI, optional Artificial Analysis)
 - [ ] Record a demo GIF
 
 ## Notes

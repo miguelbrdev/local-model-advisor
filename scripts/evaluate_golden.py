@@ -1,8 +1,11 @@
 """Run the golden-query suite against the local catalogue and report metrics.
 
 Offline by construction: the catalogue comes from ``runtime/catalog/`` or
-the committed bootstrap, and VRAM compatibility is the deterministic
-parameter-count heuristic, so two runs on the same snapshot always agree.
+the committed bootstrap, benchmark scores come from the committed
+``data/benchmarks_bootstrap.json`` only (never from ``runtime/``, whose
+optional Artificial Analysis data differs per operator), and VRAM
+compatibility is the deterministic parameter-count heuristic, so two runs
+on the same snapshots always agree.
 
 Exit codes: ``0`` every case passed (and, with ``--strict-snapshot``, the
 catalogue is the snapshot the suite was written for), ``1`` at least one
@@ -11,7 +14,8 @@ case failed, ``2`` the suite file is missing or invalid.
 Usage::
 
     python -m scripts.evaluate_golden [--suite FILE] [--catalog-dir DIR]
-        [--bootstrap-path FILE] [--json] [--strict-snapshot]
+        [--bootstrap-path FILE] [--benchmarks-path FILE | --no-benchmarks]
+        [--json] [--strict-snapshot]
 """
 
 from __future__ import annotations
@@ -24,6 +28,8 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
+from src.benchmarks.provider import BenchmarksLocales
+from src.benchmarks.snapshot import DEFAULT_BENCHMARKS_BOOTSTRAP_PATH
 from src.catalog.synced import DEFAULT_RUNTIME_CATALOG_DIR, CatalogoSincronizado
 from src.compatibility.heuristica import HeuristicaParametrosProvider
 from src.evaluation.golden import DEFAULT_SUITE_PATH, InformeGolden, cargar_suite, evaluar_suite
@@ -55,6 +61,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="Bootstrap fallback (default: data/catalog_bootstrap.json).",
     )
     parser.add_argument(
+        "--benchmarks-path", type=Path, default=DEFAULT_BENCHMARKS_BOOTSTRAP_PATH,
+        help="Benchmark snapshot to rank with (default: data/benchmarks_bootstrap.json).",
+    )
+    parser.add_argument(
+        "--no-benchmarks", action="store_true",
+        help="Evaluate with neutral capacidad_medida (no benchmark snapshot).",
+    )
+    parser.add_argument(
         "--json", action="store_true", help="Print the full report as JSON instead of text."
     )
     parser.add_argument(
@@ -78,8 +92,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     catalogo = CatalogoSincronizado(
         runtime_dir=args.catalog_dir, bootstrap_path=args.bootstrap_path
     )
+    benchmarks = (
+        None
+        if args.no_benchmarks
+        else BenchmarksLocales(
+            runtime_path=args.benchmarks_path, bootstrap_path=args.benchmarks_path
+        )
+    )
     informe = evaluar_suite(
-        suite, catalogo=catalogo, vram_provider=HeuristicaParametrosProvider()
+        suite,
+        catalogo=catalogo,
+        vram_provider=HeuristicaParametrosProvider(),
+        benchmarks=benchmarks,
     )
 
     if args.json:
@@ -89,7 +113,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     if informe.aprobados < informe.total:
         return EXIT_CASES_FAILED
-    if args.strict_snapshot and not informe.snapshot_coincide:
+    if args.strict_snapshot and not (informe.snapshot_coincide and informe.benchmarks_coinciden):
         return EXIT_CASES_FAILED
     return EXIT_OK
 
@@ -100,6 +124,9 @@ def formatear_informe(informe: InformeGolden) -> str:
         f"Golden suite {informe.version} (written for {informe.snapshot_id_suite}) "
         f"against catalogue {informe.snapshot_id_catalogo}"
         + ("" if informe.snapshot_coincide else "  [SNAPSHOT MISMATCH]"),
+        f"benchmarks: {informe.benchmarks_id_usado or 'none'} "
+        f"(suite written for {informe.benchmarks_id_suite or 'none'})"
+        + ("" if informe.benchmarks_coinciden else "  [BENCHMARKS MISMATCH]"),
         "",
     ]
     for r in informe.resultados:

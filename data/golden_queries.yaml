@@ -13,16 +13,22 @@
 # budget). 1.2.0 adds task-aware specialisation, recency (months behind the
 # newest model, zero at 24) and context window: a dedicated coder from 2024
 # no longer leads by default over a 2026 generalist of the same size, and
-# dedicated reasoning models lead reasoning queries.
+# dedicated reasoning models lead reasoning queries. 1.3.0 adds the measured
+# capability signal (capacidad_medida, weight 0.15) from the committed
+# Epoch AI benchmark bootstrap named below: among models of the same size
+# and generation, the one with a measured score leads the unmeasured ones,
+# and a 2024 7B model no longer has to appear in the top 8 of a 24 GB query.
 #
 # Run: python -m scripts.evaluate_golden
-version: "1.2.0"
+version: "1.3.0"
 snapshot_id: "snap-176d40242fd0157a"
+benchmarks_snapshot_id: "bench-6443d25354393222"
 descripcion: >
-  Suite written against the bootstrap snapshot. Covers the three v1 tasks,
-  VRAM budgets from 1 GB to 48 GB, the commercial-licence filter, the
-  empty-result case, the "no longer smallest-first" policy and the
-  recency/specialisation signals.
+  Suite written against the bootstrap snapshot and the Epoch-only benchmark
+  bootstrap. Covers the three v1 tasks, VRAM budgets from 1 GB to 48 GB, the
+  commercial-licence filter, the empty-result case, the "no longer
+  smallest-first" policy, the recency/specialisation signals and the
+  measured-capability signal.
 
 casos:
   - id: codigo-8gb
@@ -41,10 +47,14 @@ casos:
   - id: codigo-24gb-comercial
     descripcion: >
       Commercial use excludes Llama/GLM licences. The 24B and 30B Apache coders
-      fit comfortably and must rank in the top 8 together with the 7B coder.
+      fit comfortably and must rank in the top 8, as must qwen3.8-27b, the
+      Apache model with the highest measured capability (Epoch Capabilities
+      Index 152.7) that fits the budget. Since 1.3.0 the 2024 7B coder is no
+      longer required in the top 8: it uses a quarter of the budget and has no
+      measured score, so 2026 24B-30B models legitimately outrank it.
     criterios: {tarea: codigo, vram_gb: 24, requiere_licencia_comercial: true}
     top_n: 8
-    debe_incluir: [devstral-small-2-24b, qwen3-coder-30b, qwen2.5-coder-7b]
+    debe_incluir: [devstral-small-2-24b, qwen3-coder-30b, qwen3.8-27b]
     debe_excluir: [llama3.2-3b, llama3.1-8b, glm-4-9b, llama3.3-70b]
     min_candidatos: 10
 
@@ -72,10 +82,13 @@ casos:
   - id: chat-12gb-comercial
     descripcion: >
       Gemma, Llama and MRL licences are not permissive. Apache Qwen 14B (78 % of
-      the budget) and 8B must rank; the 0.6B model must not.
+      the budget, index 136.2) and its measured 2026 successor Qwen 3.5 9B
+      (index 139.3, GPQA 0.79) must rank; the 0.6B model must not. Since 1.3.0
+      the 2025 Qwen 3 8B is no longer required: its successor of the same size
+      scores higher on every signal, so it sits just outside the top 8.
     criterios: {tarea: chat, vram_gb: 12, requiere_licencia_comercial: true}
     top_n: 8
-    debe_incluir: [qwen3-14b, qwen3-8b]
+    debe_incluir: [qwen3-14b, qwen3.5-9b]
     debe_quedar_fuera_del_top: [qwen3-0.6b]
     debe_excluir: [gemma3-4b, gemma4-e2b-it, llama3.2-1b, ministral-8b]
     min_candidatos: 10
@@ -94,6 +107,21 @@ casos:
     debe_quedar_fuera_del_top: [deepseek-r1-1.5b]
     debe_excluir: [deepseek-r1-32b, deepseek-r1, qwen2.5-coder-7b]
     min_candidatos: 10
+
+  - id: razonamiento-24gb-medido
+    descripcion: >
+      Pins the measured-capability signal. Five 2026 models of 27B-30B fit a
+      24 GB budget with the same margin; two of them have Epoch scores
+      (qwen3.8-27b index 152.7, qwen3.6-27b GPQA 0.86 and index 146.7) and
+      the rest (north-mini-code, muse-glimmer, granite-4.1-30b, qwen3.5-27b)
+      have none. The measured pair must take the first two places, the
+      highest index first. The 671B R1 and the 235B MoE do not fit.
+    criterios: {tarea: razonamiento, vram_gb: 24}
+    top_n: 2
+    primero: qwen3.8-27b
+    debe_incluir: [qwen3.8-27b, qwen3.6-27b]
+    debe_excluir: [deepseek-r1, qwen3-235b-a22b, qwen2.5-coder-7b]
+    min_candidatos: 15
 
   - id: razonamiento-4gb
     descripcion: >

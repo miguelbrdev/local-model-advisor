@@ -1,0 +1,1027 @@
+{
+  "meta": {
+    "schema_version": "1.0",
+    "snapshot_id": "bench-6443d25354393222",
+    "fecha_sincronizacion": "2026-11-08T11:27:38.212605Z",
+    "hash_contenido": "6443d253543932225dcda67cfea5e9fe9869e0b36c9190f5977050d80b15246b",
+    "fuentes": [
+      {
+        "nombre": "epoch_ai",
+        "version": "2026-11-08",
+        "url": "https://epoch.ai/data/benchmark_data.zip",
+        "licencia": "CC BY 4.0",
+        "atribucion": "Benchmark scores and Capabilities Index: Epoch AI, \"Capabilities & benchmarking\", https://epoch.ai/benchmarks (CC BY 4.0).",
+        "redistribuible": true,
+        "registros": 587,
+        "descargado_en": "2026-11-08T11:27:36.494264Z"
+      }
+    ],
+    "mapeo_version": "1.0.0",
+    "mapeo_snapshot_id": "snap-176d40242fd0157a",
+    "familias_mapeadas": 91,
+    "familias_con_datos": 45,
+    "sin_coincidencia": []
+  },
+  "puntuaciones": {
+    "llama3.2-1b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.2393,
+        "valor_normalizado": 0.0,
+        "modelo_fuente": "Llama-3.2-1B-Instruct",
+        "fecha_modelo": "2024-09-24",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      }
+    ],
+    "gemma3-1b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.1995,
+        "valor_normalizado": 0.0,
+        "modelo_fuente": "gemma-3-1b-it",
+        "fecha_modelo": "2025-03-12",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      }
+    ],
+    "qwen2.5-coder-1.5b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 89.57,
+        "valor_normalizado": 0.0,
+        "modelo_fuente": "Qwen2.5-Coder (1.5B)",
+        "fecha_modelo": "2024-09-18",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "deepseek-r1-1.5b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.3359,
+        "valor_normalizado": 0.1192,
+        "modelo_fuente": "DeepSeek-R1-Distill-Qwen-1.5B",
+        "fecha_modelo": "2025-01-20",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      }
+    ],
+    "qwen3-1.7b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.3801,
+        "valor_normalizado": 0.1806,
+        "modelo_fuente": "qwen3-1.7b",
+        "fecha_modelo": "2025-04-29",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      }
+    ],
+    "gemma3-4b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.2323,
+        "valor_normalizado": 0.0,
+        "modelo_fuente": "gemma-3-4b-it",
+        "fecha_modelo": "2025-03-12",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      }
+    ],
+    "qwen2.5-coder-7b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 107.93,
+        "valor_normalizado": 0.1322,
+        "modelo_fuente": "Qwen2.5-Coder (7B)",
+        "fecha_modelo": "2024-09-18",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "llama3.1-8b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.2696,
+        "valor_normalizado": 0.0272,
+        "modelo_fuente": "Llama-3.1-8B-Instruct",
+        "fecha_modelo": "2024-07-23",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "math_level_5",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.2288,
+        "valor_normalizado": 0.2288,
+        "modelo_fuente": "Llama-3.1-8B-Instruct",
+        "fecha_modelo": "2024-07-23",
+        "nota": "Anchored on random baseline 0 and ceiling 1."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 111.34,
+        "valor_normalizado": 0.189,
+        "modelo_fuente": "Llama 3.1-8B",
+        "fecha_modelo": "2024-07-23",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "qwen3-8b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.5676,
+        "valor_normalizado": 0.441,
+        "modelo_fuente": "qwen3-8b",
+        "fecha_modelo": "2025-04-28",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 132.2,
+        "valor_normalizado": 0.5367,
+        "modelo_fuente": "Qwen3-8B",
+        "fecha_modelo": "2025-04-28",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "ministral-8b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.2715,
+        "valor_normalizado": 0.0298,
+        "modelo_fuente": "ministral-8b-2410",
+        "fecha_modelo": "2024-10-16",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "math_level_5",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.1494,
+        "valor_normalizado": 0.1494,
+        "modelo_fuente": "ministral-8b-2410",
+        "fecha_modelo": "2024-10-16",
+        "nota": "Anchored on random baseline 0 and ceiling 1."
+      }
+    ],
+    "qwen3.5-9b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.7898,
+        "valor_normalizado": 0.7497,
+        "modelo_fuente": "qwen3.5-9B",
+        "fecha_modelo": "2026-02-24",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 139.33,
+        "valor_normalizado": 0.6555,
+        "modelo_fuente": "Qwen3.5-9B",
+        "fecha_modelo": "2026-02-24",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "gemma3-12b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.3946,
+        "valor_normalizado": 0.2008,
+        "modelo_fuente": "gemma-3-12b-it",
+        "fecha_modelo": "2025-03-12",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      }
+    ],
+    "mistral-nemo-12b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.2989,
+        "valor_normalizado": 0.068,
+        "modelo_fuente": "open-mistral-nemo-2407",
+        "fecha_modelo": "2024-07-18",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "math_level_5",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.1083,
+        "valor_normalizado": 0.1083,
+        "modelo_fuente": "open-mistral-nemo-2407",
+        "fecha_modelo": "2024-07-18",
+        "nota": "Anchored on random baseline 0 and ceiling 1."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 114.06,
+        "valor_normalizado": 0.2343,
+        "modelo_fuente": "Mistral NeMo",
+        "fecha_modelo": "2024-07-18",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "phi-4-14b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.5606,
+        "valor_normalizado": 0.4314,
+        "modelo_fuente": "phi-4",
+        "fecha_modelo": "2024-12-12",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "math_level_5",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.6494,
+        "valor_normalizado": 0.6494,
+        "modelo_fuente": "phi-4",
+        "fecha_modelo": "2024-12-12",
+        "nota": "Anchored on random baseline 0 and ceiling 1."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 129.19,
+        "valor_normalizado": 0.4865,
+        "modelo_fuente": "Phi-4",
+        "fecha_modelo": "2024-12-12",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "qwen3-14b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.6376,
+        "valor_normalizado": 0.5384,
+        "modelo_fuente": "qwen3-14b",
+        "fecha_modelo": "2025-04-29",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 136.2,
+        "valor_normalizado": 0.6033,
+        "modelo_fuente": "Qwen3-14B",
+        "fecha_modelo": "2025-04-29",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "deepseek-r1-14b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.447,
+        "valor_normalizado": 0.2736,
+        "modelo_fuente": "DeepSeek-R1-Distill-Qwen-14B",
+        "fecha_modelo": "2025-01-20",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "math_level_5",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.8712,
+        "valor_normalizado": 0.8712,
+        "modelo_fuente": "DeepSeek-R1-Distill-Qwen-14B",
+        "fecha_modelo": "2025-01-20",
+        "nota": "Anchored on random baseline 0 and ceiling 1."
+      }
+    ],
+    "llama4-scout-17b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.5183,
+        "valor_normalizado": 0.3727,
+        "modelo_fuente": "Llama-4-Scout-17B-16E-Instruct",
+        "fecha_modelo": "2025-04-05",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "math_level_5",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.6227,
+        "valor_normalizado": 0.6227,
+        "modelo_fuente": "Llama-4-Scout-17B-16E-Instruct",
+        "fecha_modelo": "2025-04-05",
+        "nota": "Anchored on random baseline 0 and ceiling 1."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 127.78,
+        "valor_normalizado": 0.463,
+        "modelo_fuente": "Llama 4 Scout",
+        "fecha_modelo": "2025-04-05",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "gpt-oss-20b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.4596,
+        "valor_normalizado": 0.2911,
+        "modelo_fuente": "gpt-oss-20b_high",
+        "fecha_modelo": "2025-08-05",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 135.01,
+        "valor_normalizado": 0.5835,
+        "modelo_fuente": "gpt-oss-20b",
+        "fecha_modelo": "2025-08-05",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "mistral-small-24b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.4192,
+        "valor_normalizado": 0.235,
+        "modelo_fuente": "mistral-small-3.1-2503",
+        "fecha_modelo": "2025-03-17",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      }
+    ],
+    "gemma4-26b-a4b-it": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.7323,
+        "valor_normalizado": 0.6699,
+        "modelo_fuente": "gemma-4-26b-a4b-it_minimal",
+        "fecha_modelo": "2026-04-02",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 141.69,
+        "valor_normalizado": 0.6948,
+        "modelo_fuente": "Gemma 4 26B A4B",
+        "fecha_modelo": "2026-04-02",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "gemma4-31b-it": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.7576,
+        "valor_normalizado": 0.705,
+        "modelo_fuente": "gemma-4-31b-it_minimal",
+        "fecha_modelo": "2026-04-02",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 144.24,
+        "valor_normalizado": 0.7373,
+        "modelo_fuente": "Gemma 4 31B IT",
+        "fecha_modelo": "2026-04-02",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "qwen3-30b-a3b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.6168,
+        "valor_normalizado": 0.5094,
+        "modelo_fuente": "Qwen3-30B-A3B",
+        "fecha_modelo": "2025-04-29",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 134.26,
+        "valor_normalizado": 0.571,
+        "modelo_fuente": "Qwen3-30B-A3B",
+        "fecha_modelo": "2025-04-29",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "qwen3-32b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.6572,
+        "valor_normalizado": 0.5656,
+        "modelo_fuente": "Qwen3-32B",
+        "fecha_modelo": "2025-04-29",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 136.94,
+        "valor_normalizado": 0.6157,
+        "modelo_fuente": "Qwen3-32B",
+        "fecha_modelo": "2025-04-29",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "deepseek-r1-32b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.6414,
+        "valor_normalizado": 0.5436,
+        "modelo_fuente": "DeepSeek-R1-Distill-Qwen-32B",
+        "fecha_modelo": "2025-01-20",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      }
+    ],
+    "qwen3.5-35b-a3b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.8346,
+        "valor_normalizado": 0.8119,
+        "modelo_fuente": "qwen3.5-35b-a3b",
+        "fecha_modelo": "2026-02-24",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 143.93,
+        "valor_normalizado": 0.7322,
+        "modelo_fuente": "Qwen3.5-35B-A3B",
+        "fecha_modelo": "2026-02-24",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "mixtral-8x7b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.3059,
+        "valor_normalizado": 0.0776,
+        "modelo_fuente": "Mixtral-8x7B-Instruct-v0.1",
+        "fecha_modelo": "2023-12-11",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "math_level_5",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.0929,
+        "valor_normalizado": 0.0929,
+        "modelo_fuente": "Mixtral-8x7B-Instruct-v0.1",
+        "fecha_modelo": "2023-12-11",
+        "nota": "Anchored on random baseline 0 and ceiling 1."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 113.41,
+        "valor_normalizado": 0.2235,
+        "modelo_fuente": "Mixtral 8x7B",
+        "fecha_modelo": "2023-12-11",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "llama3.3-70b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.4744,
+        "valor_normalizado": 0.3117,
+        "modelo_fuente": "Llama-3.3-70B-Instruct",
+        "fecha_modelo": "2024-12-06",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "math_level_5",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.416,
+        "valor_normalizado": 0.416,
+        "modelo_fuente": "Llama-3.3-70B-Instruct",
+        "fecha_modelo": "2024-12-06",
+        "nota": "Anchored on random baseline 0 and ceiling 1."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 126.19,
+        "valor_normalizado": 0.4365,
+        "modelo_fuente": "Llama 3.3 70B",
+        "fecha_modelo": "2024-12-06",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "gpt-oss-120b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.7576,
+        "valor_normalizado": 0.705,
+        "modelo_fuente": "openai/gpt-oss-120b_high",
+        "fecha_modelo": "2025-08-05",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 140.22,
+        "valor_normalizado": 0.6703,
+        "modelo_fuente": "gpt-oss-120b",
+        "fecha_modelo": "2025-08-05",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "llama4-maverick-17b-128e": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.6698,
+        "valor_normalizado": 0.5831,
+        "modelo_fuente": "Llama-4-Maverick-17B-128E-Instruct-FP8",
+        "fecha_modelo": "2025-04-05",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "math_level_5",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.7302,
+        "valor_normalizado": 0.7302,
+        "modelo_fuente": "Llama-4-Maverick-17B-128E-Instruct-FP8",
+        "fecha_modelo": "2025-04-05",
+        "nota": "Anchored on random baseline 0 and ceiling 1."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 132.13,
+        "valor_normalizado": 0.5355,
+        "modelo_fuente": "Llama 4 Maverick",
+        "fecha_modelo": "2025-04-06",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "qwen3-235b-a22b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.7071,
+        "valor_normalizado": 0.6348,
+        "modelo_fuente": "qwen3-235b-a22b",
+        "fecha_modelo": "2025-04-29",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "math_level_5",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.6886,
+        "valor_normalizado": 0.6886,
+        "modelo_fuente": "qwen3-235b-a22b",
+        "fecha_modelo": "2025-04-29",
+        "nota": "Anchored on random baseline 0 and ceiling 1."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 138.44,
+        "valor_normalizado": 0.6407,
+        "modelo_fuente": "Qwen3-235B-A22B",
+        "fecha_modelo": "2025-04-28",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "qwen3.5-397b-a17b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.8586,
+        "valor_normalizado": 0.8453,
+        "modelo_fuente": "qwen3.5-397b-a17b",
+        "fecha_modelo": "2026-02-13",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 147.87,
+        "valor_normalizado": 0.7978,
+        "modelo_fuente": "Qwen3.5 397B-A17B",
+        "fecha_modelo": "2026-02-13",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "deepseek-r1": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.7172,
+        "valor_normalizado": 0.6488,
+        "modelo_fuente": "DeepSeek-R1",
+        "fecha_modelo": "2025-01-20",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "math_level_5",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.9305,
+        "valor_normalizado": 0.9305,
+        "modelo_fuente": "DeepSeek-R1",
+        "fecha_modelo": "2025-01-20",
+        "nota": "Anchored on random baseline 0 and ceiling 1."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 138.62,
+        "valor_normalizado": 0.6437,
+        "modelo_fuente": "DeepSeek-R1",
+        "fecha_modelo": "2025-01-20",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "deepseek-v3.2": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 146.22,
+        "valor_normalizado": 0.7703,
+        "modelo_fuente": "DeepSeek-V3.2",
+        "fecha_modelo": "2025-12-01",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "qwen3.6-27b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.8586,
+        "valor_normalizado": 0.8453,
+        "modelo_fuente": "qwen3.6-27b",
+        "fecha_modelo": "2026-04-22",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 146.71,
+        "valor_normalizado": 0.7785,
+        "modelo_fuente": "Qwen3.6 27B",
+        "fecha_modelo": "2026-04-22",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "qwen3.6-35b-a3b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.8384,
+        "valor_normalizado": 0.8172,
+        "modelo_fuente": "qwen3.6-35b-a3b",
+        "fecha_modelo": "2026-04-14",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 144.0,
+        "valor_normalizado": 0.7333,
+        "modelo_fuente": "Qwen 3.6 35B-A3B",
+        "fecha_modelo": "2026-04-14",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "glm-5": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.8782,
+        "valor_normalizado": 0.8725,
+        "modelo_fuente": "glm-5",
+        "fecha_modelo": "2026-02-11",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "swe_bench_verified",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.7208,
+        "valor_normalizado": 0.7208,
+        "modelo_fuente": "glm-5",
+        "fecha_modelo": "2026-02-11",
+        "nota": "Anchored on random baseline 0 and ceiling 1."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 146.43,
+        "valor_normalizado": 0.7738,
+        "modelo_fuente": "GLM-5",
+        "fecha_modelo": "2026-02-11",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "glm-5.1": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.899,
+        "valor_normalizado": 0.9014,
+        "modelo_fuente": "glm-5.1",
+        "fecha_modelo": "2026-04-07",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "swe_bench_verified",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.7417,
+        "valor_normalizado": 0.7417,
+        "modelo_fuente": "glm-5.1",
+        "fecha_modelo": "2026-04-07",
+        "nota": "Anchored on random baseline 0 and ceiling 1."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 150.67,
+        "valor_normalizado": 0.8445,
+        "modelo_fuente": "GLM-5.1",
+        "fecha_modelo": "2026-04-07",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "glm-5.2": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.9186,
+        "valor_normalizado": 0.9286,
+        "modelo_fuente": "glm-5.2_max",
+        "fecha_modelo": "2026-06-16",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "swe_bench_verified",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.787,
+        "valor_normalizado": 0.787,
+        "modelo_fuente": "glm-5.2_max",
+        "fecha_modelo": "2026-06-16",
+        "nota": "Anchored on random baseline 0 and ceiling 1."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 152.99,
+        "valor_normalizado": 0.8832,
+        "modelo_fuente": "GLM-5.2",
+        "fecha_modelo": "2026-06-16",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "glm-5.3": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.9091,
+        "valor_normalizado": 0.9154,
+        "modelo_fuente": "glm-5.3_max",
+        "fecha_modelo": "2026-08-14",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 156.91,
+        "valor_normalizado": 0.9485,
+        "modelo_fuente": "GLM-5.3",
+        "fecha_modelo": "2026-08-14",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "deepseek-v4-flash": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 146.86,
+        "valor_normalizado": 0.781,
+        "modelo_fuente": "DeepSeek-V4-Flash",
+        "fecha_modelo": "2026-04-24",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "deepseek-v4-pro": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.8965,
+        "valor_normalizado": 0.8979,
+        "modelo_fuente": "deepseek-v4-pro_max",
+        "fecha_modelo": "2026-04-24",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "swe_bench_verified",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.7764,
+        "valor_normalizado": 0.7764,
+        "modelo_fuente": "deepseek-v4-pro_max",
+        "fecha_modelo": "2026-04-24",
+        "nota": "Anchored on random baseline 0 and ceiling 1."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 150.13,
+        "valor_normalizado": 0.8355,
+        "modelo_fuente": "DeepSeek-V4-Pro",
+        "fecha_modelo": "2026-04-24",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "kimi-k2.6": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.9078,
+        "valor_normalizado": 0.9137,
+        "modelo_fuente": "kimi-k2.6",
+        "fecha_modelo": "2026-04-20",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "swe_bench_verified",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.7665,
+        "valor_normalizado": 0.7665,
+        "modelo_fuente": "kimi-k2.6",
+        "fecha_modelo": "2026-04-20",
+        "nota": "Anchored on random baseline 0 and ceiling 1."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 151.56,
+        "valor_normalizado": 0.8593,
+        "modelo_fuente": "Kimi K2.6",
+        "fecha_modelo": "2026-04-20",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "kimi-k3": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.9312,
+        "valor_normalizado": 0.9461,
+        "modelo_fuente": "kimi-k3_max",
+        "fecha_modelo": "2026-07-16",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 158.51,
+        "valor_normalizado": 0.9752,
+        "modelo_fuente": "Kimi K3",
+        "fecha_modelo": "2026-07-16",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "qwen3.8-27b": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 152.73,
+        "valor_normalizado": 0.8788,
+        "modelo_fuente": "Qwen 3.8 27B",
+        "fecha_modelo": "2026-08-14",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ],
+    "minimax-m3": [
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "gpqa_diamond",
+        "metrica": "Best score (across scorers)",
+        "valor": 0.9091,
+        "valor_normalizado": 0.9154,
+        "modelo_fuente": "MiniMax-M3",
+        "fecha_modelo": "2026-06-01",
+        "nota": "Anchored on random baseline 0.25 and ceiling 0.97."
+      },
+      {
+        "fuente": "epoch_ai",
+        "benchmark": "eci",
+        "metrica": "eci",
+        "valor": 147.6,
+        "valor_normalizado": 0.7933,
+        "modelo_fuente": "MiniMax-M3",
+        "fecha_modelo": "2026-06-01",
+        "nota": "Epoch Capabilities Index, anchored on 100-160."
+      }
+    ]
+  }
+}

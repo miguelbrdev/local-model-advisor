@@ -38,6 +38,7 @@ from uuid import UUID, uuid4
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, Response, status
 
 from src.api.limites import RATE_LIMIT_POR_DEFECTO, LimitadorTasa, api_key_valida
+from src.benchmarks.provider import BenchmarksLocales, ProveedorBenchmarks
 from src.catalog.synced import CatalogoSincronizado
 from src.chains.extraccion_criterios import (
     DEFAULT_OLLAMA_BASE_URL,
@@ -102,16 +103,16 @@ def pregunta_aclaracion(criterios: CriteriosBusqueda, faltantes: list[str]) -> s
     pedidos = " y ".join(ETIQUETAS_CAMPOS.get(campo, campo) for campo in faltantes)
     return f"{prefijo}Falta indicar {pedidos}."
 
-LIMITACIONES_BASE = [
-    "Benchmark evidence not yet available (OpenEvals pending).",
-]
-"""Limitations that apply to every recommendation today."""
+LIMITACIONES_BASE: list[str] = []
+"""Limitations that apply to every recommendation today (none fixed: each
+line below is tied to a concrete condition of this request or deployment)."""
 
 
 def limitaciones_para(
     criterios: CriteriosBusqueda,
     candidatos: list[CandidatoRankeado] | None = None,
     evidencia: ResultadoEnriquecimiento | None = None,
+    benchmarks: ProveedorBenchmarks | None = None,
 ) -> list[str]:
     """Limitations to report for *this* request.
 
@@ -126,9 +127,25 @@ def limitaciones_para(
     results are never confused.  ``evidencia`` describes the explanatory
     evidence lookup: ``None`` means it is disabled, an error means the
     index was unreachable, and candidates without fragments (gated or
-    unindexed documentation) are counted.
+    unindexed documentation) are counted.  ``benchmarks`` is the mounted
+    benchmark provider: without a snapshot every candidate scores the
+    neutral ``capacidad_medida``; with one, candidates that have no
+    reviewed mapping entry (or no data in the sources) are counted.
     """
     limitaciones = list(LIMITACIONES_BASE)
+    if benchmarks is None or benchmarks.snapshot_id is None:
+        limitaciones.append(
+            "No benchmark snapshot loaded (run python -m scripts.sync_benchmarks); "
+            "capacidad_medida is neutral for every candidate."
+        )
+    elif candidatos:
+        sin_benchmark = sum(1 for c in candidatos if not c.evidencia_benchmark)
+        if sin_benchmark:
+            limitaciones.append(
+                f"{sin_benchmark} of {len(candidatos)} candidates have no benchmark data in "
+                "the approved sources (neutral capacidad_medida); see evidencia_benchmark "
+                "per candidate."
+            )
     dias = dias_desde(getattr(app.state, "catalogo", None))
     if dias is not None and dias > DIAS_OBSOLESCENCIA_CATALOGO:
         limitaciones.append(
@@ -243,6 +260,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     backs every conversation, and constructing a catalogue per request
     would re-read disk and forfeit that guarantee.
 
+    The benchmark snapshot (``app.state.benchmarks``) is resolved the same
+    way but its absence never aborts: it is a quality signal, reported as
+    a limitation when missing.
+
     The extractor (``app.state.extractor``) is built from the environment;
     an unreachable Ollama does not block startup because structured JSON
     input keeps working without it.
@@ -258,6 +279,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     catalogo = CatalogoSincronizado()
     catalogo.cargar()  # resolve + memoize now, or raise and abort boot
     app.state.catalogo = catalogo
+    benchmarks = BenchmarksLocales()
+    # Resolve + memoize now; absence is a limitation, not a boot fault.
+    logger.info("Benchmark snapshot mounted: %s", benchmarks.snapshot_id)
+    app.state.benchmarks = benchmarks
     app.state.extractor = construir_extractor()
     app.state.evidencia = construir_buscador_evidencia()
     app.state.limitador = LimitadorTasa(
@@ -325,12 +350,15 @@ def health() -> dict:
     """Liveness plus what this process is serving with.
 
     ``status`` stays ``"ok"`` for existing probes; the other keys say which
-    catalogue snapshot is mounted and whether free-text input and
-    explanatory evidence are enabled (not whether their backends are up:
-    that is only known per request and reported in ``limitaciones``).
+    catalogue snapshot is mounted, which benchmark snapshot and sources
+    back ``capacidad_medida`` (``None``/empty when no snapshot is loaded),
+    and whether free-text input and explanatory evidence are enabled (not
+    whether their backends are up: that is only known per request and
+    reported in ``limitaciones``).
     """
     catalogo = getattr(app.state, "catalogo", None)
     extractor = getattr(app.state, "extractor", None)
+    benchmarks = getattr(app.state, "benchmarks", None)
     fecha = catalogo.fecha_sincronizacion if catalogo is not None else None
     dias = dias_desde(catalogo)
     return {
@@ -341,6 +369,8 @@ def health() -> dict:
         "catalogo_obsoleto": dias is not None and dias > DIAS_OBSOLESCENCIA_CATALOGO,
         "texto_libre": bool(extractor is not None and extractor.acepta_texto_libre),
         "evidencia": getattr(app.state, "evidencia", None) is not None,
+        "benchmarks_snapshot_id": getattr(benchmarks, "snapshot_id", None),
+        "benchmarks_fuentes": getattr(benchmarks, "fuentes", []),
         "modelos_listos": getattr(app.state, "modelos_listos", None),
         "api_key_requerida": bool(getattr(app.state, "api_key", None)),
     }
@@ -403,7 +433,10 @@ def chat(peticion: PeticionChat) -> RespuestaChat:
             campo_faltante=faltantes[0],
         )
     else:
-        candidatos = ejecutar_pipeline(criterios, catalogo=catalogo, top_n=TOP_N_RECOMENDACIONES)
+        benchmarks: ProveedorBenchmarks = app.state.benchmarks
+        candidatos = ejecutar_pipeline(
+            criterios, catalogo=catalogo, top_n=TOP_N_RECOMENDACIONES, benchmarks=benchmarks
+        )
         buscador: BuscadorEvidencia | None = app.state.evidencia
         evidencia = None
         if buscador is not None:
@@ -415,7 +448,8 @@ def chat(peticion: PeticionChat) -> RespuestaChat:
             conversation_id=conversation_id,
             criterios_interpretados=criterios,
             candidatos=candidatos,
-            limitaciones=limitaciones_para(criterios, candidatos, evidencia),
+            limitaciones=limitaciones_para(criterios, candidatos, evidencia, benchmarks),
+            atribuciones=benchmarks.atribuciones,
             datos_actualizados_hace=describir_antiguedad(catalogo.fecha_sincronizacion),
         )
 

@@ -1,10 +1,15 @@
-"""Pipeline orchestrator: load catalogue → filter → VRAM check → score → top N.
+"""Pipeline orchestrator: load → filter → VRAM check → benchmarks → score → top N.
 
-No Qdrant, no reranking, no LLM — purely deterministic.
+No Qdrant, no reranking, no LLM — purely deterministic.  Benchmark scores
+are structured data from the approved snapshot, attached to each eligible
+candidate *before* scoring because they are ranking evidence (unlike the
+explanatory README fragments, which are added after ranking and never
+score).
 """
 
 from __future__ import annotations
 
+from src.benchmarks.provider import ProveedorBenchmarks
 from src.catalog.protocol import CatalogoModelos
 from src.compatibility.provider import VRAMCompatibilityProvider, elegir_provider
 from src.models.schemas import CandidatoRankeado, CriteriosBusqueda, FamiliaModelo
@@ -24,6 +29,7 @@ def ejecutar_pipeline(
     catalogo: CatalogoModelos,
     top_n: int = 3,
     vram_provider: VRAMCompatibilityProvider | None = None,
+    benchmarks: ProveedorBenchmarks | None = None,
 ) -> list[CandidatoRankeado]:
     """Run the full load → filter → score → rank pipeline.
 
@@ -42,6 +48,9 @@ def ejecutar_pipeline(
         vram_provider: Compatibility oracle.  ``None`` (production) routes
             by task through :func:`elegir_provider`; the golden-query
             evaluation injects a deterministic offline heuristic instead.
+        benchmarks: Measured scores per ``canirun_id``.  ``None`` leaves
+            ``evidencia_benchmark`` empty, so ``capacidad_medida`` is
+            neutral for every candidate.
 
     Raises:
         ValueError: If ``top_n`` is negative.
@@ -62,6 +71,12 @@ def ejecutar_pipeline(
     provider = vram_provider or elegir_provider(criterios.tarea or "codigo")
 
     candidatos = filtrar_candidatos(familias, criterios, provider)
+    if benchmarks is not None:
+        for candidato in candidatos:
+            canirun_id = candidato.familia.canirun_id
+            candidato.evidencia_benchmark = (
+                benchmarks.puntuaciones_de(canirun_id) if canirun_id else []
+            )
     fecha_referencia = fecha_mas_reciente(familias)
     for candidato in candidatos:
         calcular_puntuacion(

@@ -12,9 +12,10 @@ pipeline (filter + scorer).  It therefore requires a deterministic
 compatibility oracle — in practice
 :class:`src.compatibility.heuristica.HeuristicaParametrosProvider` — and
 **does not** exercise the real canirun.ai answers.  A suite is written
-against one ``snapshot_id``; running it against another catalogue is
-allowed but flagged in the report, because expectations may legitimately
-differ when the catalogue changes.
+against one catalogue ``snapshot_id`` and, since 1.3.0, one benchmark
+snapshot (``benchmarks_snapshot_id``, the committed Epoch-only bootstrap);
+running it against other data is allowed but flagged in the report,
+because expectations may legitimately differ when the data changes.
 
 Metrics reported:
 
@@ -34,6 +35,7 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, Field, model_validator
 
+from src.benchmarks.provider import ProveedorBenchmarks
 from src.catalog.protocol import CatalogoModelos
 from src.chains.recommend_pipeline import ejecutar_pipeline
 from src.compatibility.provider import VRAMCompatibilityProvider
@@ -100,10 +102,12 @@ class CasoGolden(BaseModel):
 
 
 class SuiteGolden(BaseModel):
-    """Versioned set of golden cases written against one catalogue snapshot."""
+    """Versioned set of golden cases written against one catalogue snapshot
+    and (optionally) one benchmark snapshot."""
 
     version: str = Field(min_length=1)
     snapshot_id: str = Field(min_length=1)
+    benchmarks_snapshot_id: str | None = None
     descripcion: str = ""
     casos: list[CasoGolden] = Field(min_length=1)
 
@@ -138,6 +142,9 @@ class InformeGolden(BaseModel):
     snapshot_id_suite: str
     snapshot_id_catalogo: str | None
     snapshot_coincide: bool
+    benchmarks_id_suite: str | None = None
+    benchmarks_id_usado: str | None = None
+    benchmarks_coinciden: bool = True
     total: int
     aprobados: int
     tasa_aprobacion: float
@@ -167,6 +174,7 @@ def evaluar_suite(
     *,
     catalogo: CatalogoModelos,
     vram_provider: VRAMCompatibilityProvider,
+    benchmarks: ProveedorBenchmarks | None = None,
 ) -> InformeGolden:
     """Run every case of ``suite`` through the pipeline and aggregate metrics.
 
@@ -177,13 +185,21 @@ def evaluar_suite(
             treated as an error here.
         vram_provider: Must be deterministic and offline for results to be
             reproducible; callers are expected to pass the heuristic.
+        benchmarks: Benchmark scores injected into the pipeline; ``None``
+            evaluates with neutral ``capacidad_medida``.  Its snapshot id
+            is compared with the suite's ``benchmarks_snapshot_id`` and a
+            mismatch is reported the same way.
 
     Returns:
         The :class:`InformeGolden` with one :class:`ResultadoCaso` per case,
         in suite order.
     """
-    resultados = [evaluar_caso(caso, catalogo=catalogo, vram_provider=vram_provider)
-                  for caso in suite.casos]
+    resultados = [
+        evaluar_caso(
+            caso, catalogo=catalogo, vram_provider=vram_provider, benchmarks=benchmarks
+        )
+        for caso in suite.casos
+    ]
 
     incluidos_esperados = sum(r.incluidos_esperados for r in resultados)
     incluidos_encontrados = sum(r.incluidos_encontrados for r in resultados)
@@ -192,12 +208,16 @@ def evaluar_suite(
     con_primero = [r for r in resultados if r.primero_ok is not None]
     aprobados = sum(r.aprobado for r in resultados)
     snapshot_catalogo = catalogo.snapshot_id
+    benchmarks_usado = benchmarks.snapshot_id if benchmarks is not None else None
 
     return InformeGolden(
         version=suite.version,
         snapshot_id_suite=suite.snapshot_id,
         snapshot_id_catalogo=snapshot_catalogo,
         snapshot_coincide=snapshot_catalogo == suite.snapshot_id,
+        benchmarks_id_suite=suite.benchmarks_snapshot_id,
+        benchmarks_id_usado=benchmarks_usado,
+        benchmarks_coinciden=benchmarks_usado == suite.benchmarks_snapshot_id,
         total=len(resultados),
         aprobados=aprobados,
         tasa_aprobacion=aprobados / len(resultados),
@@ -214,6 +234,7 @@ def evaluar_caso(
     *,
     catalogo: CatalogoModelos,
     vram_provider: VRAMCompatibilityProvider,
+    benchmarks: ProveedorBenchmarks | None = None,
 ) -> ResultadoCaso:
     """Evaluate one case against the full ranking.
 
@@ -226,6 +247,7 @@ def evaluar_caso(
         catalogo=catalogo,
         top_n=_TODOS_LOS_CANDIDATOS,
         vram_provider=vram_provider,
+        benchmarks=benchmarks,
     )
     todos = [c.familia.familia_id for c in ranking]
     top = todos[: caso.top_n]

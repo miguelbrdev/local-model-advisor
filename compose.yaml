@@ -3,6 +3,8 @@
 #   docker compose up --build            # API on :8000, Ollama on :11434 (CPU)
 #   docker compose -f compose.yaml -f compose.gpu.yaml up --build   # NVIDIA GPU
 #   docker compose run --rm sync         # one catalogue synchronisation cycle
+#   docker compose run --rm sync-benchmarks   # benchmark scores (Epoch AI; + Artificial
+#                                             # Analysis when ARTIFICIAL_ANALYSIS_API_KEY is in .env)
 #   docker compose run --rm index        # fetch READMEs + index them in Qdrant
 #   docker compose run --rm index python -m scripts.index_docs --skip-fetch   # re-index only
 #
@@ -69,6 +71,16 @@ services:
     build: .
     profiles: ["sync"]
     command: ["python", "-m", "scripts.sync_catalog"]
+    volumes:
+      - runtime:/app/runtime
+
+  sync-benchmarks:
+    build: .
+    profiles: ["sync-benchmarks"]
+    environment:
+      # Optional: without it only Epoch AI (public, CC BY 4.0) is used.
+      ARTIFICIAL_ANALYSIS_API_KEY: ${ARTIFICIAL_ANALYSIS_API_KEY:-}
+    command: ["python", "-m", "scripts.sync_benchmarks"]
     volumes:
       - runtime:/app/runtime
 
